@@ -1,3 +1,6 @@
+# MongoDB Data Folder
+data
+
 # Logs
 logs
 *.log
