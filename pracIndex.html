@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Inventory Helper Practice</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="Container">
+        <h1>Inventory Helper <small>practice version</small></h1>
+        <hr />
+        <div class="Container viewOne">
+            <!-- Main View Template -->
+            <form class="form-inline">
+                <table class="table striped">
+                    <thead>
+                        <tr>
+                            <td>Coffee</td>
+                            <td>Green</td>
+                            <td>Roasted</td>
+                            <td>Total</td>
+                        </tr>
+                    </thead>
+                    <tbody class="viewModels" data-bind="collection:$collection">
+                    </tbody>
+                    <tbody>
+                         <tr>
+                            <td>Total:</td>
+                            <td><span class="totalGreen">0.00</span></td>
+                            <td><span class="totalRoasted">0.00</span></td>
+                            <td><span class="total">0.00</span></td>
+                        </tr>   
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+    
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+    <script src="//cdn.jsdelivr.net/backbone.epoxy/1.2/backbone.epoxy.min.js"></script>
+    
+    <!-- Calculator Template -->
+    
+    <script type="text/template" id="calcTemplate">
+        
+    </script>
+    
+    <!-- Main MVC Script -->
+    
+    <script>
+    var Router = Backbone.Router.extend({
+        routes: {
+            '': 'home'
+        }
+    });
+        
+    var router = new Router();
+    router.on('route:home', function() {
+        console.log("We have loaded the homepage!");
+    }); 
+    
+    Backbone.history.start();
+    
+    var Coffee = Backbone.Model.extend({
+        defaults: {
+            name: "New Coffee",
+            origin: "Origin",
+            greenWeight: "0.00",
+            roastedWeight: "0.00",
+            totalWeight: "0.00"
+        },
+        initialize: function() {
+            console.log("New coffee model created: " + this.get("name"));
+            this.on("change", function(model) {
+               var changedTotal = parseFloat(model.get("greenWeight")) + parseFloat(model.get("roastedWeight"));
+               model.set("totalWeight", changedTotal.toFixed(2));
+            });
+        }
+    });
+    
+    //establish data source for coffee collection
+    var Coffees = Backbone.Collection.extend({
+        url: '//c9.io/beaudavenport/apipractice/workspace/pracjsonfactory.js',
+        model: Coffee
+    });
+    
+   
+    //epoxy item view for each coffee model
+    var coffeeItemView = Backbone.Epoxy.View.extend({
+        tagName: "tr",
+        
+        bindings: {
+            "input.green": "value:greenWeight,events:['keyup']",
+            "input.roasted": "value:roastedWeight,events:['keyup']",
+            "span.rowTotal": "text:totalWeight,events:['keyup']"
+        },
+        
+        initialize: function() {
+            var name = this.model.get("name");
+            var output = "<td>" + name + "</td>" +
+                "<td><input type='text' class='green'/><button class='btn calculate'>Calculate</button></td>" +
+                "<td><input type='text' class='roasted'/><button class='btn calcuate'>Calculate</button></td>" +
+                "<td><span class='rowTotal'></span></td>";
+            this.$el.append(output);
+            console.log("Row Added.");
+        }
+    });
+    
+    //epoxy collection view for all coffee models
+    var CoffeeList = Backbone.Epoxy.View.extend({
+        
+        el: "tbody.viewModels",
+        
+        collection: new Coffees(),
+        
+        itemView: coffeeItemView,
+        
+        initialize: function() {
+            this.collection.fetch();
+        },
+        events: {
+            "mouseover input": "consoleThis",
+            "click button.calculate": "renderCalculator",
+            "keyup input": "updateTotals"
+        },
+        
+        //update vertical totals
+        updateTotals: function() {
+            var greenTotal = 0.00, roastedTotal = 0.00, total = 0.00;
+             $('input.green').each(function() {
+                greenTotal+= parseFloat(this.value);
+                console.log(typeof(greenTotal) + ": " + greenTotal);
+            });
+            $('input.roasted').each(function() {
+                roastedTotal+= parseFloat(this.value);
+            });
+            total = greenTotal + roastedTotal;
+            $('span.totalGreen').text(greenTotal.toFixed(2));
+            $('span.totalRoasted').text(roastedTotal.toFixed(2));
+            $('span.total').text(total.toFixed(2)); 
+            console.log(greenTotal + " + " + roastedTotal + " = " + total);
+        },
+        //Console Log the current target of the "event" object returned when a mouseover input event occurs.
+        consoleThis: function(event) {
+            var thisField = $(event.currentTarget);
+            console.log('You moused over ' + thisField.val());
+        },
+        //Launch calculator view
+        renderCalculator: function(event) {
+            console.log("Launch Calculator View for model: ");
+        }
+
+    });
+    
+    var coffeeList = new CoffeeList();
+    
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "API-practice",
+  "version": "0.0.1",
+  "description": "A practice application for creating a node.js API",
+  "main": "server.js",
+  "repository": "",
+  "author": "Beau Davenport <davenportbeau@gmail.com>",
+  "dependencies": {
+    "async": "~0.2.8",
+    "express": "~3.2.4",
+    "socket.io": "~0.9.14"
+  }
+}
