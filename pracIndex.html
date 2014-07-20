@@ -45,8 +45,19 @@
     <!-- Calculator Template -->
     
     <script type="text/template" id="calcTemplate">
-        
+        <td>
+        <div class="container">
+            <p><%= calcModel.get("name") %></p>
+            <label>Gross Weight:</label>
+            <input type="text" class="calcGross" />
+            <% var contList = calcModel.get("containers");
+            _.each(contList.models, function(num) { %>
+                <button class="btn tareButton" onclick="return false" value="<%= num.get('weight') %>"><%= num.get("name") %></button>
+            <% }); %>
+        </div>
+        </td>
     </script>
+
     
     <!-- Main MVC Script -->
     
@@ -62,6 +73,20 @@
         console.log("We have loaded the homepage!");
     }); 
     
+    //declare global tare utility function that maintains access to the original value
+    var tare = function(gross, tare) {
+        var original = gross;
+        return {
+            taredVal: function() {
+               return (gross >= tare) ? (gross - tare) : 0;
+            },
+            originalVal: function() {
+                return original;
+            }
+        };
+    };
+    
+    //begin Backbone history
     Backbone.history.start();
     
     var Coffee = Backbone.Model.extend({
@@ -70,7 +95,7 @@
             origin: "Origin",
             greenWeight: "0.00",
             roastedWeight: "0.00",
-            totalWeight: "0.00"
+            totalWeight: "0.00",
         },
         initialize: function() {
             console.log("New coffee model created: " + this.get("name"));
@@ -81,13 +106,75 @@
         }
     });
     
+    var Container = Backbone.Model.extend({
+        defaults: {
+            name: "New Container",
+            weight: "0.00"
+        }
+    });
+    
     //establish data source for coffee collection
     var Coffees = Backbone.Collection.extend({
-        url: '//c9.io/beaudavenport/apipractice/workspace/pracjsonfactory.js',
+        url: '//c9.io/beaudavenport/inventoryhelper/workspace/pracjsonfactory.js',
         model: Coffee
     });
     
-   
+    //establish data source for inventory container collection
+    var Containers = Backbone.Collection.extend({
+        url: '//c9.io/beaudavenport/inventoryhelper/workspace/containerfactory.js',
+        model: Container
+    });
+    //backbone view for calculator panel
+    var CalculatorView = Backbone.View.extend({
+        tagName: "tr",
+
+        //initialize function with parent view's scope and calculate subtotal
+        initialize: function(parent) {
+            console.log(this.events);
+            console.log(this.$el);
+            var containers = new Containers();
+            
+            //pass down scope from parent view
+            this.currentView = parent; 
+            var calcPanelTarget = "<tr><td colspan='4'><table class='calcPanelTable'>" +
+                "<tr><td>Running Total: <span class='calcTotal'>0.00</span><td></tr>" +
+                "</table></td></tr>";
+            this.$el.after(calcPanelTarget);
+            this.setElement($(".calcPanelTable"));
+            var self = this;
+            
+            //fetch updated list of containers before rendering panel
+            containers.fetch().done(function() {
+                //attach list of containers to coffee item model
+                self.currentView.model.set("containers", containers);
+                self.calcPanel = _.template($("#calcTemplate").html(), {calcModel: self.currentView.model});
+                self.$el.append(self.calcPanel);
+                self.delegateEvents({
+                    "click .tareButton": "tare",
+                    "mouseover input": "oink"
+                });
+                console.log(self.$el);
+                console.log(self.events);
+                return self;
+            });    
+        },
+        //append additional rows
+        append: function() {
+            this.currentView.$el.after(this.calcPanel);    
+        },
+        tare: function(event) {
+            console.log("you hit the tare button");
+            var origWeight = parseFloat(this.$(":input").val());
+            var tareWeight = parseFloat(event.currentTarget.value);
+            this.lastTare = tare(origWeight, tareWeight);
+            console.log(this.lastTare.taredVal());
+            this.$(".calcTotal").text(this.lastTare.taredVal());    
+        },
+        oink: function() {
+            console.log("oink");
+        }
+    });
+    
     //epoxy item view for each coffee model
     var coffeeItemView = Backbone.Epoxy.View.extend({
         tagName: "tr",
@@ -98,14 +185,24 @@
             "span.rowTotal": "text:totalWeight,events:['keyup']"
         },
         
+        events: {
+            "click button.calculate": "renderCalculator"
+        },
+        
         initialize: function() {
             var name = this.model.get("name");
             var output = "<td>" + name + "</td>" +
-                "<td><input type='text' class='green'/><button class='btn calculate'>Calculate</button></td>" +
-                "<td><input type='text' class='roasted'/><button class='btn calcuate'>Calculate</button></td>" +
+                "<td><input type='text' class='green'/><button class='btn calculate' onclick='return false'>Calculate</button></td>" +
+                "<td><input type='text' class='roasted'/><button class='btn calculate' onclick='return false'>Calculate</button></td>" +
                 "<td><span class='rowTotal'></span></td>";
             this.$el.append(output);
             console.log("Row Added.");
+        },
+        
+        //open calculator panel
+        renderCalculator: function() {
+            
+            var calculatorView = new CalculatorView(this);
         }
     });
     
@@ -123,7 +220,6 @@
         },
         events: {
             "mouseover input": "consoleThis",
-            "click button.calculate": "renderCalculator",
             "keyup input": "updateTotals"
         },
         
@@ -147,10 +243,6 @@
         consoleThis: function(event) {
             var thisField = $(event.currentTarget);
             console.log('You moused over ' + thisField.val());
-        },
-        //Launch calculator view
-        renderCalculator: function(event) {
-            console.log("Launch Calculator View for model: ");
         }
 
     });
