@@ -1,3 +1,8 @@
+#settings and metadata
+.c9/metadata/
+.c9/.nakignore
+.c9/project.settings
+
 # MongoDB Data Folder
 data/
 
