@@ -10,9 +10,11 @@
         <h1>Inventory Helper <small>practice version</small></h1>
         <hr />
         <div class="Container viewOne">
+        <button class="btn" onclick="return false">Edit Coffees</button>
+        <button class="btn" onclick="return false">Edit Containers</button>
             <!-- Main View Template -->
             <form class="form-inline">
-                <table class="table striped">
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             <td>Coffee</td>
@@ -32,7 +34,7 @@
                         </tr>   
                     </tbody>
                 </table>
-                <table class="table striped">
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             <td>Blend</td>
@@ -119,8 +121,8 @@
         initialize: function() {
             console.log("New coffee model created: " + this.get("name"));
             this.on("change", function(model) {
-               var changedTotal = parseFloat(model.get("greenWeight")) + parseFloat(model.get("roastedWeight"));
-               model.set("totalWeight", changedTotal.toFixed(2));
+                var changedTotal = parseFloat(model.get("greenWeight")) + parseFloat(model.get("roastedWeight"));
+                model.set("totalWeight", changedTotal.toFixed(2));
             });
         }
     });
@@ -160,7 +162,9 @@
     //backbone view for calculator panel
     var CalculatorView = Backbone.View.extend({
         tagName: "tr",
-
+        
+        runningTotal: 0.00,
+        
         //initialize function with parent view's scope and calculate subtotal
         initialize: function(parent) {
             console.log(this.events);
@@ -208,6 +212,8 @@
         },
         tare: function(event) {
             console.log("you hit the tare button");
+            $(event.currentTarget).addClass("btn-danger");
+            $(event.currentTarget).siblings(".tareButton").removeClass("btn-danger");
             var currentInput = $(event.currentTarget).siblings(".calcGross");
             console.log(currentInput);
             var tareWeight = parseFloat(event.currentTarget.value);
@@ -239,13 +245,13 @@
             //set correct weight of passed-in view's model based on which button pressed
             switch (this.currentView.buttonValue) {
                 case "green":
-                    this.currentView.model.set("greenWeight", this.runningTotal);
+                    this.currentView.model.set("greenWeight", this.runningTotal.toFixed(2));
                     break;
                 case "roasted":
-                    this.currentView.model.set("roastedWeight", this.runningTotal);
+                    this.currentView.model.set("roastedWeight", this.runningTotal.toFixed(2));
                     break;
                 case "blend":
-                    this.currentView.model.set("weight", this.runningTotal);
+                    this.currentView.model.set("weight", this.runningTotal.toFixed(2));
                     break;
                 default:
                     return 0;
@@ -262,12 +268,14 @@
             this.remove();
         },
         updateRunningTotal: function() {
+            
             this.runningTotal = 0.00;
             var that = this;
             
             //update running total of all rows
             this.$el.find(".calcGross").each(function() {
-                that.runningTotal += parseFloat(this.value);    
+                that.runningTotal += parseFloat(this.value);
+                console.log(that.runningTotal);
             });
             $(".calcTotal").text(this.runningTotal.toFixed(2));
         }
@@ -343,10 +351,14 @@
         
         initialize: function() {
             this.collection.fetch();
+            var that = this;
+            this.collection.on("change", function() {
+                console.log("collection changed.");
+                that.updateTotals();
+            });
         },
         events: {
-            "mouseover input": "consoleThis",
-            "keyup input": "updateTotals"
+            "mouseover input": "consoleThis"
         },
         
         //update vertical totals
@@ -387,7 +399,8 @@
         },
         
         events: {
-            "keyup input": "updateTotals"
+            "keyup input": "updateTotals",
+            "change input": "updateTotals"
         },
         
         updateTotals: function() {
