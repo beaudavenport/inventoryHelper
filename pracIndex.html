@@ -63,14 +63,13 @@
     <!-- Calculator Template -->
     
     <script type="text/template" id="calcTemplate">
-        <td>
+        <td class="well">
         <div class="container">
             <p><%= calcModel.get("name") %></p>
-            <button class="btn addRow" onclick="return false">Add Row</button>
             <button class="btn btn-danger deleteRow" onclick="return false">Delete</button>
             <label>Gross Weight:</label>
             <input type="text" class="calcGross" />
-            <button class="btn btn-danger clearTare" onclick="return false">Reset</button>
+            <button class="btn btn-info clearTare" onclick="return false">No Tare</button>
             <% var contList = calcModel.get("containers");
             _.each(contList.models, function(num) { %>
                 <button class="btn tareButton" onclick="return false" value="<%= num.get('weight') %>"><%= num.get("name") %></button>
@@ -94,7 +93,7 @@
         console.log("We have loaded the homepage!");
     }); 
     
-    //declare global tare utility function that maintains access to the original value
+    //declare global 'tare' utility function that maintains access to the original value
     var tare = function(gross) {
         var original = gross;
         return {
@@ -110,6 +109,7 @@
     //begin Backbone history
     Backbone.history.start();
     
+    //backbone model for single-origin (unblended) coffees
     var Coffee = Backbone.Model.extend({
         defaults: {
             name: "New Coffee",
@@ -127,6 +127,7 @@
         }
     });
     
+    //backbone model for coffee blends
     var Blend = Backbone.Model.extend({
         defaults: {
             name: "New Blend",
@@ -134,11 +135,55 @@
         }
     });
     
+    //backbone model for containers to tare
     var Container = Backbone.Model.extend({
         defaults: {
             name: "New Container",
             weight: "0.00"
         }
+    });
+    
+    //backbone model for local collections that don't sync with server
+    var LocalModel = Backbone.Model.extend({});
+    LocalModel.prototype.sync = function() { return false; };
+    LocalModel.prototype.fetch = function() { return false; };
+    LocalModel.prototype.save = function() { return false; };
+    
+    
+    
+    //local backbone model for rows in calculator that get tared
+    var CalculatorRow = LocalModel.extend({
+        defaults: {
+            name: "New Row",
+            weight: "0.00"
+        },
+        initialize: function() {
+            console.log("new calculator row here: ");
+            var parsedWeight = parseFloat(this.get("weight"));
+            this.tareFunction = tare(parsedWeight);
+        }
+    });
+    
+    var CalculatorRows = Backbone.Collection.extend({
+        
+        model: CalculatorRow,
+        
+        newTotal: 0.00,
+        
+        initialize: function() {
+            console.log("new calculator row collection!!");
+            
+            //any change to the collection triggers an update of the total.
+            this.on("all", function() {
+                var total = 0.00;
+                _.each(this.models, function(event) {
+                    total += event.get("weight");
+                });
+                this.newTotal = total;
+            }, this);
+            
+        }
+        
     });
     
     //establish data source for coffee collection
@@ -161,102 +206,76 @@
     
     //backbone view for calculator panel
     var CalculatorView = Backbone.View.extend({
-        tagName: "tr",
-        
-        runningTotal: 0.00,
         
         //initialize function with parent view's scope and calculate subtotal
         initialize: function(parent) {
+            
+            console.log(this);
             console.log(this.events);
             console.log(this.$el);
             var containers = new Containers();
-            
+            this.collection = new CalculatorRows();
             //pass down scope from parent view
             this.currentView = parent; 
-            var calcPanelTarget = "<tr><td colspan='4'><table class='calcPanelTable'>" +
-                "<tr><td colspan='4'>Running Total: <span class='calcTotal'>0.00</span>" +
+            var calcPanelTarget = "<tr><td colspan='4'><table class='table calcPanelTable'>" +
+                "<tbody data-bind='collection:$collection'><tr><td colspan='4'>Running Total: <span class='calcTotal'>0.00</span>" +
+                "<button class='btn addRow' onclick='return false'>New Row</button>" +
                 "<button class='btn done' onclick='return false'>Done</button>" + 
                 "<button class='btn cancel' onclick='return false'>Cancel</button></td></tr>" +
-                "</table></td></tr>";
+                "</tbody></table></td></tr>";
             this.$el.after(calcPanelTarget);
-            this.setElement($(".calcPanelTable"));
+            var newElement = this.$el.closest("tr").next("tr").find(".calcPanelTable");
+            console.log(newElement);
+            this.setElement(newElement);
             var self = this;
             
             //fetch updated list of containers before rendering panel
             containers.fetch().done(function() {
                 
-                //attach list of containers to coffee item model
+                //attach list of containers to coffee item model as well as which value is associated with the calculator button pressed
                 self.currentView.model.set("containers", containers);
-                self.calcPanel = _.template($("#calcTemplate").html(), {calcModel: self.currentView.model});
-                self.$el.append(self.calcPanel);
-                
-                //delegate events inside fetch completion callback to ensure proper binding
+                self.currentView.model.set("buttonValue", self.currentView.buttonValue);
                 self.delegateEvents({
-                    "click .tareButton": "tare",
-                    "click .addRow": "append",
-                    "click .deleteRow": "delete",
-                    "click .clearTare": "clearTare",
-                    "change .calcGross": "updateTare",
+                    "click .addRow": "renderAdditional",
                     "click .done": "returnPanel",
                     "click .cancel": "cancelPanel"
                 });
-                console.log(self.$el);
-                console.log(self.events);
+                
+                //render new calculator row, passing in current model on rendering for access within view
+                var newRow = new calculatorRowView({model: new CalculatorRow()});
+                newRow.render(self);
+                console.log(self.currentView.model.get("name"));
+                
+                //add listener for changes to collection and update running total field
+                self.listenTo(self.collection, "all", function() {
+                    self.updateRunningTotal();
+                });
                 return self;
             });    
         },
-        //append additional rows
-        append: function() {
-            //add new row using calculator template
-            this.$el.append("<tr class='newRow'>" + this.calcPanel + "</tr>");    
-        },
-        tare: function(event) {
-            console.log("you hit the tare button");
-            $(event.currentTarget).addClass("btn-danger");
-            $(event.currentTarget).siblings(".tareButton").removeClass("btn-danger");
-            var currentInput = $(event.currentTarget).siblings(".calcGross");
-            console.log(currentInput);
-            var tareWeight = parseFloat(event.currentTarget.value);
-            
-            //get tared weight from tare function attached to associated input field
-            var taredInput = currentInput.data("tareFunction").taredVal(tareWeight);
-            currentInput.val(taredInput);
-            this.updateRunningTotal();
-        },
-        updateTare: function(event) {
-            var value = event.currentTarget.value;
-            //attach tare function to input field as a data object
-            $(event.currentTarget).data("tareFunction", tare(value));
-            this.updateRunningTotal();
-        },
-        clearTare: function(event) {
-            var currentInput = $(event.currentTarget).siblings(".calcGross");
-            var original = currentInput.data("tareFunction").originalVal;
-            currentInput.val(original);
-            this.updateRunningTotal();
-        },
-        delete: function(event) {
-            console.log("Delete this row");
-            var rowToDelete = $(event.currentTarget).closest(".newRow");
-            $(rowToDelete).remove();
+        renderAdditional: function() {
+            var newRow = new calculatorRowView({model: new CalculatorRow()});
+            newRow.render(this);
+            console.log("this is what this is:" + this);
         },
         returnPanel: function() {
-            
+            console.log("returning panel.");
+            console.log(this.model.get("buttonValue"));
             //set correct weight of passed-in view's model based on which button pressed
-            switch (this.currentView.buttonValue) {
+            switch (this.model.get("buttonValue")) {
                 case "green":
-                    this.currentView.model.set("greenWeight", this.runningTotal.toFixed(2));
+                    this.model.set("greenWeight", this.collection.newTotal.toFixed(2));
                     break;
                 case "roasted":
-                    this.currentView.model.set("roastedWeight", this.runningTotal.toFixed(2));
+                    this.model.set("roastedWeight", this.collection.newTotal.toFixed(2));
                     break;
                 case "blend":
-                    this.currentView.model.set("weight", this.runningTotal.toFixed(2));
+                    this.model.set("weight", this.collection.newTotal.toFixed(2));
                     break;
                 default:
                     return 0;
             }
-            console.log(this.currentView.buttonValue + ": " + this.runningTotal);
+            console.log(this.model.buttonValue + ": " + this.collection.newTotal.toFixed(2));
             
             //set element to parent row associated with view element
             this.setElement(this.$el.closest('tr'));
@@ -268,16 +287,76 @@
             this.remove();
         },
         updateRunningTotal: function() {
+            console.log(this.el);
+            this.$(".calcTotal").text(this.collection.newTotal);
+        }
+    });
+    
+    //item view for each calculator row
+    var calculatorRowView = Backbone.View.extend({
+        tagName: "tr",
+        
+        events: {
+            "click .tareButton": "tare",
+            "click .deleteRow": "delete",
+            "click .clearTare": "clearTare",
+            "change .calcGross": "updateTare"
+        },
+        initialize: function() {
+            console.log("new calculator row view added...");
+
+        },
+        render: function(parentModel) {
+            console.log("new calculator row appended!" +  " " + parentModel.model.get("name"));
             
-            this.runningTotal = 0.00;
-            var that = this;
+            //add new calculator row model to collection
+            parentModel.collection.add(this.model);
+            console.log(parentModel.collection);
             
-            //update running total of all rows
-            this.$el.find(".calcGross").each(function() {
-                that.runningTotal += parseFloat(this.value);
-                console.log(that.runningTotal);
-            });
-            $(".calcTotal").text(this.runningTotal.toFixed(2));
+            //attach coffee model passed in render function as parent model for current view
+            this.parentModel = parentModel;
+            this.calcPanel = _.template($("#calcTemplate").html(), {calcModel: this.parentModel.model});
+            this.$el.html(this.calcPanel);
+            this.parentModel.$el.prepend(this.$el);
+            console.log(this.el);
+            
+            //declare DOM constants for easy access
+            this.inputField = this.$(".calcGross");
+            this.inputField.val(this.model.get("weight"));
+        },
+        tare: function(event) {
+            //highlight current tare when clicked 
+            console.log(this.model.get("weight"));
+            $(event.currentTarget).addClass("btn-danger");
+            $(event.currentTarget).siblings(".tareButton").removeClass("btn-danger");
+            $(event.currentTarget).siblings(".clearTare").removeClass("btn-danger");
+    
+            console.log(this.inputField);
+            var tareWeight = parseFloat(event.currentTarget.value);
+            
+            //get tared weight from model
+            var newTare = this.model.tareFunction.taredVal(tareWeight);
+            this.model.set("weight", newTare);
+            this.inputField.val(this.model.get("weight"));
+            console.log(this.model.get("weight"));
+        },
+        updateTare: function(event) {
+            var value = parseFloat(event.currentTarget.value);
+            //attach tare function to model
+            this.model.tareFunction = tare(value);
+        },
+        clearTare: function(event) {
+            $(event.currentTarget).addClass("btn-danger");
+            $(event.currentTarget).siblings(".tareButton").removeClass("btn-danger");
+            var original = this.model.tareFunction.originalVal();
+            this.model.set("weight", original);
+            this.inputField.val(original);
+        },
+        delete: function() {
+            console.log("Delete this row");
+            var deleted = this.parentModel.collection.remove(this.model);
+            console.log(deleted);
+            this.remove();
         }
     });
     
@@ -364,7 +443,7 @@
         //update vertical totals
         updateTotals: function() {
             var greenTotal = 0.00, roastedTotal = 0.00, total = 0.00;
-             $('input.green').each(function() {
+            $('input.green').each(function() {
                 greenTotal+= parseFloat(this.value);
                 console.log(typeof(greenTotal) + ": " + greenTotal);
             });
@@ -396,11 +475,15 @@
         
         initialize: function() {
             this.collection.fetch();
+            var that = this;
+            this.collection.on("change", function() {
+                console.log("collection changed.");
+                that.updateTotals();
+            });
         },
         
         events: {
-            "keyup input": "updateTotals",
-            "change input": "updateTotals"
+            "keyup input": "updateTotals"
         },
         
         updateTotals: function() {
