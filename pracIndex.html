@@ -60,7 +60,26 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
     <script src="//cdn.jsdelivr.net/backbone.epoxy/1.2/backbone.epoxy.min.js"></script>
     
-    <!-- Calculator Template -->
+    <!-- Calculator Panel Template -->
+    <script type="text/template" id="panelTemplate">
+        <tr>
+            <td colspan='4'>
+                <table class='table calcPanelTable'>
+                    <tbody data-bind='collection:$collection'>
+                        <tr>
+                            <td colspan='4'>Running Total: <span class='calcTotal'>0.00</span>
+                                <button class='btn addRow' onclick='return false'>New Row</button>
+                                <button class='btn done' onclick='return false'>Done</button> 
+                                <button class='btn cancel' onclick='return false'>Cancel</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>    
+    </script>
+    
+    <!-- Calculator Row Template -->
     
     <script type="text/template" id="calcTemplate">
         <td class="well">
@@ -106,6 +125,14 @@
         };
     };
     
+    //declare global input validation function that checks for NaN or "" and if so sets to 0.00
+    var validateNumInput = function(model, field) {
+        if (isNaN(model.get(field)))
+            model.set(field, 0.00);
+        if (model.get(field) === "" || model.get(field) === null)
+            model.set(field, 0.00);
+    };
+    
     //begin Backbone history
     Backbone.history.start();
     
@@ -121,6 +148,8 @@
         initialize: function() {
             console.log("New coffee model created: " + this.get("name"));
             this.on("change", function(model) {
+                validateNumInput(model, "greenWeight");
+                validateNumInput(model, "roastedWeight");
                 var changedTotal = parseFloat(model.get("greenWeight")) + parseFloat(model.get("roastedWeight"));
                 model.set("totalWeight", changedTotal.toFixed(2));
             });
@@ -177,9 +206,9 @@
             this.on("all", function() {
                 var total = 0.00;
                 _.each(this.models, function(event) {
-                    total += event.get("weight");
+                    total += parseFloat(event.get("weight"));
                 });
-                this.newTotal = total;
+                this.newTotal = total.toFixed(2);
             }, this);
             
         }
@@ -215,15 +244,13 @@
             console.log(this.$el);
             var containers = new Containers();
             this.collection = new CalculatorRows();
+            
             //pass down scope from parent view
             this.currentView = parent; 
-            var calcPanelTarget = "<tr><td colspan='4'><table class='table calcPanelTable'>" +
-                "<tbody data-bind='collection:$collection'><tr><td colspan='4'>Running Total: <span class='calcTotal'>0.00</span>" +
-                "<button class='btn addRow' onclick='return false'>New Row</button>" +
-                "<button class='btn done' onclick='return false'>Done</button>" + 
-                "<button class='btn cancel' onclick='return false'>Cancel</button></td></tr>" +
-                "</tbody></table></td></tr>";
+            var calcPanelTarget = _.template($("#panelTemplate").html());
             this.$el.after(calcPanelTarget);
+            
+            //set view element to newly added table
             var newElement = this.$el.closest("tr").next("tr").find(".calcPanelTable");
             console.log(newElement);
             this.setElement(newElement);
@@ -264,26 +291,28 @@
             //set correct weight of passed-in view's model based on which button pressed
             switch (this.model.get("buttonValue")) {
                 case "green":
-                    this.model.set("greenWeight", this.collection.newTotal.toFixed(2));
+                    this.model.set("greenWeight", this.collection.newTotal);
                     break;
                 case "roasted":
-                    this.model.set("roastedWeight", this.collection.newTotal.toFixed(2));
+                    this.model.set("roastedWeight", this.collection.newTotal);
                     break;
                 case "blend":
-                    this.model.set("weight", this.collection.newTotal.toFixed(2));
+                    this.model.set("weight", this.collection.newTotal);
                     break;
                 default:
                     return 0;
             }
-            console.log(this.model.buttonValue + ": " + this.collection.newTotal.toFixed(2));
+            console.log(this.model.buttonValue + ": " + this.collection.newTotal);
             
-            //set element to parent row associated with view element
+            //set element to parent row associated with view element, reset openPanel switch and remove view
             this.setElement(this.$el.closest('tr'));
+            this.currentView.openPanel = false;
             this.remove();
         },
         cancelPanel: function() {
-            //set element to parent row associated with view element
+            //set element to parent row associated with view element, reset openPanel switch and remove view
             this.setElement(this.$el.closest('tr'));
+            this.currentView.openPanel = false;
             this.remove();
         },
         updateRunningTotal: function() {
@@ -375,10 +404,11 @@
         },
         
         initialize: function() {
+            this.openPanel = false;
             var name = this.model.get("name");
             var output = "<td>" + name + "</td>" +
-                "<td><input type='text' class='green'/><button class='btn calculate' value='green' onclick='return false'>Calculate</button></td>" +
-                "<td><input type='text' class='roasted'/><button class='btn calculate' value='roasted' onclick='return false'>Calculate</button></td>" +
+                "<td><input type='text' class='green'/><button type='button' class='btn calculate' value='green' onclick='return false'>Calculate</button></td>" +
+                "<td><input type='text' class='roasted'/><button type='button' class='btn calculate' value='roasted' onclick='return false'>Calculate</button></td>" +
                 "<td><span class='rowTotal'></span></td>";
             this.$el.append(output);
             console.log("Row Added.");
@@ -386,7 +416,10 @@
         
         //open calculator panel
         renderCalculator: function(event) {
+            if (this.openPanel)
+                return false;
             //initialize calculator view, passing it the scope of the current coffee item view as an argument
+            this.openPanel = true;
             this.buttonValue = event.currentTarget.value;
             var calculatorView = new CalculatorView(this);
         }
@@ -404,16 +437,20 @@
         },
         
         initialize: function() {
+            this.openPanel = false;
             var name = this.model.get("name");
             var output = "<td>" + name + "</td>" +
-                "<td><input type='text' class='blend'/><button class='btn calculate' value='blend' onclick='return false'>Calculate</button></td>";
+                "<td><input type='text' class='blend'/><button type='button' class='btn calculate' value='blend' onclick='return false'>Calculate</button></td>";
             this.$el.append(output);
             console.log("Row Added.");
         }, 
         
         //open calculator panel
         renderCalculator: function(event) {
+            if(this.openPanel)
+                return false;
             //initialize calculator view, passing it the scope of the current coffee item view as an argument
+            this.openPanel = true;
             this.buttonValue = event.currentTarget.value;
             var calculatorView = new CalculatorView(this);
         }
@@ -494,7 +531,8 @@
             $("span.blendTotal").text(total.toFixed(2));
         }
         
-    })
+    });
+    
     //generate coffees list
     var coffeeList = new CoffeeList();
     
