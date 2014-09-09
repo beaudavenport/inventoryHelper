@@ -171,7 +171,9 @@ var AppCollections = function() {
     this.getCollection = function(collection) {
         return _.find(collectionArray, collection);
     };
-    
+    this.getAll = function(collection) {
+        return collectionArray;
+    };
     //fetch the collection passed to 'fetchThis' function, otherwise fetch all collections
     this.fetchThis = function(collection) {
         if (collection) {
@@ -385,8 +387,8 @@ var coffeeItemView = Backbone.Epoxy.View.extend({
         this.openPanel = false;
         var name = this.model.get("name");
         var output = "<td>" + name + "</td>" +
-            "<td><input type='text' class='green'/><button type='button' class='btn calculate' value='green' onclick='return false'>Calculate</button></td>" +
-            "<td><input type='text' class='roasted'/><button type='button' class='btn calculate' value='roasted' onclick='return false'>Calculate</button></td>" +
+            "<td><input type='text' class='green' size='8'/><button type='button' class='btn calculate' value='green' onclick='return false'>Calculate</button></td>" +
+            "<td><input type='text' class='roasted' size='8'/><button type='button' class='btn calculate' value='roasted' onclick='return false'>Calculate</button></td>" +
             "<td><span class='rowTotal'></span></td>";
         this.$el.append(output);
         console.log("Row Added.");
@@ -422,7 +424,7 @@ var blendItemView = Backbone.Epoxy.View.extend({
         this.openPanel = false;
         var name = this.model.get("name");
         var output = "<td>" + name + "</td>" +
-            "<td><input type='text' class='blend'/><button type='button' class='btn calculate' value='blend' onclick='return false'>Calculate</button></td>";
+            "<td><input type='text' class='blend' size='8' /><button type='button' class='btn calculate' value='blend' onclick='return false'>Calculate</button></td>";
         this.$el.append(output);
         console.log("Row Added.");
     }, 
@@ -504,6 +506,9 @@ var BlendList = Backbone.Epoxy.View.extend({
 });
 
 var Router = Backbone.Router.extend({
+    initialize: function() {
+        console.log("We have made a new router");
+    },
     routes: {
         '': 'home',
         'test': 'test'
@@ -511,33 +516,37 @@ var Router = Backbone.Router.extend({
 });
 
 var router = new Router();
+var mainViewForm = _.template($("#mainForm").html());
+
+// upon successful fetching of data, render calculator homepage
+appCollections.addCollection(coffees);
+appCollections.addCollection(blends);
+appCollections.addCollection(containers);
+console.log(appCollections.collectionArray);
+$.when.apply(this, appCollections.fetchThis()).then(function() {
+    console.log("okay, we got the stuff");
+    //generate coffees list
+    var coffeeList = new CoffeeList();
+    
+    //generate blends list
+    var blendList = new BlendList();   
+});
+
 router.on('route:home', function() {
     console.log("We have loaded the homepage!");
-    var mainViewForm = _.template($("#mainForm").html());
-    $(".viewOne").append(mainViewForm);
-    // upon successful fetching of data, render calculator homepage
-    appCollections.addCollection(coffees);
-    appCollections.addCollection(blends);
-    appCollections.addCollection(containers);
-    console.log(appCollections.collectionArray);
-    $.when.apply(this, appCollections.fetchThis()).then(function() {
-        console.log("okay, we got the stuff");
-        //generate coffees list
-        var coffeeList = new CoffeeList();
-        
-        //generate blends list
-        var blendList = new BlendList();   
-    });
-
+    $(".viewOne").html(mainViewForm);
 }); 
 
 router.on('route:test', function() {
     console.log("Test page!");
     $(".viewOne").html("<p>testing...</p>");
     $(".viewOne").append("<h1>The state of the page...</h1>");
-    _.each(loadCollections, function(event) {
-        _.each(event.models, function(event) {
-            $(".viewOne").append("<p>" + JSON.stringify(event) + "</p>");
+    $(".viewOne").append('<button type="button" class="btn" onclick="router.navigate(\'\', {trigger: true});">Go Home</button>');
+    console.log(Backbone.history);
+    _.each(appCollections.getAll(), function(event) {
+        console.log(event);
+        _.each(event.models, function(event2) {
+            $(".viewOne").append("<p>" + JSON.stringify(event2) + "</p>");
         });
     });
 });
