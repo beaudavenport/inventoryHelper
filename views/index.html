@@ -60,7 +60,7 @@
                             <td>Total</td>
                         </tr>
                     </thead>
-                    <tbody class="viewModels" data-bind="collection:$collection">
+                    <tbody class="viewModels">
                     </tbody>
                     <tbody>
                          <tr>
@@ -101,28 +101,20 @@
     
     <!-- Calculator Panel Template -->
     <script type="text/template" id="panelTemplate">
-        <tr>
-            <td colspan='4'>
-                <table class='table calcPanelTable'>
-                    <tbody data-bind='collection:$collection'>
-                        <tr>
-                            <td colspan='4'>Running Total: <span class='calcTotal'>0.00</span>
-                                <button type='button' class='btn addRow' onclick='return false'>New Row</button>
-                                <button type='button' class='btn done' onclick='return false'>Done</button> 
-                                <button type='button' class='btn cancel' onclick='return false'>Cancel</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>    
+        <td colspan='4'>
+            <div>
+                Running Total: <span class='calcTotal'>0.00</span>
+                <button type='button' class='btn addRow' onclick='return false'>New Row</button>
+                <button type='button' class='btn done' onclick='return false'>Done</button> 
+                <button type='button' class='btn cancel' onclick='return false'>Cancel</button>
+            </div>
+        </td>
     </script>
     
     <!-- Calculator Row Template -->
     
     <script type="text/template" id="calcTemplate">
-        <td class="well">
-        <div class="container">
+        <div class="well container">
             <p><%= calcModel.get("name") %></p>
             <button type="button" class="btn btn-danger deleteRow" onclick="return false">Delete</button>
             <label>Gross Weight:</label>
@@ -133,7 +125,6 @@
                 <button type="button" class="btn tareButton" onclick="return false" value="<%= num.get('weight') %>"><%= num.get("name") %></button>
             <% }); %>
         </div>
-        </td>
     </script>
     <script src="javascripts/global.js"></script>
     

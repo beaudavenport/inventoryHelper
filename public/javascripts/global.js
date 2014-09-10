@@ -205,28 +205,23 @@ var appCollections = new AppCollections(),
     
 //backbone view for calculator panel
 var CalculatorView = Backbone.View.extend({
-
+    
     //initialize function with parent view's scope and calculate subtotal
     initialize: function(parent) {
    
         console.log(this);
-        console.log("the events for this view are: " + this.events.toString());
+        console.log("the events for this view are: " + JSON.stringify(this.events));
         console.log(this.$el);
         this.containers = containers;
         this.collection = new CalculatorRows();
-        
+        this.$el = parent.$el.next(".calcTarget");
+        console.log(this.$el);
         //pass down scope from parent view
         this.currentView = parent; 
         var calcPanelTarget = _.template($("#panelTemplate").html());
-        this.$el.after(calcPanelTarget);
-        
-        //set view element to newly added table
-        var newElement = this.$el.closest("tr").next("tr").find(".calcPanelTable");
-
-        this.setElement(newElement);
-        console.log("the element was successfully changed to: " + this.$el);
+        console.log(parent);
+        this.$el.html(calcPanelTarget);
         console.log("We reached the end of the function...");
-
     },
     events: {
         "click .addRow": "renderAdditional",
@@ -321,7 +316,7 @@ var calculatorRowView = Backbone.View.extend({
         this.parentModel = parentModel;
         this.calcPanel = _.template($("#calcTemplate").html(), {calcModel: this.parentModel.model});
         this.$el.html(this.calcPanel);
-        this.parentModel.$el.prepend(this.$el);
+        this.parentModel.$el.find("td").prepend(this.$el);
         console.log(this.el);
         
         //declare DOM constants for easy access
@@ -369,33 +364,40 @@ var calculatorRowView = Backbone.View.extend({
     }
 });
 
-//epoxy item view for each coffee model
-var coffeeItemView = Backbone.Epoxy.View.extend({
+//item view for each coffee model
+var coffeeItemView = Backbone.View.extend({
+    
     tagName: "tr",
     
-    bindings: {
-        "input.green": "value:greenWeight,events:['keyup']",
-        "input.roasted": "value:roastedWeight,events:['keyup']",
-        "span.rowTotal": "text:totalWeight,events:['keyup']"
-    },
-    
     events: {
-        "click button.calculate": "renderCalculator"
+        "click button.calculate": "renderCalculator",
+        "keyup input.green": "updateModelGreen",
+        "keyup input.roasted": "updateModelRoasted"
     },
-    
     initialize: function() {
         this.openPanel = false;
         var name = this.model.get("name");
-        var output = "<td>" + name + "</td>" +
+        this.output =
+            "<td>" + name + "</td>" +
             "<td><input type='text' class='green' size='8'/><button type='button' class='btn calculate' value='green' onclick='return false'>Calculate</button></td>" +
             "<td><input type='text' class='roasted' size='8'/><button type='button' class='btn calculate' value='roasted' onclick='return false'>Calculate</button></td>" +
             "<td><span class='rowTotal'></span></td>";
-        this.$el.append(output);
         console.log("Row Added.");
+        this.listenTo(this.model, "all", function() {
+            this.updateValues();
+        }, this);
     },
-    
+    render: function() {
+        this.$el.html(this.output);
+        this.updateValues();
+        return this;
+    },
     //open calculator panel
     renderCalculator: function(event) {
+        //append target row for calculator
+        this.$el.after("<tr class='calcTarget'></tr>");
+        console.log("the element with a calc table being appended is: ");
+        console.log(this.$el);
         if (this.openPanel)
             return false;
         //initialize calculator view, passing it the scope of the current coffee item view as an argument
@@ -406,6 +408,20 @@ var coffeeItemView = Backbone.Epoxy.View.extend({
         //by placing the contents in a seperate function and calling after the initialize function
         //is complete, proper event delegation is ensured.
         calculatorView.render();
+    },
+    updateModelGreen: function(event) {
+        var newValue = $(event.currentTarget).val();
+        console.log("the new value is:" + newValue);
+        this.model.set("greenWeight", newValue);
+    },
+    updateModelRoasted: function(event) {
+        var newValue = $(event.currentTarget).val();
+        this.model.set("roastedWeight", newValue);
+    },
+    updateValues: function() {
+        this.$("input.green").val(this.model.get("greenWeight"));
+        this.$("input.roasted").val(this.model.get("roastedWeight"));
+        this.$("span.rowTotal").text(this.model.get("totalWeight"));
     }
 });
 
@@ -442,19 +458,28 @@ var blendItemView = Backbone.Epoxy.View.extend({
 });
 
 //epoxy collection view for all coffee models
-var CoffeeList = Backbone.Epoxy.View.extend({
+var CoffeeList = Backbone.View.extend({
     
     el: "tbody.viewModels",
     
     collection: coffees,
-    
-    itemView: coffeeItemView,
     
     initialize: function() {
         this.updateTotals();
         this.listenTo(this.collection, "all", function() {
             console.log("collection changed.");
             this.updateTotals();
+        }, this);
+    },
+    render: function() {
+        console.log(this.collection);
+        this.setElement("tbody.viewModels");
+        _.each(this.collection.models, function(item) {
+            console.log(item);
+            console.log(this.$el);
+            console.log("You would add the following: " + item.get("name"));
+            var newCoffeeView = new coffeeItemView({model: item});
+            this.$el.append(newCoffeeView.render().$el);
         }, this);
     },
     events: {
@@ -505,52 +530,57 @@ var BlendList = Backbone.Epoxy.View.extend({
     }
 });
 
+var mainViewForm = _.template($("#mainForm").html());
+
+var coffeeList, blendList, router;
+var firstVisit = true;
 var Router = Backbone.Router.extend({
     initialize: function() {
         console.log("We have made a new router");
+        
+        this.on('route:home', function() {
+            console.log("We have loaded the homepage!");
+            $(".viewOne").html(mainViewForm);
+            if (firstVisit) {
+                appCollections.addCollection(coffees);
+                appCollections.addCollection(blends);
+                appCollections.addCollection(containers);
+                console.log(appCollections.collectionArray);
+                $.when.apply(this, appCollections.fetchThis()).then(function() {
+                    console.log("okay, we got the stuff");
+                    //generate coffees list
+                    coffeeList = new CoffeeList();
+                    coffeeList.render();
+                    //generate blends list
+                    blendList = new BlendList();
+                });
+                firstVisit = false;
+            } else {
+                console.log("you came back.");
+                coffeeList.render();
+            }
+        }); 
+
+        this.on('route:test', function() {
+            console.log("Test page!");
+            $(".viewOne").html("<p>testing...</p>");
+            $(".viewOne").append("<h1>The state of the page...</h1>");
+            $(".viewOne").append('<button type="button" class="btn" onclick="router.navigate(\'\', {trigger: true});">Go Home</button>');
+            console.log(Backbone.history);
+            _.each(appCollections.getAll(), function(event) {
+                console.log(event);
+                _.each(event.models, function(event2) {
+                    $(".viewOne").append("<p>" + JSON.stringify(event2) + "</p>");
+                });
+            });
+        });
     },
     routes: {
         '': 'home',
         'test': 'test'
     }
 });
-
-var router = new Router();
-var mainViewForm = _.template($("#mainForm").html());
-
-// upon successful fetching of data, render calculator homepage
-appCollections.addCollection(coffees);
-appCollections.addCollection(blends);
-appCollections.addCollection(containers);
-console.log(appCollections.collectionArray);
-$.when.apply(this, appCollections.fetchThis()).then(function() {
-    console.log("okay, we got the stuff");
-    //generate coffees list
-    var coffeeList = new CoffeeList();
     
-    //generate blends list
-    var blendList = new BlendList();   
-});
-
-router.on('route:home', function() {
-    console.log("We have loaded the homepage!");
-    $(".viewOne").html(mainViewForm);
-}); 
-
-router.on('route:test', function() {
-    console.log("Test page!");
-    $(".viewOne").html("<p>testing...</p>");
-    $(".viewOne").append("<h1>The state of the page...</h1>");
-    $(".viewOne").append('<button type="button" class="btn" onclick="router.navigate(\'\', {trigger: true});">Go Home</button>');
-    console.log(Backbone.history);
-    _.each(appCollections.getAll(), function(event) {
-        console.log(event);
-        _.each(event.models, function(event2) {
-            $(".viewOne").append("<p>" + JSON.stringify(event2) + "</p>");
-        });
-    });
-});
-
-//begin Backbone history
+// upon successful fetching of data, render calculator homepage
+router = new Router();
 Backbone.history.start();
-
