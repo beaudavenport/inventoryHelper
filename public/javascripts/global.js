@@ -375,7 +375,7 @@ var coffeeItemView = Backbone.View.extend({
         "keyup input.roasted": "updateModelRoasted"
     },
     initialize: function() {
-        this.openPanel = false;
+        this.openPanel = false; //calculator panel is not open.
         var name = this.model.get("name");
         this.output =
             "<td>" + name + "</td>" +
@@ -398,8 +398,11 @@ var coffeeItemView = Backbone.View.extend({
         this.$el.after("<tr class='calcTarget'></tr>");
         console.log("the element with a calc table being appended is: ");
         console.log(this.$el);
+        
+        //prevent opening multiple calculator panels
         if (this.openPanel)
             return false;
+            
         //initialize calculator view, passing it the scope of the current coffee item view as an argument
         this.openPanel = true;
         this.buttonValue = event.currentTarget.value;
@@ -425,28 +428,32 @@ var coffeeItemView = Backbone.View.extend({
     }
 });
 
-var blendItemView = Backbone.Epoxy.View.extend({
+var blendItemView = Backbone.View.extend({
     tagName: "tr",
     
-    bindings: {
-        "input.blend": "value:weight,events:['keyup']"
-    },
-    
     events: {
-        "click button.calculate": "renderCalculator"
+        "click button.calculate": "renderCalculator",
+        "keyup input.blend": "updateBlends"
     },
     
     initialize: function() {
         this.openPanel = false;
         var name = this.model.get("name");
-        var output = "<td>" + name + "</td>" +
+        this.output = "<td>" + name + "</td>" +
             "<td><input type='text' class='blend' size='8' /><button type='button' class='btn calculate' value='blend' onclick='return false'>Calculate</button></td>";
-        this.$el.append(output);
         console.log("Row Added.");
+        this.listenTo(this.model, "all", function() {
+            this.updateValues();
+        }, this);
     }, 
-    
+    render: function() {
+        this.$el.html(this.output);
+        this.updateValues();
+        return this;
+    },
     //open calculator panel
     renderCalculator: function(event) {
+        this.$el.after("<tr class='calcTarget'></tr>");
         if(this.openPanel)
             return false;
         //initialize calculator view, passing it the scope of the current coffee item view as an argument
@@ -454,6 +461,13 @@ var blendItemView = Backbone.Epoxy.View.extend({
         this.buttonValue = event.currentTarget.value;
         var calculatorView = new CalculatorView(this);
         calculatorView.render();
+    },
+    updateBlends: function(event) {
+        var newValue = $(event.currentTarget).val();
+        this.model.set("weight", newValue);
+    },
+    updateValues: function() {
+        this.$("input.blend").val(this.model.get("weight"));
     }
 });
 
@@ -465,6 +479,7 @@ var CoffeeList = Backbone.View.extend({
     collection: coffees,
     
     initialize: function() {
+        //update totals upon collection view creation and any subsequent changes
         this.updateTotals();
         this.listenTo(this.collection, "all", function() {
             console.log("collection changed.");
@@ -503,23 +518,32 @@ var CoffeeList = Backbone.View.extend({
 
 });
 
-//epoxy collection view for all blends
-var BlendList = Backbone.Epoxy.View.extend({
+//collection view for all blends
+var BlendList = Backbone.View.extend({
     
     el: "tbody.blendModels",
     
     collection: blends,
     
-    itemView: blendItemView,
-    
     initialize: function() {
+        //update totals upon collection view creation and any subsequent changes
         this.updateTotals();
         this.listenTo(this.collection, "all", function() {
             console.log("collection changed.");
             this.updateTotals();
         }, this);
     },
-    
+    render: function() {
+        console.log(this.collection);
+        this.setElement("tbody.blendModels");
+        _.each(this.collection.models, function(item) {
+            console.log(item);
+            console.log(this.$el);
+            console.log("You would add the following: " + item.get("name"));
+            var newBlendView = new blendItemView({model: item});
+            this.$el.append(newBlendView.render().$el);
+        }, this);
+    },
     events: {
         "keyup input": "updateTotals"
     },
@@ -553,6 +577,7 @@ var Router = Backbone.Router.extend({
                     coffeeList.render();
                     //generate blends list
                     blendList = new BlendList();
+                    blendList.render();
                 });
                 firstVisit = false;
             } else {
