@@ -14,16 +14,21 @@ var tare = function(gross) {
     };
 };
 
-//declare global input validation function that trims input and detects sets model to 0 if NaN detected
-var validateNumInput = function(model, field) {
-    if (model.get(field) !== "") {                      //only validate if input is present (i.e., allow backspace button)
-        var trimmedField = String(model.get(field));
-        trimmedField = trimmedField.trim();
-        model.set(field, parseFloat(trimmedField));
-        console.log(model.get(field));
-        if (isNaN(model.get(field))) {
-            model.set(field, 0.00);
+//declare global input validation function that uses Regex to check for number with optional single decimal input, otherwise sets to "0.00"
+var validateAndSet = function(model, field, value) {
+    if (value !== "") {                                     //only validate if input is present (i.e., allow empty field)
+        console.log(value);
+        var regExp = /([0-9].[0-9])|[0-9]/;                 //"0.00" format
+        console.log("regex test: " + regExp.test(value));
+        if (!regExp.test(value)) {
+            console.log(value + " failed the regex test!");
+            model.set(field, "0.00");
+        } else {
+            console.log(value + " passed the regex test!");
+            model.set(field, value);
         }
+    } else {
+        model.set(field, "");
     }
 };
 
@@ -44,10 +49,12 @@ var Coffee = Backbone.Model.extend({
     initialize: function() {
         console.log("New coffee model created: " + this.get("name") + ": " + this.get("totalWeight"));
         this.on("change", function(model) {
-            validateNumInput(model, "greenWeight");
-            validateNumInput(model, "roastedWeight");
             var changedTotal = parseFloat(model.get("greenWeight")) + parseFloat(model.get("roastedWeight"));
-            model.set("totalWeight", changedTotal.toFixed(2));
+            if (isNaN(changedTotal)) {
+                model.set("totalWeight", "0.00");
+            } else {
+                model.set("totalWeight", changedTotal.toFixed(2));
+            }
         });
     }
 });
@@ -60,9 +67,6 @@ var Blend = Backbone.Model.extend({
     },
     initialize: function() {
         console.log("new blend created: " + this.get("name"));
-        this.on("change", function(model) {
-            validateNumInput(model, "weight");
-        });
     }
 });
 
@@ -121,16 +125,29 @@ var CalculatorRows = Backbone.Collection.extend({
 var Coffees = Backbone.Collection.extend({
     url: 'inventory/coffeelist',
     model: Coffee,
+    
+    //return totals of all models, excluding any invalid fields
     getTotal: function() {
         var total = {
             green: 0.00, roasted: 0.00
         };
         _.each(this.models, function(event) {
-            total.green += parseFloat(event.get("greenWeight"));
-            total.roasted += parseFloat(event.get("roastedWeight"));
+            var greenInstance = event.get("greenWeight");
+            var roastedInstance = event.get("roastedWeight");
+            //check for NaN, if found, ignore
+            if (!isNaN(greenInstance) && greenInstance !== "") {
+                console.log(event.get("greenWeight") + " is the number were adding");
+                total.green += parseFloat(event.get("greenWeight"));
+            }
+            if (!isNaN(roastedInstance) && roastedInstance !== "") {
+                total.roasted += parseFloat(event.get("roastedWeight"));    
+            }
         });
         total.total = parseFloat(total.green) + parseFloat(total.roasted);
         console.log("calculated totals from collection: " + total.green + ", " + total.roasted + ", " + total.total);
+        total.green = parseFloat(total.green).toFixed(2);
+        total.roasted = parseFloat(total.roasted).toFixed(2);
+        total.total = parseFloat(total.total).toFixed(2);
         return total;
     },
     initialize: function() {
@@ -142,12 +159,21 @@ var Coffees = Backbone.Collection.extend({
 var Blends = Backbone.Collection.extend({
     url: 'inventory/blendlist',
     model: Blend,
+    
+    //return totals of all models, excluding any invalid fields
     getTotal: function() {
         var total = 0.00;
         _.each(this.models, function(event) {
-            total += parseFloat(event.get("weight"));
+            var totalInstance = event.get("weight");
+            if(!isNaN(totalInstance) && totalInstance !== "") {
+                console.log(totalInstance + " is the number we're adding");
+                total += parseFloat(totalInstance);
+            }
         });
-        return total;
+        return parseFloat(total).toFixed(2);
+    },
+    initialize: function() {
+        this.getTotal();
     }
 });
 
@@ -160,28 +186,17 @@ var Containers = Backbone.Collection.extend({
 //create collection management object
 var AppCollections = function() {
     
-    //create new collections
-    var collectionArray = [];
-    this.addCollection = function(collection) {
-        collectionArray.push(collection);
-    };
-    this.removeCollection = function(collection) {
-        collectionArray.pop(collection);
-    };
-    this.getCollection = function(collection) {
-        return _.find(collectionArray, collection);
-    };
-    this.getAll = function(collection) {
-        return collectionArray;
-    };
+    //array to hold collections
+    this.collectionArray = [];
+    
     //fetch the collection passed to 'fetchThis' function, otherwise fetch all collections
     this.fetchThis = function(collection) {
         if (collection) {
-            var col = _.find(collectionArray, collection, this);
+            var col = _.find(this.collectionArray, collection, this);
             return col.fetch(); //return jqXHR object for use in deffered callbacks
         } else {
             var returnArray = [];
-            _.each(collectionArray, function(col) {
+            _.each(this.collectionArray, function(col) {
                  returnArray.push(col.fetch());    
             });
             return returnArray; //return array of jqXHR objects for use in deffered callbacks
@@ -190,7 +205,7 @@ var AppCollections = function() {
     //sync collections
     this.syncThis = function() {
         var returnArray = [];
-        _.each(collectionArray, function(col) {
+        _.each(this.collectionArray, function(col) {
             returnArray.push(col.sync());
         });
         return returnArray;
@@ -371,8 +386,8 @@ var coffeeItemView = Backbone.View.extend({
     
     events: {
         "click button.calculate": "renderCalculator",
-        "keyup input.green": "updateModelGreen",
-        "keyup input.roasted": "updateModelRoasted"
+        "input input.roasted": "updateModelRoasted",
+        "input input.green": "updateModelGreen"
     },
     initialize: function() {
         this.openPanel = false; //calculator panel is not open.
@@ -414,12 +429,12 @@ var coffeeItemView = Backbone.View.extend({
     },
     updateModelGreen: function(event) {
         var newValue = $(event.currentTarget).val();
-        console.log("the new value is:" + newValue);
-        this.model.set("greenWeight", newValue);
+        validateAndSet(this.model, "greenWeight", newValue);
+        console.log("the new value is:" + this.model.get("greenWeight"));
     },
     updateModelRoasted: function(event) {
         var newValue = $(event.currentTarget).val();
-        this.model.set("roastedWeight", newValue);
+        validateAndSet(this.model, "roastedWeight", newValue);
     },
     updateValues: function() {
         this.$("input.green").val(this.model.get("greenWeight"));
@@ -433,7 +448,7 @@ var blendItemView = Backbone.View.extend({
     
     events: {
         "click button.calculate": "renderCalculator",
-        "keyup input.blend": "updateBlends"
+        "input input.blend": "updateBlends"
     },
     
     initialize: function() {
@@ -464,7 +479,8 @@ var blendItemView = Backbone.View.extend({
     },
     updateBlends: function(event) {
         var newValue = $(event.currentTarget).val();
-        this.model.set("weight", newValue);
+        validateAndSet(this.model, "weight", newValue);
+        console.log("the new value is: " + this.model.get("weight"));
     },
     updateValues: function() {
         this.$("input.blend").val(this.model.get("weight"));
@@ -486,6 +502,7 @@ var CoffeeList = Backbone.View.extend({
             this.updateTotals();
         }, this);
     },
+    
     render: function() {
         console.log(this.collection);
         this.setElement("tbody.viewModels");
@@ -496,24 +513,17 @@ var CoffeeList = Backbone.View.extend({
             var newCoffeeView = new coffeeItemView({model: item});
             this.$el.append(newCoffeeView.render().$el);
         }, this);
+        this.updateTotals();
     },
-    events: {
-        "mouseover input": "consoleThis"
-    },
-    
+
     //update vertical totals
     updateTotals: function() {
         var totals = this.collection.getTotal();
         console.log(totals);
-        $('span.totalGreen').text(totals.green.toFixed(2));
-        $('span.totalRoasted').text(totals.roasted.toFixed(2));
-        $('span.total').text(totals.total.toFixed(2)); 
+        $('span.totalGreen').text(totals.green);
+        $('span.totalRoasted').text(totals.roasted);
+        $('span.total').text(totals.total); 
         console.log(totals.green + " + " + totals.roasted + " = " + totals.total);
-    },
-    //Console Log the current target of the "event" object returned when a mouseover input event occurs.
-    consoleThis: function(event) {
-        var thisField = $(event.currentTarget);
-        console.log('You moused over ' + thisField.val());
     }
 
 });
@@ -533,6 +543,7 @@ var BlendList = Backbone.View.extend({
             this.updateTotals();
         }, this);
     },
+    
     render: function() {
         console.log(this.collection);
         this.setElement("tbody.blendModels");
@@ -543,14 +554,13 @@ var BlendList = Backbone.View.extend({
             var newBlendView = new blendItemView({model: item});
             this.$el.append(newBlendView.render().$el);
         }, this);
-    },
-    events: {
-        "keyup input": "updateTotals"
+        this.updateTotals();
     },
     
+    //update vertical fields
     updateTotals: function() {
         var total = this.collection.getTotal();
-        $('span.blendTotal').text(total.toFixed(2));
+        $('span.blendTotal').text(total);
     }
 });
 
@@ -566,9 +576,11 @@ var Router = Backbone.Router.extend({
             console.log("We have loaded the homepage!");
             $(".viewOne").html(mainViewForm);
             if (firstVisit) {
-                appCollections.addCollection(coffees);
-                appCollections.addCollection(blends);
-                appCollections.addCollection(containers);
+                //upon first visit, put collections in management array and fetch all
+                //once complete, initialize and render collection views
+                appCollections.collectionArray.push(coffees);
+                appCollections.collectionArray.push(blends);
+                appCollections.collectionArray.push(containers);
                 console.log(appCollections.collectionArray);
                 $.when.apply(this, appCollections.fetchThis()).then(function() {
                     console.log("okay, we got the stuff");
@@ -583,21 +595,17 @@ var Router = Backbone.Router.extend({
             } else {
                 console.log("you came back.");
                 coffeeList.render();
+                blendList.render();
             }
         }); 
 
         this.on('route:test', function() {
             console.log("Test page!");
-            $(".viewOne").html("<p>testing...</p>");
-            $(".viewOne").append("<h1>The state of the page...</h1>");
-            $(".viewOne").append('<button type="button" class="btn" onclick="router.navigate(\'\', {trigger: true});">Go Home</button>');
-            console.log(Backbone.history);
-            _.each(appCollections.getAll(), function(event) {
-                console.log(event);
-                _.each(event.models, function(event2) {
-                    $(".viewOne").append("<p>" + JSON.stringify(event2) + "</p>");
-                });
+            var printablePage = _.template($("#printPage").html(), {
+                printCoffees: coffees, 
+                printBlends: blends
             });
+            $(".viewOne").html(printablePage);
         });
     },
     routes: {

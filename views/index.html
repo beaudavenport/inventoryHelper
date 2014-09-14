@@ -125,6 +125,61 @@
             <% }); %>
         </div>
     </script>
+    
+    <!-- Printable Page Template-->
+    <script type="text/template" id="printPage">
+        <table class="table">
+                    <thead>
+                        <tr>
+                            <td>Coffee</td>
+                            <td>Green</td>
+                            <td>Roasted</td>
+                            <td>Total</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <% _.each(printCoffees.models, function(model) { %>
+                           <tr>
+                               <td><%= model.get("name") %></td>
+                               <td><%= model.get("greenWeight") %></td>
+                               <td><%= model.get("roastedWeight") %></td>
+                               <td><%= model.get("roastedWeight") %></td>
+                           </tr>
+                    <% }); %>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                        <% var coffeeTotals = printCoffees.getTotal(); %>
+                            <td>Total:</td>
+                            <td><%= coffeeTotals.green %></td>
+                            <td><%= coffeeTotals.roasted %></td>
+                            <td><%= coffeeTotals.total %></td>
+                        </tr>   
+                    </tbody>
+                </table>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td>Blend</td>
+                            <td>Weight</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <% _.each(printBlends.models, function(model) { %>
+                        <tr>
+                            <td><%= model.get("name") %></td>
+                            <td><%= model.get("weight") %></td>
+                        </tr>
+                    <% }); %>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Total:</td>
+                            <td><%= printBlends.getTotal() %></td>
+                        </tr>
+                    </tbody>
+                </table>
+    </script>
     <script src="javascripts/global.js"></script>
     
 </body>
