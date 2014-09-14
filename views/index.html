@@ -26,8 +26,9 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul class="nav navbar-nav">
                 <li class="active"><a href="#">Inventory</a></li>
-                <li><button type="button" class="btn" onclick="resetModels();">Edit Coffees</button></li>
-                <li><button type="button" class="btn" onclick="router.navigate('test', {trigger: true});">Edit Containers</button></li>
+                <li><button type="button" class="btn" onclick="resetModels();">Revert to Saved</button></li>
+                <li><button type="button" class="btn" onclick="router.navigate('print', {trigger: true});">Print Table</button></li>
+                <li><button type="button" class="btn" onclick="router.navigate('edit', {trigger: true});">Edit Inventory</button></li>
                 <li><a href="#">View Printable</a></li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
@@ -46,59 +47,84 @@
             </div><!-- /.container-fluid -->
         </nav>
         
+        <!-- Target div for rendering content from templates -->
         <div class="viewOne">
-        
-        <script type="text/template" id="mainForm">
-            <!-- Main View Template -->
-            <form class="form-inline">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <td>Coffee</td>
-                            <td>Green</td>
-                            <td>Roasted</td>
-                            <td>Total</td>
-                        </tr>
-                    </thead>
-                    <tbody class="viewModels">
-                    </tbody>
-                    <tbody>
-                         <tr>
-                            <td>Total:</td>
-                            <td><span class="totalGreen">0.00</span></td>
-                            <td><span class="totalRoasted">0.00</span></td>
-                            <td><span class="total">0.00</span></td>
-                        </tr>   
-                    </tbody>
-                </table>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <td>Blend</td>
-                            <td>Weight</td>
-                        </tr>
-                    </thead>
-                    <tbody class="blendModels">
-                    </tbody>
-                    <tbody>
-                        <tr>
-                            <td>Total:</td>
-                            <td><span class="blendTotal">0.00</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </form>
-            </script>
-            
+            <!-- content rendered here -->
+            <div class="container text-center">
+                <span class="glyphicon glyphicon-refresh"></span>
+                <p>Loading...</p>
+            </div>
         </div>
+        
     </div>
     
+    <!-- Load Dependencies -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
     
+    <!-- Main View Template -->
+        
+    <script type="text/template" id="mainForm">
+        <form class="form-inline">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>Coffee</td>
+                        <td>Green</td>
+                        <td>Roasted</td>
+                        <td>Total</td>
+                    </tr>
+                </thead>
+                <tbody class="viewModels">
+                    <tr class="placeHolder">
+                        <td colspan="4">
+                            <div class="container text-center">
+                                <span class="glyphicon glyphicon-refresh"></span>
+                                <p>Loading...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody>
+                     <tr>
+                        <td>Total:</td>
+                        <td><span class="totalGreen">0.00</span></td>
+                        <td><span class="totalRoasted">0.00</span></td>
+                        <td><span class="total">0.00</span></td>
+                    </tr>   
+                </tbody>
+            </table>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>Blend</td>
+                        <td>Weight</td>
+                    </tr>
+                </thead>
+                <tbody class="blendModels">
+                    <tr class="placeHolder">
+                        <td colspan="2">
+                            <div class="container text-center">
+                                <span class="glyphicon glyphicon-refresh"></span>
+                                <p>Loading...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td>Total:</td>
+                        <td><span class="blendTotal">0.00</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </script>
+    
     <!-- Calculator Panel Template -->
+    
     <script type="text/template" id="panelTemplate">
         <td colspan='4'>
             <div>
@@ -127,59 +153,88 @@
     </script>
     
     <!-- Printable Page Template-->
-    <script type="text/template" id="printPage">
+    
+    <script type="text/template" id="printPageTemplate">
         <table class="table">
-                    <thead>
-                        <tr>
-                            <td>Coffee</td>
-                            <td>Green</td>
-                            <td>Roasted</td>
-                            <td>Total</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <% _.each(printCoffees.models, function(model) { %>
-                           <tr>
-                               <td><%= model.get("name") %></td>
-                               <td><%= model.get("greenWeight") %></td>
-                               <td><%= model.get("roastedWeight") %></td>
-                               <td><%= model.get("roastedWeight") %></td>
-                           </tr>
-                    <% }); %>
-                    </tbody>
-                    <tbody>
-                        <tr>
-                        <% var coffeeTotals = printCoffees.getTotal(); %>
-                            <td>Total:</td>
-                            <td><%= coffeeTotals.green %></td>
-                            <td><%= coffeeTotals.roasted %></td>
-                            <td><%= coffeeTotals.total %></td>
-                        </tr>   
-                    </tbody>
-                </table>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <td>Blend</td>
-                            <td>Weight</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <% _.each(printBlends.models, function(model) { %>
-                        <tr>
-                            <td><%= model.get("name") %></td>
-                            <td><%= model.get("weight") %></td>
-                        </tr>
-                    <% }); %>
-                    </tbody>
-                    <tbody>
-                        <tr>
-                            <td>Total:</td>
-                            <td><%= printBlends.getTotal() %></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <thead>
+                <tr>
+                    <td>Coffee</td>
+                    <td>Green</td>
+                    <td>Roasted</td>
+                    <td>Total</td>
+                </tr>
+            </thead>
+            <tbody>
+            <% _.each(printCoffees.models, function(model) { %>
+                   <tr>
+                       <td><%= model.get("name") %></td>
+                       <td><%= model.get("greenWeight") %></td>
+                       <td><%= model.get("roastedWeight") %></td>
+                       <td><%= model.get("roastedWeight") %></td>
+                   </tr>
+            <% }); %>
+            </tbody>
+            <tbody>
+                <tr>
+                <% var coffeeTotals = printCoffees.getTotal(); %>
+                    <td>Total:</td>
+                    <td><%= coffeeTotals.green %></td>
+                    <td><%= coffeeTotals.roasted %></td>
+                    <td><%= coffeeTotals.total %></td>
+                </tr>   
+            </tbody>
+        </table>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Blend</td>
+                    <td>Weight</td>
+                </tr>
+            </thead>
+            <tbody>
+            <% _.each(printBlends.models, function(model) { %>
+                <tr>
+                    <td><%= model.get("name") %></td>
+                    <td><%= model.get("weight") %></td>
+                </tr>
+            <% }); %>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td>Total:</td>
+                    <td><%= printBlends.getTotal() %></td>
+                </tr>
+            </tbody>
+        </table>
     </script>
+    
+    <!-- Edit Inventory Items Template -->
+
+    
+    <script type="text/template" id="editPanelTemplate">
+    <td colspan="4">
+        <div class="container">
+            <button type="button" class="btn btn-danger deleteModel">Delete</button>
+            Name: <input type="text" class="editName" value="<%= editModel.get('name') %>" />
+            <button type="button" class="btn updateModel">Update</button>
+            <button type="button" class="btn cancelEdit">Cancel</button>
+        </div>
+    </td>
+    </script>
+    
+    <!-- placeholder template -->
+    <script type="text/template" id="placeHolderTemplate">
+        <tr class="placeHolder">
+            <td colspan="4">
+                <div class="container text-center">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                    <p>Loading...</p>
+                </div>
+            </td>
+        </tr>   
+    </script>
+    
+    <!-- load application file -->
     <script src="javascripts/global.js"></script>
     
 </body>
