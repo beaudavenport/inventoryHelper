@@ -37,10 +37,23 @@ var resetModels = function() {
     console.log(coffees);
 };
 
+var syncModels = function() {
+    console.log(appCollections.collectionArray);
+    _.each(appCollections.collectionArray, function(collection) {
+        _.each(collection.models, function(model) {
+            console.log(model.id);
+            model.save();
+        });
+    });
+};
+
+
 //backbone model for single-origin (unblended) coffees
 var Coffee = Backbone.Model.extend({
     
     urlRoot: 'inventory/coffeelist',
+    
+    idAttribute: "_id",
     
     defaults: {
         name: "New Coffee",
@@ -68,6 +81,8 @@ var Blend = Backbone.Model.extend({
     
     urlRoot: 'inventory/blendlist',
     
+    idAttribute: "_id",
+    
     defaults: {
         name: "New Blend",
         weight: "0.00"
@@ -82,6 +97,8 @@ var Blend = Backbone.Model.extend({
 var Container = Backbone.Model.extend({
     
     urlRoot: 'inventory/containerlist',
+    
+    idAttribute: "_id",
     
     defaults: {
         name: "New Container",
@@ -597,6 +614,7 @@ var CoffeeList = Backbone.View.extend({
             var newCoffeeView = new coffeeItemView({model: item});
             this.$el.append(newCoffeeView.render().$el);
         }, this);
+        this.$el.append("<tr><td colspan='4'>add a coffee...<td></tr>");
         this.updateTotals();
     },
 
@@ -696,6 +714,7 @@ var BlendList = Backbone.View.extend({
             var newBlendView = new blendItemView({model: item});
             this.$el.append(newBlendView.render().$el);
         }, this);
+        this.$el.append("<tr><td colspan='4'>Add a blend...</td></tr>");
         this.updateTotals();
     },
     
