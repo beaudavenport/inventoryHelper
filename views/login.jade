@@ -1,0 +1,14 @@
+html
+    head
+        title Practice Login
+        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+    body
+        div.container.jumbotron
+            p= errorMessage
+            form(action='', method='post')
+              h1 This is the signup form!
+              input(type='text', name='name')
+              br
+              input(type='password', name='dbKey')
+              br
+              input(type='submit', value='send a post to this same url')

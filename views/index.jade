@@ -1,1 +1,59 @@
-include index.html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+  body
+    include index.html
+    // Nav Bar
+    nav.navbar.navbar-default(role='navigation')
+      .container-fluid
+        // Brand and toggle get grouped for better mobile display
+        .navbar-header
+          button.navbar-toggle(data-target='#bs-example-navbar-collapse-1', data-toggle='collapse', type='button')
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand(href='#')= title
+        // Collect the nav links, forms, and other content for toggling
+        #bs-example-navbar-collapse-1.collapse.navbar-collapse
+          ul.nav.navbar-nav
+            li.active
+              a(href='#')
+            li
+              button.btn(onclick='resetModels();', type='button') Revert to Saved
+            li
+              button.btn(onclick='router.navigate("print", {trigger: true});', type='button') Print Table
+            li
+              button.btn(onclick='router.navigate("edit", {trigger: true});', type='button') Edit Inventory
+            li
+              button.btn(onclick='syncModels();', type='button') Sync to DB
+            li
+              a(href='#') View Printable
+        // /.navbar-collapse
+
+    // Target div for rendering content from templates
+    .viewOne
+      // content rendered here
+      .container.text-center
+        span.glyphicon.glyphicon-refresh
+        p Loading...
+    
+    // Set API access token
+    script!= "(function() { localStorage.setItem('token', '" + token + "'); })()"
+    
+    // Boostrap inital collections into application
+    
+    script!= "(function() { localStorage.setItem('payload', '" + payload + "'); })()"
+    // Load Dependencies
+    
+    // include main html file
+    
+    script(src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js')
+    
+    script(src='javascripts/global.js')
+    

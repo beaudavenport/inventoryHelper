@@ -8,6 +8,9 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var config = require('./config.js');
+var jwt = require('jwt-simple');
+var moment = require('moment');
 
 // Database
 var mongo = require('mongoskin');
@@ -22,6 +25,9 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+// jwt setup
+app.set('jwtTokenSecret', config.jwtString);
+
 app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -31,6 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req,res,next){
     req.db = db;
+    req.app = app;
     next();
 });
 

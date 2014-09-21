@@ -1,150 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Inventory Helper Practice</title>
-    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.min.css" />
-</head>
-<body>
-    <div class="Container">
-        <!-- Nav Bar -->
-        <nav class="navbar navbar-default" role="navigation">
-            <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="#">Inventory Helper</a>
-            </div>
-            
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-              <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><button type="button" class="btn" onclick="resetModels();">Revert to Saved</button></li>
-                <li><button type="button" class="btn" onclick="router.navigate('print', {trigger: true});">Print Table</button></li>
-                <li><button type="button" class="btn" onclick="router.navigate('edit', {trigger: true});">Edit Inventory</button></li>
-                <li><button type="button" class="btn" onclick="syncModels();">Sync to DB</button></li>
-                <li><a href="#">View Printable</a></li>
-              </ul>
-            </div><!-- /.navbar-collapse -->
-            </div><!-- /.container-fluid -->
-        </nav>
-        
-        <!-- Target div for rendering content from templates -->
-        <div class="viewOne">
-            <!-- content rendered here -->
-            <div class="container text-center">
-                <span class="glyphicon glyphicon-refresh"></span>
-                <p>Loading...</p>
-            </div>
-        </div>
-        
-    </div>
+
+<!-- Main View Template -->
     
-    <!-- Load Dependencies -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
-    
-    <!-- Main View Template -->
-        
-    <script type="text/template" id="mainForm">
-        <form class="form-inline">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <td>Coffee</td>
-                        <td>Green</td>
-                        <td>Roasted</td>
-                        <td>Total</td>
-                    </tr>
-                </thead>
-                <tbody class="viewModels">
-                    <tr class="placeHolder">
-                        <td colspan="4">
-                            <div class="container text-center">
-                                <span class="glyphicon glyphicon-refresh"></span>
-                                <p>Loading...</p>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                <tbody>
-                     <tr>
-                        <td>Total:</td>
-                        <td><span class="totalGreen">0.00</span></td>
-                        <td><span class="totalRoasted">0.00</span></td>
-                        <td><span class="total">0.00</span></td>
-                    </tr>   
-                </tbody>
-            </table>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <td>Blend</td>
-                        <td>Weight</td>
-                    </tr>
-                </thead>
-                <tbody class="blendModels">
-                    <tr class="placeHolder">
-                        <td colspan="2">
-                            <div class="container text-center">
-                                <span class="glyphicon glyphicon-refresh"></span>
-                                <p>Loading...</p>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr>
-                        <td>Total:</td>
-                        <td><span class="blendTotal">0.00</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </form>
-    </script>
-    
-    <!-- Calculator Panel Template -->
-    
-    <script type="text/template" id="panelTemplate">
-        <td colspan='4'>
-            <div>
-                Running Total: <span class='calcTotal'>0.00</span>
-                <button type='button' class='btn addRow' onclick='return false'>New Row</button>
-                <button type='button' class='btn done' onclick='return false'>Done</button> 
-                <button type='button' class='btn cancel' onclick='return false'>Cancel</button>
-            </div>
-        </td>
-    </script>
-    
-    <!-- Calculator Row Template -->
-    
-    <script type="text/template" id="calcTemplate">
-        <div class="well container">
-            <p><%= calcModel.get("name") %></p>
-            <button type="button" class="btn btn-danger deleteRow" onclick="return false">Delete</button>
-            <label>Gross Weight:</label>
-            <input type="text" class="calcGross" size="8"/>
-            <button type="button" class="btn btn-info clearTare" onclick="return false">No Tare</button>
-            <% var contList = calcModel.get("containers");
-            _.each(contList.models, function(num) { %>
-                <button type="button" class="btn tareButton" onclick="return false" value="<%= num.get('weight') %>"><%= num.get("name") %></button>
-            <% }); %>
-        </div>
-    </script>
-    
-    <!-- Printable Page Template-->
-    
-    <script type="text/template" id="printPageTemplate">
-        <table class="table">
+<script type="text/template" id="mainForm">
+    <form class="form-inline">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <td>Coffee</td>
@@ -153,78 +12,160 @@
                     <td>Total</td>
                 </tr>
             </thead>
-            <tbody>
-            <% _.each(printCoffees.models, function(model) { %>
-                   <tr>
-                       <td><%= model.get("name") %></td>
-                       <td><%= model.get("greenWeight") %></td>
-                       <td><%= model.get("roastedWeight") %></td>
-                       <td><%= model.get("roastedWeight") %></td>
-                   </tr>
-            <% }); %>
+            <tbody class="viewModels">
+                <tr class="placeHolder">
+                    <td colspan="4">
+                        <div class="container text-center">
+                            <span class="glyphicon glyphicon-refresh"></span>
+                            <p>Loading...</p>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
             <tbody>
-                <tr>
-                <% var coffeeTotals = printCoffees.getTotal(); %>
+                 <tr>
                     <td>Total:</td>
-                    <td><%= coffeeTotals.green %></td>
-                    <td><%= coffeeTotals.roasted %></td>
-                    <td><%= coffeeTotals.total %></td>
+                    <td><span class="totalGreen">0.00</span></td>
+                    <td><span class="totalRoasted">0.00</span></td>
+                    <td><span class="total">0.00</span></td>
                 </tr>   
             </tbody>
         </table>
-        <table class="table">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <td>Blend</td>
                     <td>Weight</td>
                 </tr>
             </thead>
-            <tbody>
-            <% _.each(printBlends.models, function(model) { %>
-                <tr>
-                    <td><%= model.get("name") %></td>
-                    <td><%= model.get("weight") %></td>
+            <tbody class="blendModels">
+                <tr class="placeHolder">
+                    <td colspan="2">
+                        <div class="container text-center">
+                            <span class="glyphicon glyphicon-refresh"></span>
+                            <p>Loading...</p>
+                        </div>
+                    </td>
                 </tr>
-            <% }); %>
             </tbody>
             <tbody>
                 <tr>
                     <td>Total:</td>
-                    <td><%= printBlends.getTotal() %></td>
+                    <td><span class="blendTotal">0.00</span></td>
                 </tr>
             </tbody>
         </table>
-    </script>
-    
-    <!-- Edit Inventory Items Template -->
+    </form>
+</script>
 
-    
-    <script type="text/template" id="editPanelTemplate">
-    <td colspan="4">
-        <div class="container">
-            <button type="button" class="btn btn-danger deleteModel">Delete</button>
-            Name: <input type="text" class="editName" value="<%= editModel.get('name') %>" />
-            <button type="button" class="btn updateModel">Update</button>
-            <button type="button" class="btn cancelEdit">Cancel</button>
+<!-- Calculator Panel Template -->
+
+<script type="text/template" id="panelTemplate">
+    <td colspan='4'>
+        <div>
+            Running Total: <span class='calcTotal'>0.00</span>
+            <button type='button' class='btn addRow' onclick='return false'>New Row</button>
+            <button type='button' class='btn done' onclick='return false'>Done</button> 
+            <button type='button' class='btn cancel' onclick='return false'>Cancel</button>
         </div>
     </td>
-    </script>
-    
-    <!-- placeholder template -->
-    <script type="text/template" id="placeHolderTemplate">
-        <tr class="placeHolder">
-            <td colspan="4">
-                <div class="container text-center">
-                    <span class="glyphicon glyphicon-refresh"></span>
-                    <p>Loading...</p>
-                </div>
-            </td>
-        </tr>   
-    </script>
-    
-    <!-- load application file -->
-    <script src="javascripts/global.js"></script>
-    
-</body>
-</html>
+</script>
+
+<!-- Calculator Row Template -->
+
+<script type="text/template" id="calcTemplate">
+    <div class="well container">
+        <p><%= calcModel.get("name") %></p>
+        <button type="button" class="btn btn-danger deleteRow" onclick="return false">Delete</button>
+        <label>Gross Weight:</label>
+        <input type="text" class="calcGross" size="8"/>
+        <button type="button" class="btn btn-info clearTare" onclick="return false">No Tare</button>
+        <% var contList = calcModel.get("containers");
+        _.each(contList.models, function(num) { %>
+            <button type="button" class="btn tareButton" onclick="return false" value="<%= num.get('weight') %>"><%= num.get("name") %></button>
+        <% }); %>
+    </div>
+</script>
+
+<!-- Printable Page Template-->
+
+<script type="text/template" id="printPageTemplate">
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Coffee</td>
+                <td>Green</td>
+                <td>Roasted</td>
+                <td>Total</td>
+            </tr>
+        </thead>
+        <tbody>
+        <% _.each(printCoffees.models, function(model) { %>
+               <tr>
+                   <td><%= model.get("name") %></td>
+                   <td><%= model.get("greenWeight") %></td>
+                   <td><%= model.get("roastedWeight") %></td>
+                   <td><%= model.get("roastedWeight") %></td>
+               </tr>
+        <% }); %>
+        </tbody>
+        <tbody>
+            <tr>
+            <% var coffeeTotals = printCoffees.getTotal(); %>
+                <td>Total:</td>
+                <td><%= coffeeTotals.green %></td>
+                <td><%= coffeeTotals.roasted %></td>
+                <td><%= coffeeTotals.total %></td>
+            </tr>   
+        </tbody>
+    </table>
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Blend</td>
+                <td>Weight</td>
+            </tr>
+        </thead>
+        <tbody>
+        <% _.each(printBlends.models, function(model) { %>
+            <tr>
+                <td><%= model.get("name") %></td>
+                <td><%= model.get("weight") %></td>
+            </tr>
+        <% }); %>
+        </tbody>
+        <tbody>
+            <tr>
+                <td>Total:</td>
+                <td><%= printBlends.getTotal() %></td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<!-- Edit Inventory Items Template -->
+
+
+<script type="text/template" id="editPanelTemplate">
+<td colspan="4">
+    <div class="container">
+        <button type="button" class="btn btn-danger deleteModel">Delete</button>
+        Name: <input type="text" class="editName" value="<%= editModel.get('name') %>" />
+        <button type="button" class="btn updateModel">Update</button>
+        <button type="button" class="btn cancelEdit">Cancel</button>
+    </div>
+</td>
+</script>
+
+<!-- placeholder template -->
+<script type="text/template" id="placeHolderTemplate">
+    <tr class="placeHolder">
+        <td colspan="4">
+            <div class="container text-center">
+                <span class="glyphicon glyphicon-refresh"></span>
+                <p>Loading...</p>
+            </div>
+        </td>
+    </tr>   
+</script>
+

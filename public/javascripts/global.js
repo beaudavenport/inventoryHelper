@@ -1,5 +1,23 @@
 // Main Application javascript file
 
+// store 'Backbone.sync' function, then override to automatically add JWT authentication token to all API calls
+
+
+var backboneSync = Backbone.sync;
+
+Backbone.sync = function(method, model, options) {
+    
+    var token = localStorage.getItem('token');
+    
+    if (token) {
+        options.headers = {
+            'x-access-token': token
+        };
+    }
+    
+    //call original 'Backbone.sync' with updated options
+    backboneSync(method, model, options);
+};
 
 //declare global 'tare' utility function that maintains access to the original value
 var tare = function(gross) {
@@ -51,7 +69,7 @@ var syncModels = function() {
 //backbone model for single-origin (unblended) coffees
 var Coffee = Backbone.Model.extend({
     
-    urlRoot: 'inventory/coffeelist',
+    urlRoot: 'inventory',
     
     idAttribute: "_id",
     
@@ -79,7 +97,7 @@ var Coffee = Backbone.Model.extend({
 //backbone model for coffee blends
 var Blend = Backbone.Model.extend({
     
-    urlRoot: 'inventory/blendlist',
+    urlRoot: 'inventory',
     
     idAttribute: "_id",
     
@@ -96,7 +114,7 @@ var Blend = Backbone.Model.extend({
 //backbone model for containers to tare
 var Container = Backbone.Model.extend({
     
-    urlRoot: 'inventory/containerlist',
+    urlRoot: 'inventory',
     
     idAttribute: "_id",
     
@@ -111,7 +129,6 @@ var LocalModel = Backbone.Model.extend({});
 LocalModel.prototype.sync = function() { return false; };
 LocalModel.prototype.fetch = function() { return false; };
 LocalModel.prototype.save = function() { return false; };
-
 
 
 //local backbone model for rows in calculator that get tared
@@ -152,7 +169,7 @@ var CalculatorRows = Backbone.Collection.extend({
 //establish data source for coffee collection
 var Coffees = Backbone.Collection.extend({
     
-    url: 'inventory/coffeelist',
+    url: 'inventory/coffee',
     
     model: Coffee,
     
@@ -182,14 +199,14 @@ var Coffees = Backbone.Collection.extend({
     },
     
     initialize: function() {
-        this.getTotal();
+        //this.getTotal();
     }
 });
 
 //establish data source for coffee blends collection
 var Blends = Backbone.Collection.extend({
     
-    url: 'inventory/blendlist',
+    url: 'inventory/blend',
     
     model: Blend,
     
@@ -207,14 +224,14 @@ var Blends = Backbone.Collection.extend({
     },
     
     initialize: function() {
-        this.getTotal();
+        //this.getTotal();
     }
 });
 
 //establish data source for inventory container collection
 var Containers = Backbone.Collection.extend({
     
-    url: 'inventory/containerlist',
+    url: 'inventory/container',
     
     model: Container
 });
@@ -247,13 +264,22 @@ var AppCollections = function() {
         return returnArray;
     };
 };
-
-var appCollections = new AppCollections(),
-    coffees = new Coffees(),
-    blends = new Blends(),
-    containers = new Containers();
-
     
+var appCollections = new AppCollections();
+var bootstrappedCollections = JSON.parse(localStorage.getItem('payload'));
+var coffees = new Coffees();
+coffees.reset(bootstrappedCollections.coffees);
+
+var blends = new Blends();
+blends.reset(bootstrappedCollections.blends);
+
+var containers = new Containers();
+containers.reset(bootstrappedCollections.containers);
+
+appCollections.collectionArray.push(coffees);
+appCollections.collectionArray.push(blends);
+appCollections.collectionArray.push(containers);
+
 //backbone view for calculator panel
 var CalculatorView = Backbone.View.extend({
     
@@ -756,7 +782,10 @@ var Router = Backbone.Router.extend({
     
     initialize: function() {
         console.log("We have made a new router");
-        
+        var token = localStorage.getItem('token');
+        console.log(token);
+        var payload = localStorage.getItem('payload');
+        console.log(payload);
         //home page route renders inventory collections table.
         this.on('route:home', function() {
             $(".viewOne").html(mainViewForm);
@@ -793,24 +822,16 @@ var Router = Backbone.Router.extend({
     }
 });
     
-//upon first visit, put collections in management array and fetch all
-//once complete, begin Backbone history
+//create new router and begin navigation history
 
-appCollections.collectionArray.push(coffees);
-appCollections.collectionArray.push(blends);
-appCollections.collectionArray.push(containers);
+router = new Router();
 
-$.when.apply(this, appCollections.fetchThis()).then(function() {
-    
-    console.log("okay, we got the stuff");
-    
-    //generate coffees list
-    coffeeList = new CoffeeList();
-    
-    //generate blends list
-    blendList = new BlendList();
-    
-    //create new router and begin navigation history
-    router = new Router();
-    Backbone.history.start();
-});
+//generate coffees list
+coffeeList = new CoffeeList();
+
+//generate blends list
+blendList = new BlendList();
+
+Backbone.history.start();
+
+ 
