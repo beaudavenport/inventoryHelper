@@ -1,6 +1,9 @@
 #settings and metadata
 .c9/
 
+#config file
+config.js
+
 # MongoDB Data Folder
 data/
 
