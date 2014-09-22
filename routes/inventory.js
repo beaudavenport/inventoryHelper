@@ -4,12 +4,15 @@
 */
 
 var express = require('express');
-var router = express.Router();
 var jwtAuth = require('../jwtauth.js');
 var ObjectID = require('mongodb').ObjectID;
 
+var router = express.Router();
+
+//any API call must pass JWT authentication
 router.all('/*', jwtAuth);
 
+//get requests with 'type' specified filter results by category, returning a sub-collection
 router.get('/:type', function(req, res) {
     var type = req.params.type;
     var db = req.db;
@@ -21,35 +24,40 @@ router.get('/:type', function(req, res) {
     });
 });
 
+//get requests with an id specified return a single result by ObjectID
 router.get('/:id', function(req, res) {
-    var itemID = new ObjectID(req.params.type);
+    var itemID = new ObjectID(req.params.id);
     var db = req.db;
-    var requestedCollection = 'parkavenue';
-    db.collection(requestedCollection, function(err, col) {
-        col.findOne({_id: itemID}, function(err, result) {
-            if(!err) {
-                res.json(result);
-            }
-        });
+    var requestedCollection = req.inventoryName;
+    db.collection(requestedCollection).findOne({_id: itemID}, function(err, result) {
+        if(!err) {
+            res.json(result);
+        }
     });
 });
 
+//post requests have a 'category' field specified client-side for later retrieval by category
 router.post('/', function(req, res) {
     var newItem = req.body;
     var db = req.db;
     var requestedCollection = req.inventoryName;
-    db.collection(requestedCollection, function(err, col) {
-        col.insert(newItem, {safe: true}, function(err, result) {
-            res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
-        });
+    db.collection(requestedCollection).insert(newItem, {safe: true}, function(error, result, status) {
+        if (!error) {
+            console.log("here's the status: " + status);
+            res.send(newItem);
+        } else {
+            console.log("heres the error: " + error);
+        }
     });
 });
 
+//put requests update a single result by ObjectID
 router.put('/:id', function(req, res) {
+    var itemUpdate = req.body;
+    //remove '_id' field from request body to prevent conflict during update
     var itemID = ObjectID(req.params.id);
     console.log('item id:' + itemID);
-    var itemUpdate = req.body;
-    delete itemUpdate._id;
+    delete itemUpdate._id;  
     console.log(req.body);
     var db = req.db;
     var requestedCollection = req.inventoryName;
@@ -63,14 +71,18 @@ router.put('/:id', function(req, res) {
     });
 });
 
+//delete single result by ObjectID
 router.delete('/:id', function(req, res) {
     var itemId = req.params.id;
     var db = req.db;
     var requestedCollection = req.inventoryName;
-    db.collection(requestedCollection, function(err, col) {
-        col.removeById(itemId, {safe: true}, function(err, result) {
-            res.send((result === 1) ? { msg: '' } : { msg: 'error: ' + err});
-        });
+    db.collection(requestedCollection).removeById(itemId, {safe: true}, function(error, result, status) {
+        if (!error) {
+            console.log("here's the status: " + status);
+            res.send(itemId);
+        } else {
+            console.log("heres the error: " + error);
+        }
     });
 });
 

@@ -56,15 +56,19 @@ var resetModels = function() {
 };
 
 var syncModels = function() {
-    console.log(appCollections.collectionArray);
+    console.log("Syncing data with database...");
+    console.log("These will be saved: " + appCollections.collectionArray);
+    console.log("These will be deleted: " + appCollections.discardedModels)
     _.each(appCollections.collectionArray, function(collection) {
         _.each(collection.models, function(model) {
             console.log(model.id);
             model.save();
         });
     });
+    _.each(appCollections.discardedModels, function(model) {
+        model.destroy();
+    });
 };
-
 
 //backbone model for single-origin (unblended) coffees
 var Coffee = Backbone.Model.extend({
@@ -76,6 +80,7 @@ var Coffee = Backbone.Model.extend({
     defaults: {
         name: "New Coffee",
         origin: "Origin",
+        category: "coffee",
         greenWeight: "0.00",
         roastedWeight: "0.00",
         totalWeight: "0.00",
@@ -103,6 +108,8 @@ var Blend = Backbone.Model.extend({
     
     defaults: {
         name: "New Blend",
+        origin: "Origin",
+        category: "blend",
         weight: "0.00"
     },
     
@@ -120,6 +127,7 @@ var Container = Backbone.Model.extend({
     
     defaults: {
         name: "New Container",
+        category: "container",
         weight: "0.00"
     }
 });
@@ -199,7 +207,7 @@ var Coffees = Backbone.Collection.extend({
     },
     
     initialize: function() {
-        //this.getTotal();
+        this.getTotal();
     }
 });
 
@@ -224,7 +232,7 @@ var Blends = Backbone.Collection.extend({
     },
     
     initialize: function() {
-        //this.getTotal();
+        this.getTotal();
     }
 });
 
@@ -241,6 +249,9 @@ var AppCollections = function() {
     
     //array to hold collections
     this.collectionArray = [];
+    
+    //array to hold removed models for deletion from server
+    this.discardedModels = [];
     
     //fetch the collection passed to 'fetchThis' function, otherwise fetch all collections
     this.fetchThis = function(collection) {
@@ -266,6 +277,8 @@ var AppCollections = function() {
 };
     
 var appCollections = new AppCollections();
+
+//declare inventory collections and reset with JSON payload that was bootstrapped into place from server
 var bootstrappedCollections = JSON.parse(localStorage.getItem('payload'));
 var coffees = new Coffees();
 coffees.reset(bootstrappedCollections.coffees);
@@ -533,6 +546,8 @@ var coffeeItemView = Backbone.View.extend({
         }
         this.$el.after("<tr class='editTarget'></tr>");
         this.openPanel = true;
+        
+        //editPanel template renders an "update" UI if model belongs to a collection
         var editPanel = new EditPanel(this);
         editPanel.render();
     }
@@ -599,6 +614,8 @@ var blendItemView = Backbone.View.extend({
         }
         this.$el.after("<tr class='editTarget'></tr>");
         this.openPanel = true;
+        
+        //editPanel template renders an "update" UI if model belongs to a collection
         var editPanel = new EditPanel(this);
         editPanel.render();
     }
@@ -610,7 +627,7 @@ var CoffeeList = Backbone.View.extend({
     el: "tbody.viewModels",
     
     collection: coffees,
-    
+
     initialize: function() {
         //update totals upon collection view creation and any subsequent changes
         this.updateTotals();
@@ -633,6 +650,10 @@ var CoffeeList = Backbone.View.extend({
         //change element to table body, remove "loading..." placeholder, and render collection
         this.setElement("tbody.viewModels");
         this.$("tr.placeHolder").remove();
+        this.delegateEvents({
+            "click button.addCoffee": "addCoffee",
+        });
+        
         _.each(this.collection.models, function(item) {
             console.log(item);
             console.log(this.$el);
@@ -640,7 +661,7 @@ var CoffeeList = Backbone.View.extend({
             var newCoffeeView = new coffeeItemView({model: item});
             this.$el.append(newCoffeeView.render().$el);
         }, this);
-        this.$el.append("<tr><td colspan='4'>add a coffee...<td></tr>");
+        this.$el.append("<tr><td colspan='4'><button type='button' class='btn addCoffee'>add coffee...</button></td></tr>");
         this.updateTotals();
     },
 
@@ -652,7 +673,26 @@ var CoffeeList = Backbone.View.extend({
         $('span.totalRoasted').text(totals.roasted);
         $('span.total').text(totals.total); 
         console.log(totals.green + " + " + totals.roasted + " = " + totals.total);
-    }
+    },
+    
+    //add new blend to collection
+    addCoffee: function() {
+        //prevent opening multiple calculator panels
+        if(this.openPanel) {
+            return false;
+        }
+        var newCoffee = new Coffee();
+        this.model = newCoffee;
+        console.log("here we would add a new coffee");
+        this.$el.after("<tr class='editTarget'></tr>");
+        this.openPanel = true;
+        
+        //editPanel template renders a "create" UI if model is not yet associated with a collection
+        var editPanel = new EditPanel(this);
+        editPanel.render();
+        this.collection.add(newCoffee);
+    },
+    
 });
 
 //Backbone view for editing inventory item
@@ -668,9 +708,10 @@ var EditPanel = Backbone.View.extend({
     
     render: function() {
         this.delegateEvents({
-            "click .deleteModel": "deleteModel",
-            "click .updateModel": "updateModel",
-            "click .cancelEdit": "cancelEdit"
+            "click button.deleteModel": "deleteModel",
+            "click button.updateModel": "updateModel",
+            "click button.cancelEdit": "cancelEdit",
+            "click button.cancelCreation": "cancelCreation"
         });
         this.$el.html(this.output);
     },
@@ -680,9 +721,11 @@ var EditPanel = Backbone.View.extend({
         //get local reference to model's collection before destroying
         var modelReference = this.model.collection;
         
-        //trigger deletion without contacting server
-        this.model.trigger("destroy", this.model);
+        //remove model from collection and place in discarded models array for deletion from server later
+        var removedModel = this.model.collection.remove(this.model);
+        appCollections.discardedModels.push(removedModel);
         this.currentView.openPanel = false;
+        this.remove();
         modelReference.trigger("renderAgain");
     },
     
@@ -691,6 +734,7 @@ var EditPanel = Backbone.View.extend({
         var newName = this.$(".editName").val();
         this.model.set("name", newName);
         this.currentView.openPanel = false;
+        this.remove();
         this.model.collection.trigger("renderAgain");
     },
     
@@ -698,6 +742,13 @@ var EditPanel = Backbone.View.extend({
         console.log("this would cancel the edit.");
         //set element to parent row associated with view element, reset openPanel switch and remove view
         this.setElement(this.$el.closest('tr'));
+        this.currentView.openPanel = false;
+        this.remove();
+    },
+    
+    cancelCreation: function() {
+        this.setElement(this.$el.closest('tr'));
+        this.model.collection.remove(this.model);
         this.currentView.openPanel = false;
         this.remove();
     }
@@ -733,14 +784,18 @@ var BlendList = Backbone.View.extend({
         //change element to table body, remove "loading..." placeholder, and render collection
         this.setElement("tbody.blendModels");
         this.$("tr.placeHolder").remove();
+        this.delegateEvents({
+            "click button.addBlend": "addBlend",
+        });
+        
         _.each(this.collection.models, function(item) {
             console.log(item);
             console.log(this.$el);
             console.log("You would add the following: " + item.get("name"));
             var newBlendView = new blendItemView({model: item});
-            this.$el.append(newBlendView.render().$el);
+            this.$el.prepend(newBlendView.render().$el);
         }, this);
-        this.$el.append("<tr><td colspan='4'>Add a blend...</td></tr>");
+        this.$el.append("<tr><td colspan='4'><button type='button' class='btn addBlend'>add a blend...</button>");
         this.updateTotals();
     },
     
@@ -748,35 +803,119 @@ var BlendList = Backbone.View.extend({
     updateTotals: function() {
         var total = this.collection.getTotal();
         $('span.blendTotal').text(total);
+    },
+    
+    //add new blend to collection
+    addBlend: function() {
+        //prevent opening multiple calculator panels
+        if(this.openPanel) {
+            return false;
+        }
+        var newBlend = new Blend();
+        this.model = newBlend;
+        console.log("here we would add a new coffee");
+        this.$el.after("<tr class='editTarget'></tr>");
+        this.openPanel = true;
+        
+        //editPanel template renders a "create" UI if model is not yet associated with a collection
+        var editPanel = new EditPanel(this);
+        editPanel.render();
+        this.collection.add(newBlend);
+    
     }
 });
 
 
-var EditContainerList = Backbone.View.extend({
+//collection view for all coffee models
+var ContainerList = Backbone.View.extend({
     
-    el: "ul.containerListUL",
+    el: "tbody.containerTable",
+    
+    events: {
+        "click button.addContainer": "addContainer"    
+    },
     
     collection: containers,
-    
+
     initialize: function() {
-        
+        //listen for an event triggered if the "edit" panel is called and a model in the collection is changed.
+        this.listenTo(this.collection, "renderAgain", function() {
+            var placeHolder = _.template($("#placeHolderTemplate").html())
+            this.$el.html(placeHolder);
+            this.render();
+        }, this);
     },
     
     render: function() {
-        console.log("edit coffee render function called.");
-        _.each(this.collection.models, function(model) {
-            console.log(model.get("name") + " to be edited...");
-            var editPanel = "<li><button type='button' class='btn btn-danger' onclick='return false'>Delete</button>" +
-                model.get("name") + "</li>";
-            this.$el.append(editPanel);
-        }, this);    
-    }
+        console.log(this.collection);
+        this.$("tr.placeHolder").remove();
+        _.each(this.collection.models, function(item) {
+            console.log(item);
+            console.log(this.$el);
+            console.log("You would add the following: " + item.get("name"));
+            var newContainerView = new containerItemView({model: item});
+            this.$el.append(newContainerView.render().$el);
+        }, this);
+        this.$el.append("<tr><td colspan='2'><button type='button' class='btn addContainer'>add container...</button><tr><td>");
+    },
+    
+    //add new container to collection
+    addContainer: function() {
+        //prevent opening multiple calculator panels
+        if(this.openPanel) {
+            return false;
+        }
+        var newContainer = new Container();
+        this.model = newContainer;
+
+        console.log("here we would add a new container");
+        this.$el.after("<tr class='editTarget'></tr>");
+        this.openPanel = true;
+        
+        //editPanel template renders a "create" UI if model is not yet associated with a collection
+        var editPanel = new EditPanel(this);
+        editPanel.render();
+        this.collection.add(newContainer);
+    },
     
 });
 
-var mainViewForm = _.template($("#mainForm").html());
+var containerItemView = Backbone.View.extend({
+    tagName: "tr",
+    
+    events: {
+        "click button.edit": "editContainer"
+    },
+    
+    initialize: function() {
+        this.openPanel = false;
+        var name = this.model.get("name");
+        this.output = "<td>" + name + "<button type='button' class='btn edit' onclick='return false'>edit</button></td>" +
+            "<td>" + this.model.get("weight") + "</td>";
+        console.log("Row Added.");
+    }, 
+    
+    render: function() {
+        this.$el.html(this.output);
+        return this;
+    },
+    
+    editContainer: function() {
+        
+        //prevent opening multiple calculator panels
+        if(this.openPanel) {
+            return false;
+        }
+        this.$el.after("<tr class='editTarget'></tr>");
+        this.openPanel = true;
+        
+        //editPanel template renders an "update" UI if model belongs to a collection
+        var editPanel = new EditPanel(this);
+        editPanel.render();
+    }    
+});
 
-var coffeeList, blendList, router;
+var mainViewForm = _.template($("#mainForm").html());
 
 var Router = Backbone.Router.extend({
     
@@ -786,6 +925,7 @@ var Router = Backbone.Router.extend({
         console.log(token);
         var payload = localStorage.getItem('payload');
         console.log(payload);
+        
         //home page route renders inventory collections table.
         this.on('route:home', function() {
             $(".viewOne").html(mainViewForm);
@@ -802,35 +942,32 @@ var Router = Backbone.Router.extend({
             $(".viewOne").html(printablePage);
         });
         
-        //edit route allows the user to edit models in all collections.
-        this.on('route:edit', function() {
-            var editPage = _.template($("#editInventoryTemplate").html());
-            $(".viewOne").html(editPage);
-            var editCoffeeList = new EditCoffeeList();
-            editCoffeeList.render();
-            var editBlendList = new EditBlendList();
-            editBlendList.render();
-            var editContainerList = new EditContainerList();
-            editContainerList.render();
+        //containers route renders table of containers used in inventory
+        this.on('route:containers', function() {
+            var containersPage = _.template($("#containerPageTemplate").html());
+            $(".viewOne").html(containersPage);
+            //generate container list
+            var containerList = new ContainerList();
+            containerList.render();
         });
     },
     
     routes: {
         '': 'home',
         'print': 'print',
-        'edit': 'edit'
+        'containers': 'containers'
     }
 });
     
 //create new router and begin navigation history
 
-router = new Router();
+var router = new Router();
 
 //generate coffees list
-coffeeList = new CoffeeList();
+var coffeeList = new CoffeeList();
 
 //generate blends list
-blendList = new BlendList();
+var blendList = new BlendList();
 
 Backbone.history.start();
 

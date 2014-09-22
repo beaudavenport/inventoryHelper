@@ -19,18 +19,14 @@ html
         // Collect the nav links, forms, and other content for toggling
         #bs-example-navbar-collapse-1.collapse.navbar-collapse
           ul.nav.navbar-nav
-            li.active
-              a(href='#')
             li
               button.btn(onclick='resetModels();', type='button') Revert to Saved
             li
               button.btn(onclick='router.navigate("print", {trigger: true});', type='button') Print Table
             li
-              button.btn(onclick='router.navigate("edit", {trigger: true});', type='button') Edit Inventory
-            li
               button.btn(onclick='syncModels();', type='button') Sync to DB
             li
-              a(href='#') View Printable
+              a(href='#containers') Edit Containers
         // /.navbar-collapse
 
     // Target div for rendering content from templates
