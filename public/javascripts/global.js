@@ -1,7 +1,27 @@
 // Main Application javascript file
 
-// store 'Backbone.sync' function, then override to automatically add JWT authentication token to all API calls
+var app = (function($, Backbone) {
+    
+//declare view for navbar
+var NavBarView = Backbone.View.extend({
+    
+    el: "#bs-example-navbar-collapse-1",
+    
+    events: {
+        "click li" : "button"
+    },
+    
+    initialize: function() {
+        console.log(this.$el);
+    },
+    
+    button: function() {
+        console.log("You clicked a navbar button");
+    }
+    
+});
 
+// store 'Backbone.sync' function, then override to automatically add JWT authentication token to all API calls
 
 var backboneSync = Backbone.sync;
 
@@ -48,6 +68,43 @@ var validateAndSet = function(model, field, value) {
     } else {
         model.set(field, "");
     }
+};
+
+//basic regex strip special characters function
+var stripSpecialChars = function(original) {
+    return original.replace(/[^\w\s]/gi, '');
+};
+
+//create collection management object
+var AppCollections = function() {
+    
+    //array to hold collections
+    this.collectionArray = [];
+    
+    //array to hold removed models for deletion from server
+    this.discardedModels = [];
+    
+    //fetch the collection passed to 'fetchThis' function, otherwise fetch all collections
+    this.fetchThis = function(collection) {
+        if (collection) {
+            var col = _.find(this.collectionArray, collection, this);
+            return col.fetch(); //return jqXHR object for use in deffered callbacks
+        } else {
+            var returnArray = [];
+            _.each(this.collectionArray, function(col) {
+                 returnArray.push(col.fetch());    
+            });
+            return returnArray; //return array of jqXHR objects for use in deffered callbacks
+        }
+    };
+    //sync collections
+    this.syncThis = function() {
+        var returnArray = [];
+        _.each(this.collectionArray, function(col) {
+            returnArray.push(col.sync());
+        });
+        return returnArray;
+    };
 };
 
 var resetModels = function() {
@@ -244,54 +301,13 @@ var Containers = Backbone.Collection.extend({
     model: Container
 });
 
-//create collection management object
-var AppCollections = function() {
-    
-    //array to hold collections
-    this.collectionArray = [];
-    
-    //array to hold removed models for deletion from server
-    this.discardedModels = [];
-    
-    //fetch the collection passed to 'fetchThis' function, otherwise fetch all collections
-    this.fetchThis = function(collection) {
-        if (collection) {
-            var col = _.find(this.collectionArray, collection, this);
-            return col.fetch(); //return jqXHR object for use in deffered callbacks
-        } else {
-            var returnArray = [];
-            _.each(this.collectionArray, function(col) {
-                 returnArray.push(col.fetch());    
-            });
-            return returnArray; //return array of jqXHR objects for use in deffered callbacks
-        }
-    };
-    //sync collections
-    this.syncThis = function() {
-        var returnArray = [];
-        _.each(this.collectionArray, function(col) {
-            returnArray.push(col.sync());
-        });
-        return returnArray;
-    };
-};
-    
+var mainViewForm = _.template($("#mainForm").html());
+
+//declare collection management object and inventory collections    
 var appCollections = new AppCollections();
-
-//declare inventory collections and reset with JSON payload that was bootstrapped into place from server
-var bootstrappedCollections = JSON.parse(localStorage.getItem('payload'));
 var coffees = new Coffees();
-coffees.reset(bootstrappedCollections.coffees);
-
 var blends = new Blends();
-blends.reset(bootstrappedCollections.blends);
-
 var containers = new Containers();
-containers.reset(bootstrappedCollections.containers);
-
-appCollections.collectionArray.push(coffees);
-appCollections.collectionArray.push(blends);
-appCollections.collectionArray.push(containers);
 
 //backbone view for calculator panel
 var CalculatorView = Backbone.View.extend({
@@ -732,7 +748,8 @@ var EditPanel = Backbone.View.extend({
     updateModel: function() {
         console.log("this would update the model.");
         var newName = this.$(".editName").val();
-        this.model.set("name", newName);
+        console.log("The updated name is: " + newName);
+        this.model.set("name", stripSpecialChars(newName));
         this.currentView.openPanel = false;
         this.remove();
         this.model.collection.trigger("renderAgain");
@@ -915,60 +932,85 @@ var containerItemView = Backbone.View.extend({
     }    
 });
 
-var mainViewForm = _.template($("#mainForm").html());
-
-var Router = Backbone.Router.extend({
+return {
     
+    // expose variable initialization in a revealing module pattern
     initialize: function() {
-        console.log("We have made a new router");
-        var token = localStorage.getItem('token');
-        console.log(token);
-        var payload = localStorage.getItem('payload');
-        console.log(payload);
-        
-        //home page route renders inventory collections table.
-        this.on('route:home', function() {
-            $(".viewOne").html(mainViewForm);
-            coffeeList.render();
-            blendList.render();
-        }); 
-        
-        //print route creates a printer-friendly output of the current LOCAL state of inventory collections.
-        this.on('route:print', function() {
-            var printablePage = _.template($("#printPageTemplate").html(), {
-                printCoffees: coffees, 
-                printBlends: blends
-            });
-            $(".viewOne").html(printablePage);
-        });
-        
-        //containers route renders table of containers used in inventory
-        this.on('route:containers', function() {
-            var containersPage = _.template($("#containerPageTemplate").html());
-            $(".viewOne").html(containersPage);
-            //generate container list
-            var containerList = new ContainerList();
-            containerList.render();
-        });
-    },
+        var Router = Backbone.Router.extend({
     
-    routes: {
-        '': 'home',
-        'print': 'print',
-        'containers': 'containers'
+            initialize: function() {
+                console.log("We have made a new router");
+                var token = localStorage.getItem('token');
+                console.log(token);
+                var payload = localStorage.getItem('payload');
+                console.log(payload);
+                
+                //home page route renders inventory collections table.
+                this.on('route:home', function() {
+                    $(".viewOne").html(mainViewForm);
+                    coffeeList.render();
+                    blendList.render();
+                }); 
+                
+                //print route creates a printer-friendly output of the current LOCAL state of inventory collections.
+                this.on('route:print', function() {
+                    var printablePage = _.template($("#printPageTemplate").html(), {
+                        printCoffees: coffees, 
+                        printBlends: blends
+                    });
+                    $(".viewOne").html(printablePage);
+                });
+                
+                //containers route renders table of containers used in inventory
+                this.on('route:containers', function() {
+                    var containersPage = _.template($("#containerPageTemplate").html());
+                    $(".viewOne").html(containersPage);
+                    //generate container list
+                    var containerList = new ContainerList();
+                    containerList.render();
+                });
+            },
+            
+            routes: {
+                '': 'home',
+                'print': 'print',
+                'containers': 'containers'
+            }
+        });
+        
+        var navBarView = new NavBarView();
+        
+        //declare inventory collections and reset with JSON payload that was bootstrapped into place from server (if present)
+        if(localStorage.getItem('payload') !== "undefined") {
+            console.log(typeof (localStorage.getItem('payload')));
+            var bootstrappedCollections = JSON.parse(localStorage.getItem('payload'));
+            coffees.reset(bootstrappedCollections.coffees);
+            blends.reset(bootstrappedCollections.blends);
+            containers.reset(bootstrappedCollections.containers);
+        }
+        
+        appCollections.collectionArray.push(coffees);
+        appCollections.collectionArray.push(blends);
+        appCollections.collectionArray.push(containers);
+        
+        
+        //generate coffees list
+        var coffeeList = new CoffeeList();
+        
+        //generate blends list
+        var blendList = new BlendList();
+        
+        //create new router and begin navigation history
+        var router = new Router();
+        
+        Backbone.history.start();
+        
     }
+};
+
+})(jQuery, Backbone);
+
+//Call application
+$(function() {
+   app.initialize();
 });
-    
-//create new router and begin navigation history
-
-var router = new Router();
-
-//generate coffees list
-var coffeeList = new CoffeeList();
-
-//generate blends list
-var blendList = new BlendList();
-
-Backbone.history.start();
-
- 

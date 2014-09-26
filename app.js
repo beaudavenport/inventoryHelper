@@ -9,8 +9,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var config = require('./config.js');
-var jwt = require('jwt-simple');
-var moment = require('moment');
 
 // Database
 var mongo = require('mongoskin');

@@ -11,6 +11,7 @@ module.exports = function(req, res, next) {
             if (decodedToken.exp <= Date.now()) {
                 res.end('Access token expired', 400);
             }
+            // if token is valid, attach associated collection to req
             req.inventoryName = decodedToken.iss;
             next();
         } catch(err) {

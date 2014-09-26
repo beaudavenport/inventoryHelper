@@ -2,10 +2,11 @@
 <!-- Main View Template -->
     
 <script type="text/template" id="mainForm">
-    <form class="form-inline">
-        <table class="table table-striped">
+    <div class="panel panel-default">
+        <div class="panel-heading">Single-Origin Coffees</div>
+        <table class="table">
             <thead>
-                <tr>
+                <tr class="text-muted">
                     <td>Coffee</td>
                     <td>Green</td>
                     <td>Roasted</td>
@@ -31,7 +32,10 @@
                 </tr>   
             </tbody>
         </table>
-        <table class="table table-striped">
+    </div>
+    <div class="panel panel-default">
+    <div class="panel-heading">Blends</div>
+        <table class="table">
             <thead>
                 <tr>
                     <td>Blend</td>
@@ -55,7 +59,7 @@
                 </tr>
             </tbody>
         </table>
-    </form>
+    </div>
 </script>
 
 <!-- Calculator Panel Template -->
@@ -161,7 +165,7 @@
 
 <script type="text/template" id="editPanelTemplate">
 <td colspan="4">
-    <div class="container">
+    <div class="container well">
         <% if(typeof(editModel.collection) !== "undefined") { %>
             <button type="button" class="btn btn-danger deleteModel">Delete</button>
         <% } %>

@@ -1,14 +1,40 @@
 html
     head
-        title Practice Login
+        title Inventory Helper Login
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
         link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
     body
-        div.container.jumbotron
-            p= errorMessage
-            form(action='', method='post')
-              h1 This is the signup form!
-              input(type='text', name='name')
-              br
-              input(type='password', name='dbKey')
-              br
-              input(type='submit', value='send a post to this same url')
+        div.container-fluid
+          div.row
+            div.col-md-4.col-md-offset-4.col-xs-8.col-xs-offset-2.text-center.well
+                h1 Welcome to Inventory Helper
+                p.bg-info= errorMessage
+                form(action='/login', method='post')
+                  h3.text-muted Please sign in
+                  input.form-control(type='text', name='name', placeholder='Inventory Name')
+                  br
+                  input.form-control(type='password', name='password', placeholder='Password')
+                  br
+                  button.btn.btn-lg.btn-primary.btn-block(type='submit') Submit
+                  button.btn.btn-lg.btn-success.btn-block.create(type='button') Create New Inventory
+                form.hidden(action='/create', method='post')
+                  h3 Complete the form below to create a new Inventory
+                  label.text-muted(for='newName') Inventory Name (no spaces or special characters)
+                  input.form-control(type='text', name='newName')
+                  br
+                  label.text-muted(for='newPassword') 
+                    |Password (must be at least 8 characters long and contain at least one 
+                    |uppercase letter, one number, and one of the following: '$@$!%?&')
+                  input.form-control(type='password', name='newPassword')
+                  br
+                  input(type='hidden', name='isHuman', val='notHuman')
+                  br
+                  button.btn.btn-lg.btn-primary.btn-block(type='submit', value='send a post to this same url') Create
+                p.bg-success 
+                  |Inventory Helper is a mobile-friendly application for calculating and saving coffee inventory information
+                  |in a coffee roasting facility or coffee shop.  Edit coffees and blends, specify the containers
+                  |they're kept in, automatically generate a printable table of inventory totals and sync changes to 
+                  |your database from any mobile device.
+        script(src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js')
+        script(src='javascripts/loginPage.js')
