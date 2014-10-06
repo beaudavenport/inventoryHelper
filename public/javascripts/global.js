@@ -8,15 +8,58 @@ var NavBarView = Backbone.View.extend({
     el: "#bs-example-navbar-collapse-1",
     
     events: {
-        "click li" : "button"
+        "click li.revert" : "revertToSaved",
+        "click li.sync": "syncToDB",
+        "click li.logout": "logout"
     },
     
     initialize: function() {
         console.log(this.$el);
     },
     
-    button: function() {
-        console.log("You clicked a navbar button");
+    revertToSaved: function() {
+        var placeHolder = _.template($("#placeHolderTemplate").html());
+        $("tbody.viewModels").html(placeHolder);
+        $("tbody.blendModels").html(placeHolder);
+        $.when(this, appCollections.fetchThis()).then(function() {
+            _.each(appCollections.collectionArray, function(col) {
+               console.log("that thing: " + col);
+               col.trigger("renderAgain"); 
+            });
+        });
+    },
+    
+    syncToDB: function() {
+        $('span.lastSync').html("<span class='glyphicon glyphicon-refresh'></span> Syncing...");
+        console.log("Syncing data with database...");
+        console.log("These will be saved: " + appCollections.collectionArray);
+        console.log("These will be deleted: " + appCollections.discardedModels);
+        
+        //save all models in all collections
+        $.when(this, appCollections.saveThis()).then(function() {
+            
+            //destroy all models in discard models "recyling bin" collection
+            $.when(this, appCollections.destroyThis()).then(function() {
+                
+                //update last sync time
+                lastSyncModel.save({}, {
+                    success: function(model, response, options) {
+                        model.set('lastSync', response);
+                        $('span.lastSync').text(moment(model.get('lastSync')).format("MM/DD/YY-h:mm a"));
+                    },
+                    error: function(model, response, options) {
+                        $('span.lastSync').text("Sync Failed. Try Again");
+                    }
+                });
+                
+            });
+        });
+        
+    },
+    
+    logout: function() {
+        localStorage.clear();
+        window.location = "/";
     }
     
 });
@@ -54,9 +97,10 @@ var tare = function(gross) {
 
 //declare global input validation function that uses Regex to check for number with optional single decimal input, otherwise sets to "0.00"
 var validateAndSet = function(model, field, value) {
-    if (value !== "") {                                     //only validate if input is present (i.e., allow empty field)
+    if (value !== "") { 
+        //only validate if input is present (i.e., allow empty field)
         console.log(value);
-        var regExp = /([0-9].[0-9])|[0-9]/;                 //"0.00" format
+        var regExp = /^\d*\.?\d*$/;                 //"0.00" format
         console.log("regex test: " + regExp.test(value));
         if (!regExp.test(value)) {
             console.log(value + " failed the regex test!");
@@ -97,6 +141,7 @@ var AppCollections = function() {
             return returnArray; //return array of jqXHR objects for use in deffered callbacks
         }
     };
+    
     //sync collections
     this.syncThis = function() {
         var returnArray = [];
@@ -105,27 +150,36 @@ var AppCollections = function() {
         });
         return returnArray;
     };
-};
-
-var resetModels = function() {
-    console.log(appCollections.fetchThis());  
-    console.log(coffees);
-};
-
-var syncModels = function() {
-    console.log("Syncing data with database...");
-    console.log("These will be saved: " + appCollections.collectionArray);
-    console.log("These will be deleted: " + appCollections.discardedModels)
-    _.each(appCollections.collectionArray, function(collection) {
-        _.each(collection.models, function(model) {
-            console.log(model.id);
-            model.save();
+    
+    //save individual models
+    this.saveThis = function() {
+        var returnArray = [];
+        _.each(this.collectionArray, function(col) {
+            _.each(col.models, function(model) {
+                returnArray.push(model.save());
+            });
         });
-    });
-    _.each(appCollections.discardedModels, function(model) {
-        model.destroy();
-    });
+        return returnArray;
+    };
+    
+    //destroy deleted models
+    this.destroyThis = function() {
+        var returnArray = [];
+        _.each(this.discardedModels, function(model) {
+            returnArray.push(model.destroy());
+        });
+    };
 };
+//backbone model for lastSync function (to take advantage of Backbone.sync) 
+var LastSync = Backbone.Model.extend({
+    
+    urlRoot: 'inventory/sync',
+    
+    idAttribute: "_id"
+    
+});
+
+var lastSyncModel = new LastSync();
 
 //backbone model for single-origin (unblended) coffees
 var Coffee = Backbone.Model.extend({
@@ -385,6 +439,10 @@ var CalculatorView = Backbone.View.extend({
         }
         console.log(this.model.buttonValue + ": " + this.collection.newTotal);
         
+        //remove collections and buttonValue attributes from model
+        this.model.unset("buttonValue");
+        this.model.unset("containers");
+        
         //set element to parent row associated with view element, reset openPanel switch and remove view
         this.setElement(this.$el.closest('tr'));
         this.currentView.openPanel = false;
@@ -392,6 +450,11 @@ var CalculatorView = Backbone.View.extend({
     },
     
     cancelPanel: function() {
+        
+        //remove collections and buttonValue attributes from model
+        this.model.unset("buttonValue");
+        this.model.unset("containers");
+        
         //set element to parent row associated with view element, reset openPanel switch and remove view
         this.setElement(this.$el.closest('tr'));
         this.currentView.openPanel = false;
@@ -407,7 +470,7 @@ var CalculatorView = Backbone.View.extend({
 //item view for each calculator row
 var calculatorRowView = Backbone.View.extend({
     
-    tagName: "tr",
+    tagName: "div",
     
     events: {
         "click .tareButton": "tare",
@@ -496,12 +559,7 @@ var coffeeItemView = Backbone.View.extend({
     
     initialize: function() {
         this.openPanel = false; //calculator panel is not open.
-        var name = this.model.get("name");
-        this.output =
-            "<td>" + name + "<button type='button' class='btn edit' onclick='return false'>edit</button></td>" +
-            "<td><input type='text' class='green' size='8'/><button type='button' class='btn calculate' value='green' onclick='return false'>Calculate</button></td>" +
-            "<td><input type='text' class='roasted' size='8'/><button type='button' class='btn calculate' value='roasted' onclick='return false'>Calculate</button></td>" +
-            "<td><span class='rowTotal'></span></td>";
+        this.output = _.template($("#coffeeRowTemplate").html(), {model: this.model});
         console.log("Row Added.");
         this.listenTo(this.model, "all", function() {
             this.updateValues();
@@ -582,8 +640,7 @@ var blendItemView = Backbone.View.extend({
     initialize: function() {
         this.openPanel = false;
         var name = this.model.get("name");
-        this.output = "<td>" + name + "<button type='button' class='btn edit' onclick='return false'>edit</button></td>" +
-            "<td><input type='text' class='blend' size='8' /><button type='button' class='btn calculate' value='blend' onclick='return false'>Calculate</button></td>";
+        this.output = _.template($("#blendRowTemplate").html(), {model: this.model});
         console.log("Row Added.");
         this.listenTo(this.model, "all", function() {
             this.updateValues();
@@ -718,8 +775,15 @@ var EditPanel = Backbone.View.extend({
         console.log("edit panel added!");
         this.currentView = parent;
         this.model = parent.model;
+        this.isContainer = parent.isContainer
         this.$el = parent.$el.next(".editTarget");
-        this.output = _.template($("#editPanelTemplate").html(), {editModel: this.model});
+        this.output = _.template($("#editPanelTemplate").html(), 
+        {
+            editModel: this.model,
+            isContainer: this.isContainer
+        });
+        console.log("This is a container: " + this.isContainer);
+
     },
     
     render: function() {
@@ -748,7 +812,15 @@ var EditPanel = Backbone.View.extend({
     updateModel: function() {
         console.log("this would update the model.");
         var newName = this.$(".editName").val();
-        console.log("The updated name is: " + newName);
+        
+        //if model is a container, update weight field, otherwise update origin field
+        if(typeof(this.isContainer) !== "undefined" && this.isContainer === true) {
+            var newWeight = this.$(".editWeight").val();
+            validateAndSet(this.model, "weight", newWeight);
+        } else {
+            var newOrigin = this.$(".editOrigin").val();
+            this.model.set("origin", stripSpecialChars(newOrigin));
+        }
         this.model.set("name", stripSpecialChars(newName));
         this.currentView.openPanel = false;
         this.remove();
@@ -861,6 +933,7 @@ var ContainerList = Backbone.View.extend({
             this.$el.html(placeHolder);
             this.render();
         }, this);
+        
     },
     
     render: function() {
@@ -873,7 +946,7 @@ var ContainerList = Backbone.View.extend({
             var newContainerView = new containerItemView({model: item});
             this.$el.append(newContainerView.render().$el);
         }, this);
-        this.$el.append("<tr><td colspan='2'><button type='button' class='btn addContainer'>add container...</button><tr><td>");
+        this.$el.append("<tr><td colspan='4'><button type='button' class='btn addContainer'>add container...</button></td></tr>");
     },
     
     //add new container to collection
@@ -888,6 +961,8 @@ var ContainerList = Backbone.View.extend({
         console.log("here we would add a new container");
         this.$el.after("<tr class='editTarget'></tr>");
         this.openPanel = true;
+        //set isContainer variable to true for formatting edit template
+        this.isContainer = true;
         
         //editPanel template renders a "create" UI if model is not yet associated with a collection
         var editPanel = new EditPanel(this);
@@ -907,8 +982,8 @@ var containerItemView = Backbone.View.extend({
     initialize: function() {
         this.openPanel = false;
         var name = this.model.get("name");
-        this.output = "<td>" + name + "<button type='button' class='btn edit' onclick='return false'>edit</button></td>" +
-            "<td>" + this.model.get("weight") + "</td>";
+        this.output = "<td colspan='2'>" + name + "<button type='button' class='btn btn-block edit' onclick='return false'><span class='glyphicon glyphicon-wrench'></span></button></td>" +
+            "<td colspan='2'>" + this.model.get("weight") + "</td>";
         console.log("Row Added.");
     }, 
     
@@ -925,6 +1000,7 @@ var containerItemView = Backbone.View.extend({
         }
         this.$el.after("<tr class='editTarget'></tr>");
         this.openPanel = true;
+        this.isContainer = true;
         
         //editPanel template renders an "update" UI if model belongs to a collection
         var editPanel = new EditPanel(this);
@@ -969,12 +1045,20 @@ return {
                     var containerList = new ContainerList();
                     containerList.render();
                 });
+                
+                //delete route deletes entire inventory after prompting user to verify
+                this.on('route:delete', function() {
+                    //render delete page passing in jwt token
+                    var deletePage = _.template($("#deletePageTemplate").html(), {token: localStorage.getItem('token')});
+                    $(".viewOne").html(deletePage);
+                });
             },
             
             routes: {
                 '': 'home',
                 'print': 'print',
-                'containers': 'containers'
+                'containers': 'containers',
+                'delete': 'delete'
             }
         });
         
@@ -987,8 +1071,17 @@ return {
             coffees.reset(bootstrappedCollections.coffees);
             blends.reset(bootstrappedCollections.blends);
             containers.reset(bootstrappedCollections.containers);
+            lastSyncModel.set(bootstrappedCollections.lastSync);
         }
         
+        //print "never" if collection has not yet been sync'd, otherwise format date output
+        if (lastSyncModel.get('lastSync') === "never") {
+            $('span.lastSync').text("never");
+        } else {
+            $('span.lastSync').text(moment(lastSyncModel.get('lastSync')).format("MM/DD/YY-h:mm a"));
+        }
+        
+        //place collections in collection management array
         appCollections.collectionArray.push(coffees);
         appCollections.collectionArray.push(blends);
         appCollections.collectionArray.push(containers);

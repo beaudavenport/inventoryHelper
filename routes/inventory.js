@@ -6,6 +6,7 @@
 var express = require('express');
 var jwtAuth = require('../jwtauth.js');
 var ObjectID = require('mongodb').ObjectID;
+var moment = require('moment');
 
 var router = express.Router();
 
@@ -20,6 +21,8 @@ router.get('/:type', function(req, res) {
     db.collection(requestedCollection).find({category: type}).toArray(function(err, items) {
         if(!err) {
             res.json(items);
+        } else {
+            res.end('An error occured.');
         }
     });
 });
@@ -32,6 +35,8 @@ router.get('/:id', function(req, res) {
     db.collection(requestedCollection).findOne({_id: itemID}, function(err, result) {
         if(!err) {
             res.json(result);
+        } else {
+            res.end('An error occured.');
         }
     });
 });
@@ -43,10 +48,9 @@ router.post('/', function(req, res) {
     var requestedCollection = req.inventoryName;
     db.collection(requestedCollection).insert(newItem, {safe: true}, function(error, result, status) {
         if (!error) {
-            console.log("here's the status: " + status);
             res.send(newItem);
         } else {
-            console.log("heres the error: " + error);
+            res.end('An error occured.');
         }
     });
 });
@@ -56,17 +60,14 @@ router.put('/:id', function(req, res) {
     var itemUpdate = req.body;
     //remove '_id' field from request body to prevent conflict during update
     var itemID = ObjectID(req.params.id);
-    console.log('item id:' + itemID);
     delete itemUpdate._id;  
-    console.log(req.body);
     var db = req.db;
     var requestedCollection = req.inventoryName;
     db.collection(requestedCollection).update({_id: itemID}, itemUpdate, {safe: true}, function(error, result, status) {
         if (!error) {
-            console.log("here's the status: " + status);
             res.send(itemUpdate);
         } else {
-            console.log("heres the error: " + error);
+            res.end('An error occured.');
         }
     });
 });
@@ -78,10 +79,24 @@ router.delete('/:id', function(req, res) {
     var requestedCollection = req.inventoryName;
     db.collection(requestedCollection).removeById(itemId, {safe: true}, function(error, result, status) {
         if (!error) {
-            console.log("here's the status: " + status);
             res.send(itemId);
         } else {
-            console.log("heres the error: " + error);
+            res.end('An error occured.');
+        }
+    });
+});
+
+//update time of last 'Sync to database' event
+router.put('/sync/:id', function(req, res) {
+    var db = req.db;
+    var requestedCollection = req.inventoryName;
+    var lastSync = moment.utc().toJSON();
+    console.log(lastSync);
+    db.collection(requestedCollection).update({'date': 'date'}, { $set: {'lastSync': lastSync}}, {safe: true}, function(error, result, status) {
+        if (!error) {
+            res.send(JSON.stringify(lastSync));
+        } else {
+            res.end('An error occured.');
         }
     });
 });

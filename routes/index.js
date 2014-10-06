@@ -1,6 +1,7 @@
 var express = require('express');
 var moment = require('moment');
 var jwt = require('jwt-simple');
+var jwtAuth = require('../jwtauth.js');
 var bcrypt = require('bcrypt-nodejs');
 var async = require('async');
 
@@ -23,32 +24,26 @@ router.post('/login', function(req, res) {
     var userCollection = stripSpecialChars(req.body.name);
     var password = req.body.password;
     var bcryptPass;
+    var lastSync;
     db.collection(userCollection, {strict: true}, function(err, col) {
     
         if (err) {
             // if collection doesn't exist or there's a problem, re-render login
-            res.render('login', {errorMessage: err});
+            res.render('login', {errorMessage: 'Database doesn\'t exist or there\'s an error'});
         } else {
             
             //check utility document for password match.
             db.collection(userCollection).findOne({'util':'util'}, function(err, result) {
                 if (err) {
-                    console.log("error finding util: " + err);
+                    res.render('login', {errorMessage: 'there\'s a problem with this inventory.'})
                 } else {
-                    console.log(result);
                     bcryptPass = result.pass;
                     
                     // check for correct password
                     bcrypt.compare(password, bcryptPass, function(hashErr, hashRes) {
                         if (hashErr || hashRes !== true) {
-                            console.log(password);
-                            console.log(bcryptPass);
-                            console.log(hashErr);
                             res.render('login', {errorMessage: 'Invalid password.'});
                         } else {
-                            console.log(hashRes);
-                            console.log(password);
-                            console.log(bcryptPass);
                             
                              //create jwt token
                             var expires = moment().add('days', 7).valueOf();
@@ -56,8 +51,6 @@ router.post('/login', function(req, res) {
                                 iss: userCollection,
                                 exp: expires
                             }, app.get('jwtTokenSecret'));
-                    
-                            console.log(token);
                     
                             //get initial JSON list of objects before rendering page
                             async.series(
@@ -85,19 +78,30 @@ router.post('/login', function(req, res) {
                                             if(!err) {
                                                 callback(null, items);
                                             } else {
-                                            callback(null);
+                                                callback(null);
+                                            }
+                                        });
+                                    },
+                                    lastSync: function(callback) {
+                                         db.collection(userCollection).findOne({'date': 'date'}, function(err, items) {
+                                            if(!err) {
+                                                lastSync = items.lastSync;
+                                                callback(null, items);
+                                            } else {
+                                                callback(null);
                                             }
                                         });
                                     }
                                 },
                                 function(err, results) {
                                 var collectionPayload = JSON.stringify(results);
-                                console.log("payload is: " + collectionPayload);
+
                                 //render userCollection template with token payload object in JSON format
                                 //as well as initial collections so that they are bootstrapped into place
                                 //for initial page load
                                 res.render('index', {
                                     title: userCollection,
+                                    lastSync: lastSync,
                                     token: token,
                                     payload: collectionPayload
                                 });
@@ -123,6 +127,7 @@ router.post('/create', function(req, res) {
     
     // a hidden form field is used to protect against bots. "notHuman" is changed to "human" via Jquery client-side.
     var passPhrase = req.body.isHuman;
+    
     if (passPhrase === 'notHuman') {
         res.render('login', {errorMessage: 'Humans only please.'});
     } else if (!passReg.test(newPassword)) {
@@ -131,16 +136,19 @@ router.post('/create', function(req, res) {
         //{strict:true} prevents duplicate collection creation.
         db.createCollection(newCollection, {strict: true}, function(err, collection) {
             if (err) {
-                res.render('login', {errorMessage: err});
+                res.render('login', {errorMessage: 'Database already exists or is unavailable'});
             } else {
                 bcrypt.hash(newPassword, null, null, function(err, bcryptPass) {
-                    console.log(bcryptPass);
-                    db.collection(newCollection).insert({'util' : 'util', 'pass' : bcryptPass}, {safe:true}, function(error, result) {
+
+                    // insert utility and date fields into collection
+                    db.collection(newCollection).insert([
+                        {'util' : 'util', 'pass' : bcryptPass}, 
+                        {'date' : 'date', 'lastSync' : 'never'}
+                    ], {safe:true}, function(error, result) {
                         if(!error) {
-                            console.log("hashed password " + bcryptPass + " inserted");
                             
                             //create jwt token
-                            var expires = moment().add('days', 7).valueOf();
+                            var expires = moment().add(7, 'days').valueOf();
                             var token = jwt.encode({
                                 iss: newCollection,
                                 exp: expires
@@ -148,11 +156,11 @@ router.post('/create', function(req, res) {
                             
                             res.render('index', {
                                 title: newCollection,
+                                lastSync: 'never',
                                 token: token
                             });
-                            console.log(token);
                         } else {
-                            console.log("there was an error: " + error);
+                            res.render('login', {errorMessage: 'An error occured. Please try again.'});
                         }
                     });
                 });
@@ -160,5 +168,19 @@ router.post('/create', function(req, res) {
         });
     }
 });
+
+//upon delete collection, delete collection and render login page
+router.post('/delete', jwtAuth, function(req, res) {
+    var db = req.db;
+    var requestedCollection = req.inventoryName;
+    db.collection(requestedCollection).drop(function(err, collection) {
+        if (err) {
+            res.render('login', {errorMessage: 'Delete Database failed. Please try again.'});
+        } else {
+            res.render('login', {errorMessage: requestedCollection + ' was successfully deleted.'});
+        }
+    });
+});
+
 
 module.exports = router;

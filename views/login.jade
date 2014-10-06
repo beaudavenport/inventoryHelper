@@ -4,10 +4,11 @@ html
         meta(charset='utf-8')
         meta(name='viewport', content='width=device-width, initial-scale=1')
         link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+        link(rel='stylesheet', href='stylesheets/additional-css.css') 
     body
         div.container-fluid
           div.row
-            div.col-md-4.col-md-offset-4.col-xs-8.col-xs-offset-2.text-center.well
+            div.col-md-4.col-md-offset-4.col-xs-8.col-xs-offset-2.text-center.panel
                 h1 Welcome to Inventory Helper
                 p.bg-info= errorMessage
                 form(action='/login', method='post')
@@ -31,10 +32,43 @@ html
                   input(type='hidden', name='isHuman', val='notHuman')
                   br
                   button.btn.btn-lg.btn-primary.btn-block(type='submit', value='send a post to this same url') Create
-                p.bg-success 
-                  |Inventory Helper is a mobile-friendly application for calculating and saving coffee inventory information
-                  |in a coffee roasting facility or coffee shop.  Edit coffees and blends, specify the containers
-                  |they're kept in, automatically generate a printable table of inventory totals and sync changes to 
-                  |your database from any mobile device.
+                hr
+                div.text-muted 
+                  p.lead
+                    |Inventory Helper is a mobile-friendly application for calculating and saving coffee inventory information
+                    |in a coffee roasting facility or coffee shop.
+                  p Coffees and Blends are sorted in a table:
+                  table.table
+                    thead
+                      tr
+                        td Coffee
+                        td Weight
+                    tbody
+                      tr
+                        td Sumatra
+                        td 
+                          input.form-control(placeholder='Enter weight here!')
+                  ul.list-unstyled
+                    li 
+                      span.glyphicon.glyphicon-wrench
+                      p Click the wrench to edit "Name" and "Origin"
+                    li
+                      span.glyphicon.glyphicon-plus
+                      p 
+                        |Click the plus to open that field's calculator panel, which allows you to 
+                        |input a gross weight and automatically tare it by specifying the container
+                        |being used. Edit this list on the "Edit Containers" page!
+                  p
+                    |Totals are updated automatically when you input weights or when you 
+                    |press 'Done' from a calculator panel. 
+                  p.lead Inventory Helper also features:
+                  strong A stateful environment: 
+                  p Edit, make changes, and 'Sync' anytime you choose
+                  strong Undo changes:
+                  p A 'revert' function allows you to reset your inventory from the last Sync
+                  strong Print with ease: 
+                  p A printable page outputs a simple table of your inventory's current state
+                  strong Fully responsive: 
+                  p Access and update your inventory from any computer, tablet or mobile device
         script(src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js')
         script(src='javascripts/loginPage.js')

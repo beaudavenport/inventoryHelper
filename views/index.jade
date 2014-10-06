@@ -3,6 +3,7 @@ html
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1')
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+    link(rel='stylesheet', href='stylesheets/additional-css.css') 
   body
     include index.html
     // Nav Bar
@@ -16,17 +17,24 @@ html
             span.icon-bar
             span.icon-bar
           a.navbar-brand(href='#')= title
+          p.navbar-text.text-muted 
+            strong Last sync: #{''}
+              span.lastSync
         // Collect the nav links, forms, and other content for toggling
         #bs-example-navbar-collapse-1.collapse.navbar-collapse
           ul.nav.navbar-nav
-            li 
+            li.revert 
               a(href='#') Revert to Saved
-            li 
-              a(href='#') Print Table
-            li 
+            li.print 
+              a(href='#print') Print Table
+            li.sync 
               a(href='#') Sync to DB
-            li
+            li.containers
               a(href='#containers') Edit Containers
+            li.delete
+              a(href='#delete') Delete Inventory
+            li.logout
+              a(href='#') Logout
         // /.navbar-collapse
 
     // Target div for rendering content from templates
@@ -46,6 +54,7 @@ html
     
     // include main html file
     
+    script(src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js')

@@ -1,2 +1,18 @@
-p I say good sir, I believe you've encountered an error.
-p= error
+html
+    head
+        title Inventory Helper Login
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+        link(rel='stylesheet', href='stylesheets/additional-css.css') 
+    body
+        div.container-fluid
+          div.row
+            div.col-md-4.col-md-offset-4.col-xs-8.col-xs-offset-2.text-center.panel
+              small
+                span.glyphicon.glyphicon-leaf
+                p Inventory Helper
+              h3 Oops! It looks like you've encountered an error.
+              p= error
+              a.btn.btn-lg.btn-primary.btn-block(href='https://inventoryhelper-c9-beaudavenport.c9.io') Go to Login
+              br

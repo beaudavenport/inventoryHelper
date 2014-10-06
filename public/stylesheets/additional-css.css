@@ -1,0 +1,14 @@
+/* Additional CSS */
+
+body {
+    background-color: #CDB79E;
+}
+
+table {
+    table-layout: fixed;
+    text-align: center;
+}
+
+.description {
+    overflow: hidden;
+}
