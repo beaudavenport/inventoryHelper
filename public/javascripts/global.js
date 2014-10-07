@@ -13,28 +13,22 @@ var NavBarView = Backbone.View.extend({
         "click li.logout": "logout"
     },
     
-    initialize: function() {
-        console.log(this.$el);
-    },
-    
+    //set loading placeholders and fetch collections from database, collections are automatically reset
     revertToSaved: function() {
         var placeHolder = _.template($("#placeHolderTemplate").html());
         $("tbody.viewModels").html(placeHolder);
         $("tbody.blendModels").html(placeHolder);
         $.when(this, appCollections.fetchThis()).then(function() {
             _.each(appCollections.collectionArray, function(col) {
-               console.log("that thing: " + col);
                col.trigger("renderAgain"); 
             });
         });
     },
     
+    //set syncing placeholder and save models, then destroy locally deleted models, then reset last sync
     syncToDB: function() {
         $('span.lastSync').html("<span class='glyphicon glyphicon-refresh'></span> Syncing...");
-        console.log("Syncing data with database...");
-        console.log("These will be saved: " + appCollections.collectionArray);
-        console.log("These will be deleted: " + appCollections.discardedModels);
-        
+
         //save all models in all collections
         $.when(this, appCollections.saveThis()).then(function() {
             
@@ -57,6 +51,7 @@ var NavBarView = Backbone.View.extend({
         
     },
     
+    //clear token and payload from local storage and redirect to login page
     logout: function() {
         localStorage.clear();
         window.location = "/";
@@ -98,15 +93,12 @@ var tare = function(gross) {
 //declare global input validation function that uses Regex to check for number with optional single decimal input, otherwise sets to "0.00"
 var validateAndSet = function(model, field, value) {
     if (value !== "") { 
+        
         //only validate if input is present (i.e., allow empty field)
-        console.log(value);
         var regExp = /^\d*\.?\d*$/;                 //"0.00" format
-        console.log("regex test: " + regExp.test(value));
         if (!regExp.test(value)) {
-            console.log(value + " failed the regex test!");
             model.set(field, "0.00");
         } else {
-            console.log(value + " passed the regex test!");
             model.set(field, value);
         }
     } else {
@@ -170,6 +162,7 @@ var AppCollections = function() {
         });
     };
 };
+
 //backbone model for lastSync function (to take advantage of Backbone.sync) 
 var LastSync = Backbone.Model.extend({
     
@@ -198,7 +191,8 @@ var Coffee = Backbone.Model.extend({
     },
     
     initialize: function() {
-        console.log("New coffee model created: " + this.get("name") + ": " + this.get("totalWeight"));
+        
+        //on model change, update totalweight from green and roasted fields
         this.on("change", function(model) {
             var changedTotal = parseFloat(model.get("greenWeight")) + parseFloat(model.get("roastedWeight"));
             if (isNaN(changedTotal)) {
@@ -224,9 +218,6 @@ var Blend = Backbone.Model.extend({
         weight: "0.00"
     },
     
-    initialize: function() {
-        console.log("new blend created: " + this.get("name"));
-    }
 });
 
 //backbone model for containers to tare
@@ -241,6 +232,7 @@ var Container = Backbone.Model.extend({
         category: "container",
         weight: "0.00"
     }
+    
 });
 
 //backbone model for local collections that don't sync with server
@@ -252,15 +244,19 @@ LocalModel.prototype.save = function() { return false; };
 
 //local backbone model for rows in calculator that get tared
 var CalculatorRow = LocalModel.extend({
+    
     defaults: {
         name: "New Row",
         weight: "0.00"
     },
+    
     initialize: function() {
-        console.log("new calculator row here: ");
+
+        //new tare closure for calculator row
         var parsedWeight = parseFloat(this.get("weight"));
         this.tareFunction = tare(parsedWeight);
     }
+    
 });
 
 var CalculatorRows = Backbone.Collection.extend({
@@ -270,7 +266,6 @@ var CalculatorRows = Backbone.Collection.extend({
     newTotal: 0.00,
     
     initialize: function() {
-        console.log("new calculator row collection!!");
         
         //any change to the collection triggers an update of the total.
         this.on("all", function() {
@@ -280,7 +275,6 @@ var CalculatorRows = Backbone.Collection.extend({
             });
             this.newTotal = total.toFixed(2);
         }, this);
-        
     }
     
 });
@@ -300,17 +294,17 @@ var Coffees = Backbone.Collection.extend({
         _.each(this.models, function(event) {
             var greenInstance = event.get("greenWeight");
             var roastedInstance = event.get("roastedWeight");
+            
             //check for NaN, if found, ignore
             if (!isNaN(greenInstance) && greenInstance !== "") {
-                console.log(event.get("greenWeight") + " is the number were adding");
                 total.green += parseFloat(event.get("greenWeight"));
             }
             if (!isNaN(roastedInstance) && roastedInstance !== "") {
                 total.roasted += parseFloat(event.get("roastedWeight"));    
             }
         });
+        
         total.total = parseFloat(total.green) + parseFloat(total.roasted);
-        console.log("calculated totals from collection: " + total.green + ", " + total.roasted + ", " + total.total);
         total.green = parseFloat(total.green).toFixed(2);
         total.roasted = parseFloat(total.roasted).toFixed(2);
         total.total = parseFloat(total.total).toFixed(2);
@@ -318,6 +312,7 @@ var Coffees = Backbone.Collection.extend({
     },
     
     initialize: function() {
+        //automatically add up totals upon creation
         this.getTotal();
     }
 });
@@ -335,7 +330,6 @@ var Blends = Backbone.Collection.extend({
         _.each(this.models, function(event) {
             var totalInstance = event.get("weight");
             if(!isNaN(totalInstance) && totalInstance !== "") {
-                console.log(totalInstance + " is the number we're adding");
                 total += parseFloat(totalInstance);
             }
         });
@@ -343,6 +337,7 @@ var Blends = Backbone.Collection.extend({
     },
     
     initialize: function() {
+        // automatically add up totals upon creation
         this.getTotal();
     }
 });
@@ -355,6 +350,7 @@ var Containers = Backbone.Collection.extend({
     model: Container
 });
 
+// main inventory table template
 var mainViewForm = _.template($("#mainForm").html());
 
 //declare collection management object and inventory collections    
@@ -369,19 +365,14 @@ var CalculatorView = Backbone.View.extend({
     //initialize function with parent view's scope and calculate subtotal
     initialize: function(parent) {
    
-        console.log(this);
-        console.log("the events for this view are: " + JSON.stringify(this.events));
-        console.log(this.$el);
         this.containers = containers;
         this.collection = new CalculatorRows();
         this.$el = parent.$el.next(".calcTarget");
-        console.log(this.$el);
+
         //pass down scope from parent view
         this.currentView = parent; 
         var calcPanelTarget = _.template($("#panelTemplate").html());
-        console.log(parent);
         this.$el.html(calcPanelTarget);
-        console.log("We reached the end of the function...");
     },
     
     events: {
@@ -391,7 +382,6 @@ var CalculatorView = Backbone.View.extend({
     },
     
     render: function() {
-        console.log("render function called.");
         
         //attach list of containers to coffee item model as well as which value is associated with the calculator button pressed
         this.currentView.model.set("containers", this.containers);
@@ -405,7 +395,6 @@ var CalculatorView = Backbone.View.extend({
         //render new calculator row, passing in current model on rendering for access within view
         var newRow = new calculatorRowView({model: new CalculatorRow()});
         newRow.render(this);
-        console.log(this.currentView.model.get("name"));
         
         //add listener for changes to collection and update running total field
         this.listenTo(this.collection, "all", function() {
@@ -417,12 +406,10 @@ var CalculatorView = Backbone.View.extend({
     renderAdditional: function() {
         var newRow = new calculatorRowView({model: new CalculatorRow()});
         newRow.render(this);
-        console.log("this is what this is:" + this);
     },
     
     returnPanel: function() {
-        console.log("returning panel.");
-        console.log(this.model.get("buttonValue"));
+
         //set correct weight of passed-in view's model based on which button pressed
         switch (this.model.get("buttonValue")) {
             case "green":
@@ -437,7 +424,6 @@ var CalculatorView = Backbone.View.extend({
             default:
                 return 0;
         }
-        console.log(this.model.buttonValue + ": " + this.collection.newTotal);
         
         //remove collections and buttonValue attributes from model
         this.model.unset("buttonValue");
@@ -462,7 +448,7 @@ var CalculatorView = Backbone.View.extend({
     },
     
     updateRunningTotal: function() {
-        console.log(this.el);
+
         this.$(".calcTotal").text(this.collection.newTotal);
     }
 });
@@ -479,22 +465,16 @@ var calculatorRowView = Backbone.View.extend({
         "change .calcGross": "updateTare"
     },
     
-    initialize: function() {
-        console.log("new calculator row view added...");
-    },
-    
     render: function(parentModel) {
-        console.log("new calculator row appended!" +  " " + parentModel.model.get("name"));
+
         //add new calculator row model to collection
         parentModel.collection.add(this.model);
-        console.log(parentModel.collection);
         
         //attach coffee model passed in render function as parent model for current view
         this.parentModel = parentModel;
         this.calcPanel = _.template($("#calcTemplate").html(), {calcModel: this.parentModel.model});
         this.$el.html(this.calcPanel);
         this.parentModel.$el.find("td").prepend(this.$el);
-        console.log(this.el);
         
         //declare DOM constants for easy access
         this.inputField = this.$(".calcGross");
@@ -502,20 +482,18 @@ var calculatorRowView = Backbone.View.extend({
     },
     
     tare: function(event) {
+        
         //highlight current tare when clicked 
-        console.log(this.model.get("weight"));
         $(event.currentTarget).addClass("btn-danger");
         $(event.currentTarget).siblings(".tareButton").removeClass("btn-danger");
         $(event.currentTarget).siblings(".clearTare").removeClass("btn-danger");
 
-        console.log(this.inputField);
         var tareWeight = parseFloat(event.currentTarget.value);
         
         //get tared weight from model
         var newTare = this.model.tareFunction.taredVal(tareWeight);
         this.model.set("weight", newTare);
         this.inputField.val(this.model.get("weight"));
-        console.log(this.model.get("weight"));
     },
     
     updateTare: function(event) {
@@ -533,14 +511,14 @@ var calculatorRowView = Backbone.View.extend({
     },
     
     delete: function() {
-        console.log("Delete this row");
+
         var deleted = this.parentModel.collection.remove(this.model);
         
         //if row to delete is the last remaining row, automatically cancel panel
         if (this.parentModel.collection.length < 1) { 
             this.parentModel.cancelPanel();
         }
-        console.log(deleted);
+
         this.remove();
     }
 });
@@ -558,9 +536,9 @@ var coffeeItemView = Backbone.View.extend({
     },
     
     initialize: function() {
+        
         this.openPanel = false; //calculator panel is not open.
         this.output = _.template($("#coffeeRowTemplate").html(), {model: this.model});
-        console.log("Row Added.");
         this.listenTo(this.model, "all", function() {
             this.updateValues();
         }, this);
@@ -582,23 +560,18 @@ var coffeeItemView = Backbone.View.extend({
         
         //append target row for calculator
         this.$el.after("<tr class='calcTarget'></tr>");
-        console.log("the element with a calc table being appended is: ");
-        console.log(this.$el);
             
         //initialize calculator view, passing it the scope of the current coffee item view as an argument
         this.openPanel = true;
         this.buttonValue = event.currentTarget.value;
+        
         var calculatorView = new CalculatorView(this);
-        //the contents of this function were previously held in a fetch().done callback
-        //by placing the contents in a seperate function and calling after the initialize function
-        //is complete, proper event delegation is ensured.
         calculatorView.render();
     },
     
     updateModelGreen: function(event) {
         var newValue = $(event.currentTarget).val();
         validateAndSet(this.model, "greenWeight", newValue);
-        console.log("the new value is:" + this.model.get("greenWeight"));
     },
     
     updateModelRoasted: function(event) {
@@ -641,7 +614,6 @@ var blendItemView = Backbone.View.extend({
         this.openPanel = false;
         var name = this.model.get("name");
         this.output = _.template($("#blendRowTemplate").html(), {model: this.model});
-        console.log("Row Added.");
         this.listenTo(this.model, "all", function() {
             this.updateValues();
         }, this);
@@ -672,7 +644,6 @@ var blendItemView = Backbone.View.extend({
     updateBlends: function(event) {
         var newValue = $(event.currentTarget).val();
         validateAndSet(this.model, "weight", newValue);
-        console.log("the new value is: " + this.model.get("weight"));
     },
     
     updateValues: function() {
@@ -702,10 +673,10 @@ var CoffeeList = Backbone.View.extend({
     collection: coffees,
 
     initialize: function() {
+        
         //update totals upon collection view creation and any subsequent changes
         this.updateTotals();
         this.listenTo(this.collection, "all", function() {
-            console.log("collection changed.");
             this.updateTotals();
         }, this);
         
@@ -718,7 +689,6 @@ var CoffeeList = Backbone.View.extend({
     },
     
     render: function() {
-        console.log(this.collection);
         
         //change element to table body, remove "loading..." placeholder, and render collection
         this.setElement("tbody.viewModels");
@@ -728,12 +698,10 @@ var CoffeeList = Backbone.View.extend({
         });
         
         _.each(this.collection.models, function(item) {
-            console.log(item);
-            console.log(this.$el);
-            console.log("You would add the following: " + item.get("name"));
             var newCoffeeView = new coffeeItemView({model: item});
             this.$el.append(newCoffeeView.render().$el);
         }, this);
+        
         this.$el.append("<tr><td colspan='4'><button type='button' class='btn addCoffee'>add coffee...</button></td></tr>");
         this.updateTotals();
     },
@@ -741,22 +709,20 @@ var CoffeeList = Backbone.View.extend({
     //update vertical totals
     updateTotals: function() {
         var totals = this.collection.getTotal();
-        console.log(totals);
         $('span.totalGreen').text(totals.green);
         $('span.totalRoasted').text(totals.roasted);
         $('span.total').text(totals.total); 
-        console.log(totals.green + " + " + totals.roasted + " = " + totals.total);
     },
     
     //add new blend to collection
     addCoffee: function() {
+        
         //prevent opening multiple calculator panels
         if(this.openPanel) {
             return false;
         }
         var newCoffee = new Coffee();
         this.model = newCoffee;
-        console.log("here we would add a new coffee");
         this.$el.after("<tr class='editTarget'></tr>");
         this.openPanel = true;
         
@@ -772,7 +738,7 @@ var CoffeeList = Backbone.View.extend({
 var EditPanel = Backbone.View.extend({
     
     initialize: function(parent) {
-        console.log("edit panel added!");
+
         this.currentView = parent;
         this.model = parent.model;
         this.isContainer = parent.isContainer
@@ -782,8 +748,6 @@ var EditPanel = Backbone.View.extend({
             editModel: this.model,
             isContainer: this.isContainer
         });
-        console.log("This is a container: " + this.isContainer);
-
     },
     
     render: function() {
@@ -797,7 +761,7 @@ var EditPanel = Backbone.View.extend({
     },
     
     deleteModel: function() {
-        console.log("this would delete the model.");
+
         //get local reference to model's collection before destroying
         var modelReference = this.model.collection;
         
@@ -810,7 +774,7 @@ var EditPanel = Backbone.View.extend({
     },
     
     updateModel: function() {
-        console.log("this would update the model.");
+
         var newName = this.$(".editName").val();
         
         //if model is a container, update weight field, otherwise update origin field
@@ -828,7 +792,7 @@ var EditPanel = Backbone.View.extend({
     },
     
     cancelEdit: function() {
-        console.log("this would cancel the edit.");
+
         //set element to parent row associated with view element, reset openPanel switch and remove view
         this.setElement(this.$el.closest('tr'));
         this.currentView.openPanel = false;
@@ -852,10 +816,10 @@ var BlendList = Backbone.View.extend({
     collection: blends,
     
     initialize: function() {
+        
         //update totals upon collection view creation and any subsequent changes
         this.updateTotals();
         this.listenTo(this.collection, "all", function() {
-            console.log("collection changed.");
             this.updateTotals();
         }, this);
         
@@ -868,7 +832,6 @@ var BlendList = Backbone.View.extend({
     },
     
     render: function() {
-        console.log(this.collection);
         
         //change element to table body, remove "loading..." placeholder, and render collection
         this.setElement("tbody.blendModels");
@@ -878,12 +841,10 @@ var BlendList = Backbone.View.extend({
         });
         
         _.each(this.collection.models, function(item) {
-            console.log(item);
-            console.log(this.$el);
-            console.log("You would add the following: " + item.get("name"));
             var newBlendView = new blendItemView({model: item});
             this.$el.prepend(newBlendView.render().$el);
         }, this);
+        
         this.$el.append("<tr><td colspan='4'><button type='button' class='btn addBlend'>add a blend...</button>");
         this.updateTotals();
     },
@@ -902,7 +863,6 @@ var BlendList = Backbone.View.extend({
         }
         var newBlend = new Blend();
         this.model = newBlend;
-        console.log("here we would add a new coffee");
         this.$el.after("<tr class='editTarget'></tr>");
         this.openPanel = true;
         
@@ -927,6 +887,7 @@ var ContainerList = Backbone.View.extend({
     collection: containers,
 
     initialize: function() {
+        
         //listen for an event triggered if the "edit" panel is called and a model in the collection is changed.
         this.listenTo(this.collection, "renderAgain", function() {
             var placeHolder = _.template($("#placeHolderTemplate").html())
@@ -937,20 +898,19 @@ var ContainerList = Backbone.View.extend({
     },
     
     render: function() {
-        console.log(this.collection);
+
         this.$("tr.placeHolder").remove();
         _.each(this.collection.models, function(item) {
-            console.log(item);
-            console.log(this.$el);
-            console.log("You would add the following: " + item.get("name"));
             var newContainerView = new containerItemView({model: item});
             this.$el.append(newContainerView.render().$el);
         }, this);
+        
         this.$el.append("<tr><td colspan='4'><button type='button' class='btn addContainer'>add container...</button></td></tr>");
     },
     
     //add new container to collection
     addContainer: function() {
+        
         //prevent opening multiple calculator panels
         if(this.openPanel) {
             return false;
@@ -958,7 +918,6 @@ var ContainerList = Backbone.View.extend({
         var newContainer = new Container();
         this.model = newContainer;
 
-        console.log("here we would add a new container");
         this.$el.after("<tr class='editTarget'></tr>");
         this.openPanel = true;
         //set isContainer variable to true for formatting edit template
@@ -973,6 +932,7 @@ var ContainerList = Backbone.View.extend({
 });
 
 var containerItemView = Backbone.View.extend({
+    
     tagName: "tr",
     
     events: {
@@ -980,11 +940,11 @@ var containerItemView = Backbone.View.extend({
     },
     
     initialize: function() {
+        
         this.openPanel = false;
         var name = this.model.get("name");
         this.output = "<td colspan='2'>" + name + "<button type='button' class='btn btn-block edit' onclick='return false'><span class='glyphicon glyphicon-wrench'></span></button></td>" +
             "<td colspan='2'>" + this.model.get("weight") + "</td>";
-        console.log("Row Added.");
     }, 
     
     render: function() {
@@ -1012,14 +972,13 @@ return {
     
     // expose variable initialization in a revealing module pattern
     initialize: function() {
+        
         var Router = Backbone.Router.extend({
     
             initialize: function() {
-                console.log("We have made a new router");
+
                 var token = localStorage.getItem('token');
-                console.log(token);
                 var payload = localStorage.getItem('payload');
-                console.log(payload);
                 
                 //home page route renders inventory collections table.
                 this.on('route:home', function() {
@@ -1066,7 +1025,7 @@ return {
         
         //declare inventory collections and reset with JSON payload that was bootstrapped into place from server (if present)
         if(localStorage.getItem('payload') !== "undefined") {
-            console.log(typeof (localStorage.getItem('payload')));
+
             var bootstrappedCollections = JSON.parse(localStorage.getItem('payload'));
             coffees.reset(bootstrappedCollections.coffees);
             blends.reset(bootstrappedCollections.blends);
@@ -1075,7 +1034,7 @@ return {
         }
         
         //print "never" if collection has not yet been sync'd, otherwise format date output
-        if (lastSyncModel.get('lastSync') === "never") {
+        if (typeof(lastSyncModel.get('lastSync')) == 'undefined' || lastSyncModel.get('lastSync') === 'never') {
             $('span.lastSync').text("never");
         } else {
             $('span.lastSync').text(moment(lastSyncModel.get('lastSync')).format("MM/DD/YY-h:mm a"));

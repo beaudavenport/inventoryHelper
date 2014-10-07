@@ -86,7 +86,6 @@
 <!-- Coffee Row Template -->
 
 <script type="text/template" id="coffeeRowTemplate">
-
     <td class="description">
         <%- model.get('name') %>
         <br />
@@ -104,7 +103,6 @@
     <td>
         <span class='rowTotal'></span>
     </td>  
-    
 </script>
 
 <!-- Blend Row Template -->
@@ -141,113 +139,113 @@
 <!-- Printable Page Template-->
 
 <script type="text/template" id="printPageTemplate">
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Single-Origin Coffees</h3>
-    </div>
-    <table class="table">
-        <thead>
-            <tr class="text-muted">
-                <td>Coffee</td>
-                <td>Green</td>
-                <td>Roasted</td>
-                <td>Total</td>
-            </tr>
-        </thead>
-        <tbody>
-        <% _.each(printCoffees.models, function(model) { %>
-               <tr>
-                   <td><%- model.get("name") %></td>
-                   <td><%- model.get("greenWeight") %></td>
-                   <td><%- model.get("roastedWeight") %></td>
-                   <td><%- model.get("totalWeight") %></td>
-               </tr>
-        <% }); %>
-        </tbody>
-        <tbody>
-            <tr>
-            <% var coffeeTotals = printCoffees.getTotal(); %>
-                <td>Total:</td>
-                <td><%- coffeeTotals.green %></td>
-                <td><%- coffeeTotals.roasted %></td>
-                <td><%- coffeeTotals.total %></td>
-            </tr>   
-        </tbody>
-    </table>
-    </div>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Blends</h3>
+            <h3 class="panel-title">Single-Origin Coffees</h3>
         </div>
-    <table class="table">
-        <thead>
-            <tr class="text-muted">
-                <td>Blend</td>
-                <td>Weight</td>
-            </tr>
-        </thead>
-        <tbody>
-        <% _.each(printBlends.models, function(model) { %>
-            <tr>
-                <td><%- model.get("name") %></td>
-                <td><%- model.get("weight") %></td>
-            </tr>
-        <% }); %>
-        </tbody>
-        <tbody>
-            <tr>
-                <td>Total:</td>
-                <td><%- printBlends.getTotal() %></td>
-            </tr>
-        </tbody>
-    </table>
+        <table class="table">
+            <thead>
+                <tr class="text-muted">
+                    <td>Coffee</td>
+                    <td>Green</td>
+                    <td>Roasted</td>
+                    <td>Total</td>
+                </tr>
+            </thead>
+            <tbody>
+            <% _.each(printCoffees.models, function(model) { %>
+                   <tr>
+                       <td><%- model.get("name") %></td>
+                       <td><%- model.get("greenWeight") %></td>
+                       <td><%- model.get("roastedWeight") %></td>
+                       <td><%- model.get("totalWeight") %></td>
+                   </tr>
+            <% }); %>
+            </tbody>
+            <tbody>
+                <tr>
+                <% var coffeeTotals = printCoffees.getTotal(); %>
+                    <td>Total:</td>
+                    <td><%- coffeeTotals.green %></td>
+                    <td><%- coffeeTotals.roasted %></td>
+                    <td><%- coffeeTotals.total %></td>
+                </tr>   
+            </tbody>
+        </table>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Blends</h3>
+            </div>
+        <table class="table">
+            <thead>
+                <tr class="text-muted">
+                    <td>Blend</td>
+                    <td>Weight</td>
+                </tr>
+            </thead>
+            <tbody>
+            <% _.each(printBlends.models, function(model) { %>
+                <tr>
+                    <td><%- model.get("name") %></td>
+                    <td><%- model.get("weight") %></td>
+                </tr>
+            <% }); %>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td>Total:</td>
+                    <td><%- printBlends.getTotal() %></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </script>
-
+    
 <!-- Container List Template -->
 <script type="text/temlate" id="containerPageTemplate">
-<div class="container">
-    <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Containers</h3>
+    <div class="container">
+        <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Containers</h3>
+        </div>
+        <table class="table">
+            <thead>
+                <tr class="text-muted">
+                    <td colspan='2'>Container</td>
+                    <td colspan='2'>Weight</td>
+                </tr>
+            </thead>
+            <tbody class="containerTable">
+            </tbody>
+        </table>
+        </div>
     </div>
-    <table class="table">
-        <thead>
-            <tr class="text-muted">
-                <td colspan='2'>Container</td>
-                <td colspan='2'>Weight</td>
-            </tr>
-        </thead>
-        <tbody class="containerTable">
-        </tbody>
-    </table>
-    </div>
-</div>
 </script>
 
 <!-- Edit Inventory Items Template -->
 
 <script type="text/template" id="editPanelTemplate">
-<td colspan="4">
-    <div class="well">
-        <form class="form-inline">
-            <label>Name:</label> <input type="text" class="editName form-control" value="<%- editModel.get('name') %>" />
-            <% if(typeof(isContainer) !== "undefined" && isContainer === true) { %>
-            <label>Weight:</label> <input type="text" class="editWeight form-control" value="<%- editModel.get('weight') %>" />
-            <% } else { %>
-            <label>Origin:</label> <input type="text" class="editOrigin form-control" value="<%- editModel.get('origin') %>" />
-            <% } %>
-            <% if(typeof(editModel.collection) !== "undefined") { %>
-                <button type="button" class="btn btn-danger deleteModel">Delete</button>
-                <button type="button" class="btn btn-info updateModel">Update</button>
-                <button type="button" class="btn cancelEdit">Cancel</button>
-            <% } else { %>
-                <button type="button" class="btn btn-primary updateModel">Create</button>
-                <button type="button" class="btn cancelCreation">Cancel</button>
-            <% } %>
-        </form>
-    </div>
-</td>
+    <td colspan="4">
+        <div class="well">
+            <form class="form-inline">
+                <label>Name:</label> <input type="text" class="editName form-control" value="<%- editModel.get('name') %>" />
+                <% if(typeof(isContainer) !== "undefined" && isContainer === true) { %>
+                <label>Weight:</label> <input type="text" class="editWeight form-control" value="<%- editModel.get('weight') %>" />
+                <% } else { %>
+                <label>Origin:</label> <input type="text" class="editOrigin form-control" value="<%- editModel.get('origin') %>" />
+                <% } %>
+                <% if(typeof(editModel.collection) !== "undefined") { %>
+                    <button type="button" class="btn btn-danger deleteModel">Delete</button>
+                    <button type="button" class="btn btn-info updateModel">Update</button>
+                    <button type="button" class="btn cancelEdit">Cancel</button>
+                <% } else { %>
+                    <button type="button" class="btn btn-primary updateModel">Create</button>
+                    <button type="button" class="btn cancelCreation">Cancel</button>
+                <% } %>
+            </form>
+        </div>
+    </td>
 </script>
 
 <!-- placeholder template -->
@@ -265,13 +263,13 @@
 <!-- delete inventory template -->
 <script type="text/template" id="deletePageTemplate">
     <div class="container">
-    <div class="jumbotron">
-        <form action="/delete" method="post">
-            <h2>Are you sure you want to delete this inventory? <small>This cannot be undone.</small></h2>
-            <button type="submit" class="btn delete btn-lg btn-danger">Delete</button>
-            <a href="#" class="btn home btn-lg btn-primary">Home</a>
-            <input type="hidden" name="access_token" value="<%=token %>"</input>
-        </form>
-    </div>
+        <div class="jumbotron">
+            <form action="/delete" method="post">
+                <h2>Are you sure you want to delete this inventory? <small>This cannot be undone.</small></h2>
+                <button type="submit" class="btn delete btn-lg btn-danger">Delete</button>
+                <a href="#" class="btn home btn-lg btn-primary">Home</a>
+                <input type="hidden" name="access_token" value="<%=token %>"</input>
+            </form>
+        </div>
     </div>
 </script>
