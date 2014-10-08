@@ -11,7 +11,7 @@ var bodyParser = require('body-parser');
 
 // Database
 var mongo = require('mongoskin');
-var db = mongo.db("mongodb://" + process.env.IP + ":27017/inventoryhelper", {native_parser:true});
+var db = mongo.db(process.env.dbURI, {native_parser:true});
 
 var routes = require('./routes/index');
 var inventory = require('./routes/inventory');
