@@ -8,7 +8,6 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var config = require('./config.js');
 
 // Database
 var mongo = require('mongoskin');
@@ -24,7 +23,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // jwt setup
-app.set('jwtTokenSecret', config.jwtString);
+app.set('jwtTokenSecret', process.env.jwtString);
 
 app.use(favicon());
 app.use(logger('dev'));
