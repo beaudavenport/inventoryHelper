@@ -1,6 +1,9 @@
 #settings and metadata
 .c9/
 
+#.env file
+.env
+
 #config file
 config.js
 
