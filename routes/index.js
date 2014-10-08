@@ -24,7 +24,6 @@ router.post('/login', function(req, res) {
     var userCollection = stripSpecialChars(req.body.name);
     var password = req.body.password;
     var bcryptPass;
-    var lastSync;
     db.collection(userCollection, {strict: true}, function(err, col) {
     
         if (err) {
@@ -85,7 +84,6 @@ router.post('/login', function(req, res) {
                                     lastSync: function(callback) {
                                          db.collection(userCollection).findOne({'date': 'date'}, function(err, items) {
                                             if(!err) {
-                                                lastSync = items.lastSync;
                                                 callback(null, items);
                                             } else {
                                                 callback(null);
@@ -94,8 +92,9 @@ router.post('/login', function(req, res) {
                                     }
                                 },
                                 function(err, results) {
+                                var lastSync = JSON.stringify(results.lastSync);
                                 var collectionPayload = JSON.stringify(results);
-
+                            
                                 //render userCollection template with token payload object in JSON format
                                 //as well as initial collections so that they are bootstrapped into place
                                 //for initial page load
@@ -156,7 +155,7 @@ router.post('/create', function(req, res) {
                             
                             res.render('index', {
                                 title: newCollection,
-                                lastSync: 'never',
+                                lastSync: JSON.stringify(result[1]), //second document of the 2 inserted
                                 token: token
                             });
                         } else {

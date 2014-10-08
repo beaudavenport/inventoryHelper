@@ -1030,11 +1030,14 @@ return {
             coffees.reset(bootstrappedCollections.coffees);
             blends.reset(bootstrappedCollections.blends);
             containers.reset(bootstrappedCollections.containers);
-            lastSyncModel.set(bootstrappedCollections.lastSync);
+            
         }
         
+        var parsedLastSync = JSON.parse(localStorage.getItem('lastSync'));
+        lastSyncModel.set(parsedLastSync);
+        
         //print "never" if collection has not yet been sync'd, otherwise format date output
-        if (typeof(lastSyncModel.get('lastSync')) == 'undefined' || lastSyncModel.get('lastSync') === 'never') {
+        if (lastSyncModel.get('lastSync') === 'never') {
             $('span.lastSync').text("never");
         } else {
             $('span.lastSync').text(moment(lastSyncModel.get('lastSync')).format("MM/DD/YY-h:mm a"));

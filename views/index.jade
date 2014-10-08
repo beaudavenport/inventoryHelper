@@ -5,7 +5,9 @@ html
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
     link(rel='stylesheet', href='stylesheets/additional-css.css') 
   body
+    // include main html file
     include index.html
+    
     // Nav Bar
     nav.navbar.navbar-default(role='navigation')
       .container-fluid
@@ -47,13 +49,13 @@ html
     // Set API access token
     script!= "(function() { localStorage.setItem('token', '" + token + "'); })()"
     
+    // Set lastSync object
+    script!= "(function() { localStorage.setItem('lastSync', '" + lastSync + "'); })()"
+    
     // Boostrap inital collections into application
-    
     script!= "(function() { localStorage.setItem('payload', '" + payload + "'); })()"
+    
     // Load Dependencies
-    
-    // include main html file
-    
     script(src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js')
