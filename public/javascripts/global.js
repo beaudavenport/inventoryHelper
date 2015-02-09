@@ -53,7 +53,7 @@ var NavBarView = Backbone.View.extend({
     
     //clear token and payload from local storage and redirect to login page
     logout: function() {
-        localStorage.clear();
+        sessionStorage.clear();
         window.location = "/";
     }
     
@@ -65,7 +65,7 @@ var backboneSync = Backbone.sync;
 
 Backbone.sync = function(method, model, options) {
     
-    var token = localStorage.getItem('token');
+    var token = sessionStorage.getItem('token');
     
     if (token) {
         options.headers = {
@@ -977,8 +977,8 @@ return {
     
             initialize: function() {
 
-                var token = localStorage.getItem('token');
-                var payload = localStorage.getItem('payload');
+                var token = sessionStorage.getItem('token');
+                var payload = sessionStorage.getItem('payload');
                 
                 //home page route renders inventory collections table.
                 this.on('route:home', function() {
@@ -1008,7 +1008,7 @@ return {
                 //delete route deletes entire inventory after prompting user to verify
                 this.on('route:delete', function() {
                     //render delete page passing in jwt token
-                    var deletePage = _.template($("#deletePageTemplate").html(), {token: localStorage.getItem('token')});
+                    var deletePage = _.template($("#deletePageTemplate").html(), {token: sessionStorage.getItem('token')});
                     $(".viewOne").html(deletePage);
                 });
             },
@@ -1024,16 +1024,16 @@ return {
         var navBarView = new NavBarView();
         
         //declare inventory collections and reset with JSON payload that was bootstrapped into place from server (if present)
-        if(localStorage.getItem('payload') !== "undefined") {
+        if(sessionStorage.getItem('payload') !== "undefined") {
 
-            var bootstrappedCollections = JSON.parse(localStorage.getItem('payload'));
+            var bootstrappedCollections = JSON.parse(sessionStorage.getItem('payload'));
             coffees.reset(bootstrappedCollections.coffees);
             blends.reset(bootstrappedCollections.blends);
             containers.reset(bootstrappedCollections.containers);
             
         }
         
-        var parsedLastSync = JSON.parse(localStorage.getItem('lastSync'));
+        var parsedLastSync = JSON.parse(sessionStorage.getItem('lastSync'));
         lastSyncModel.set(parsedLastSync);
         
         //print "never" if collection has not yet been sync'd, otherwise format date output

@@ -47,13 +47,13 @@ html
         p Loading...
     
     // Set API access token
-    script!= "(function() { localStorage.setItem('token', '" + token + "'); })()"
+    script!= "(function() { sessionStorage.setItem('token', '" + token + "'); })()"
     
     // Set lastSync object
-    script!= "(function() { localStorage.setItem('lastSync', '" + lastSync + "'); })()"
+    script!= "(function() { sessionStorage.setItem('lastSync', '" + lastSync + "'); })()"
     
     // Boostrap inital collections into application
-    script!= "(function() { localStorage.setItem('payload', '" + payload + "'); })()"
+    script!= "(function() { sessionStorage.setItem('payload', '" + payload + "'); })()"
     
     // Load Dependencies
     script(src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js')
