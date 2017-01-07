@@ -1,27 +1,44 @@
 {
   "name": "inventoryhelper",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An inventory helper application for coffee roasting facilities",
   "author": "Beau Davenport <davenportbeau@gmail.com>",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "mocha --compilers js:babel-core/register __tests__ --recursive"
   },
   "dependencies": {
-    "express": "~4.2.0",
-    "static-favicon": "~1.0.0",
-    "morgan": "~1.0.0",
-    "cookie-parser": "~1.0.1",
+    "async": "^0.9.0",
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.0.0",
+    "bson": "^0.2.15",
+    "cookie-parser": "~1.0.1",
     "debug": "~0.7.4",
+    "express": "~4.2.0",
+    "express-generator": "^4.9.0",
     "jade": "~1.3.0",
-    "mongodb": "*",
-    "mongoskin": "*",
     "jwt-simple": "^0.2.0",
     "moment": "^2.8.3",
-    "bcrypt-nodejs": "0.0.3",
-    "async": "^0.9.0",
-    "express-generator": "^4.9.0",
-    "bson": "^0.2.15"
+    "mongodb": "*",
+    "mongoskin": "*",
+    "monk": "^3.1.3",
+    "morgan": "~1.0.0",
+    "static-favicon": "~1.0.0",
+    "webpack": "^1.14.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-core": "^6.13.2",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.5.0",
+    "eslint": "^3.12.2",
+    "eslint-plugin-react": "^6.0.0",
+    "mocha": "^3.2.0",
+    "sinon": "^1.17.7",
+    "sinon-as-promised": "^4.0.2",
+    "supertest": "^2.0.1"
   }
 }
