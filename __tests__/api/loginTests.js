@@ -3,8 +3,22 @@ import assert from 'assert';
 import request from 'supertest';
 import app from '../../app';
 import db from '../../dbNew';
+import { getSessionStorageObject } from './testUtils';
+
+const COLLECTION_NAME = 'Potato';
 
 describe('login', () => {
+
+  before((done) => {
+    db.get(COLLECTION_NAME).drop()
+      .then(() => {
+        done();
+      })
+      .catch(() => {
+        done();
+      });
+  });
+
   it('renders login page', (done) => {
     request(app)
       .get('/')
@@ -21,10 +35,13 @@ describe('login', () => {
     request(app)
       .post('/create')
       .type('form')
-      .send({newName: 'potato', newPassword: 'Testw@rd1'})
+      .send({newName: COLLECTION_NAME, newPassword: 'Testw@rd1'})
       .expect(200)
-      .end((err, res) => {
-        db.get('potato').count().then(result => {
+      .end((err) => {
+        if(err) {
+          assert.fail('error creating collection:', err);
+        }
+        db.get(COLLECTION_NAME).count().then(result => {
           assert.strictEqual(result, 2, 'collection created with initial util and sync documents');
           done();
         });
@@ -35,13 +52,21 @@ describe('login', () => {
     request(app)
       .post('/login')
       .type('form')
-      .send({name: 'potato', password: 'Testw@rd1'})
+      .send({name: COLLECTION_NAME, password: 'Testw@rd1'})
       .expect(200)
-      .end((err, res) => {
+      .end((err, response) => {
         if(err) {
           assert.fail('error displaying homepage:', err);
         }
-        console.log('response: ', res);
+        assert(response.text.match(/Potato/), 'set title on response object to collection name');
+        const { payload } = getSessionStorageObject(response.text);
+        const expectedPayload = JSON.stringify({
+          coffees: [],
+          blends: [],
+          containers: [],
+          lastSync: 'never'
+        });
+        assert.strictEqual(expectedPayload, JSON.stringify(payload), 'JSON payload strings match');
         done();
       });
   });

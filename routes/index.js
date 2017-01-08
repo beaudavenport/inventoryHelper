@@ -18,99 +18,120 @@ router.get('/', function(req, res) {
 });
 
 // upon login, check credentials, then create JWT token and render main application page
-router.post('/login', function(req, res) {
-    var db = req.db;
-    var app = req.app;
-    var userCollection = stripSpecialChars(req.body.name);
-    var password = req.body.password;
-    var bcryptPass;
-    db.collection(userCollection, {strict: true}, function(err, col) {
-        if (err) {
-            // if collection doesn't exist or there's a problem, re-render login
-            res.render('login', {errorMessage: 'Database doesn\'t exist or there\'s an error'});
-        } else {
+router.post('/login', (req, res) => {
+  var db = req.dbNew;
+  var app = req.app;
+  var userCollection = stripSpecialChars(req.body.name);
+  var password = req.body.password;
+  var bcryptPass;
 
-            //check utility document for password match.
-            db.collection(userCollection).findOne({'util':'util'}, function(err, result) {
-                if (err) {
-                    res.render('login', {errorMessage: 'there\'s a problem with this inventory.'})
-                } else {
-                    bcryptPass = result.pass;
-
-                    // check for correct password
-                    bcrypt.compare(password, bcryptPass, function(hashErr, hashRes) {
-                        if (hashErr || hashRes !== true) {
-                            res.render('login', {errorMessage: 'Invalid password.'});
-                        } else {
-
-                             //create jwt token
-                            var expires = moment().add('days', 7).valueOf();
-                            var token = jwt.encode({
-                                iss: userCollection,
-                                exp: expires
-                            }, app.get('jwtTokenSecret'));
-
-                            //get initial JSON list of objects before rendering page
-                            async.series(
-                                {
-                                    coffees: function(callback) {
-                                        db.collection(userCollection).find({category: 'coffee'}).toArray(function(err, items) {
-                                            if (!err) {
-                                                callback(null, items);
-                                            } else {
-                                                callback(null);
-                                            }
-                                        });
-                                    },
-                                    blends: function(callback) {
-                                        db.collection(userCollection).find({category: 'blend'}).toArray(function(err, items) {
-                                            if (!err) {
-                                                callback(null, items);
-                                            } else {
-                                                callback(null);
-                                            }
-                                        });
-                                    },
-                                    containers: function(callback) {
-                                        db.collection(userCollection).find({category: 'container'}).toArray(function(err, items) {
-                                            if(!err) {
-                                                callback(null, items);
-                                            } else {
-                                                callback(null);
-                                            }
-                                        });
-                                    },
-                                    lastSync: function(callback) {
-                                         db.collection(userCollection).findOne({'date': 'date'}, function(err, items) {
-                                            if(!err) {
-                                                callback(null, items);
-                                            } else {
-                                                callback(null);
-                                            }
-                                        });
-                                    }
-                                },
-                                function(err, results) {
-                                var lastSync = JSON.stringify(results.lastSync);
-                                var collectionPayload = JSON.stringify(results);
-
-                                //render userCollection template with token payload object in JSON format
-                                //as well as initial collections so that they are bootstrapped into place
-                                //for initial page load
-                                res.render('index', {
-                                    title: userCollection,
-                                    lastSync: lastSync,
-                                    token: token,
-                                    payload: collectionPayload
-                                });
-                            }); // End Async Series
-                        }
-                    }); // End bcrypt.compare
-                }
-            });
-        }
+  var getCollectionUtility = db.get(userCollection).findOne({'util':'util'})
+    .then(function(utility) {
+      return utility;
+    })
+    .catch(function(error) {
+      console.log(error);
+      res.render('login', {errorMessage: 'Database doesn\'t exist or there\'s an error'});
     });
+
+  getCollectionUtility.then(function() {
+    res.render('index', { title: userCollection });
+  });
 });
+
+// router.post('/login', function(req, res) {
+//     var db = req.db;
+//     var app = req.app;
+//     var userCollection = stripSpecialChars(req.body.name);
+//     var password = req.body.password;
+//     var bcryptPass;
+//     db.collection(userCollection, {strict: true}, function(err, col) {
+//         if (err) {
+//             // if collection doesn't exist or there's a problem, re-render login
+//             res.render('login', {errorMessage: 'Database doesn\'t exist or there\'s an error'});
+//         } else {
+//
+//             //check utility document for password match.
+//             db.collection(userCollection).findOne({'util':'util'}, function(err, result) {
+//                 if (err) {
+//                     res.render('login', {errorMessage: 'there\'s a problem with this inventory.'})
+//                 } else {
+//                     bcryptPass = result.pass;
+//
+//                     // check for correct password
+//                     bcrypt.compare(password, bcryptPass, function(hashErr, hashRes) {
+//                         if (hashErr || hashRes !== true) {
+//                             res.render('login', {errorMessage: 'Invalid password.'});
+//                         } else {
+//
+//                              //create jwt token
+//                             var expires = moment().add('days', 7).valueOf();
+//                             var token = jwt.encode({
+//                                 iss: userCollection,
+//                                 exp: expires
+//                             }, app.get('jwtTokenSecret'));
+//
+//                             //get initial JSON list of objects before rendering page
+//                             async.series(
+//                                 {
+//                                     coffees: function(callback) {
+//                                         db.collection(userCollection).find({category: 'coffee'}).toArray(function(err, items) {
+//                                             if (!err) {
+//                                                 callback(null, items);
+//                                             } else {
+//                                                 callback(null);
+//                                             }
+//                                         });
+//                                     },
+//                                     blends: function(callback) {
+//                                         db.collection(userCollection).find({category: 'blend'}).toArray(function(err, items) {
+//                                             if (!err) {
+//                                                 callback(null, items);
+//                                             } else {
+//                                                 callback(null);
+//                                             }
+//                                         });
+//                                     },
+//                                     containers: function(callback) {
+//                                         db.collection(userCollection).find({category: 'container'}).toArray(function(err, items) {
+//                                             if(!err) {
+//                                                 callback(null, items);
+//                                             } else {
+//                                                 callback(null);
+//                                             }
+//                                         });
+//                                     },
+//                                     lastSync: function(callback) {
+//                                          db.collection(userCollection).findOne({'date': 'date'}, function(err, items) {
+//                                             if(!err) {
+//                                                 callback(null, items);
+//                                             } else {
+//                                                 callback(null);
+//                                             }
+//                                         });
+//                                     }
+//                                 },
+//                                 function(err, results) {
+//                                 var lastSync = JSON.stringify(results.lastSync);
+//                                 var collectionPayload = JSON.stringify(results);
+//
+//                                 //render userCollection template with token payload object in JSON format
+//                                 //as well as initial collections so that they are bootstrapped into place
+//                                 //for initial page load
+//                                 res.render('index', {
+//                                     title: userCollection,
+//                                     lastSync: lastSync,
+//                                     token: token,
+//                                     payload: collectionPayload
+//                                 });
+//                             }); // End Async Series
+//                         }
+//                     }); // End bcrypt.compare
+//                 }
+//             });
+//         }
+//     });
+// });
 
 // upon create, set up new collection, then render page
 router.post('/create', function(req, res) {
