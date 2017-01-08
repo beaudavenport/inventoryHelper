@@ -5,8 +5,9 @@
   "author": "Beau Davenport <davenportbeau@gmail.com>",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "test": "mocha --compilers js:babel-core/register __tests__ --recursive"
+    "start": "node ./lib/bin/www",
+    "test": "mocha --compilers js:babel-core/register __tests__ --recursive",
+    "build": "babel src --out-dir lib --copy-files"
   },
   "dependencies": {
     "async": "^0.9.0",

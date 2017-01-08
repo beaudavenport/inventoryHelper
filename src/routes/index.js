@@ -19,22 +19,20 @@ router.get('/', function(req, res) {
 
 // upon login, check credentials, then create JWT token and render main application page
 router.post('/login', (req, res) => {
-  var db = req.dbNew;
-  var app = req.app;
-  var userCollection = stripSpecialChars(req.body.name);
-  var password = req.body.password;
-  var bcryptPass;
+  const db = req.dbNew;
+  const app = req.app;
+  const { name, password } = req.body;
+  const userCollection = stripSpecialChars(name);
+  let bcryptPass;
 
   var getCollectionUtility = db.get(userCollection).findOne({'util':'util'})
-    .then(function(utility) {
-      return utility;
-    })
+    .then(utility => utility)
     .catch(function(error) {
       console.log(error);
       res.render('login', {errorMessage: 'Database doesn\'t exist or there\'s an error'});
     });
 
-  getCollectionUtility.then(function() {
+  getCollectionUtility.then(() => {
     res.render('index', { title: userCollection });
   });
 });
