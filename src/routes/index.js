@@ -37,17 +37,20 @@ router.post('/login', (req, res) => {
   });
 
   getToken.then(token => {
-    let payload = {
-      coffees: [],
-      blends: [],
-      containers: [],
-      lastSync: 'never'
-    };
-    res.render('index', {
-      title: userCollection,
-      payload: JSON.stringify(payload),
-      token
-    });
+    db.get(userCollection).find({category: { $in: ['coffee', 'blend', 'container']}})
+      .then(resultSet => {
+        let payload = {
+          coffees: resultSet.filter(result => result.category === 'coffee'),
+          blends: resultSet.filter(result => result.category === 'blend'),
+          containers: resultSet.filter(result => result.category === 'container'),
+          lastSync: 'never'
+        };
+        res.render('index', {
+          title: userCollection,
+          payload: JSON.stringify(payload),
+          token
+        });
+      });
   })
   .catch(() => {
     res.status(401).render('login', {errorMessage: 'Invalid password.'});

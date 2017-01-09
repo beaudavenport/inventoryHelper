@@ -88,4 +88,31 @@ describe('login', () => {
         done();
       });
   });
+
+  it('includes payload for existing collection', (done) => {
+    db.get(COLLECTION_NAME).insert([{category: 'blend'}, {category: 'coffee'}, {category: 'container'}])
+    .then(() => {
+      request(app)
+        .post('/login')
+        .type('form')
+        .send({name: COLLECTION_NAME, password: COLLECTION_PASSWORD})
+        .expect(200)
+        .end((err, response) => {
+          if(err) {
+            assert.fail('error displaying homepage:', err);
+          }
+          assert(response.text.match(/Potato/), 'set title on response object to collection name');
+          const { payload } = getSessionStorageObject(response.text);
+          const { coffees, blends, containers } = JSON.parse(payload);
+          assert.strictEqual(1, coffees.length, 'coffee record returned');
+          assert.strictEqual(1, blends.length, 'coffee record returned');
+          assert.strictEqual(1, containers.length, 'coffee record returned');
+          done();
+        });
+    })
+    .catch(() => {
+      assert.fail('error loading test data.');
+      done();
+    });
+  });
 });
