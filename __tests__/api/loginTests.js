@@ -6,6 +6,7 @@ import db from '../../src/dbNew';
 import { getSessionStorageObject } from './testUtils';
 
 const COLLECTION_NAME = 'Potato';
+const COLLECTION_PASSWORD = 'Testw@rd1';
 
 describe('login', () => {
 
@@ -35,7 +36,7 @@ describe('login', () => {
     request(app)
       .post('/create')
       .type('form')
-      .send({newName: COLLECTION_NAME, newPassword: 'Testw@rd1'})
+      .send({newName: COLLECTION_NAME, newPassword: COLLECTION_PASSWORD})
       .expect(200)
       .end((err) => {
         if(err) {
@@ -52,14 +53,14 @@ describe('login', () => {
     request(app)
       .post('/login')
       .type('form')
-      .send({name: COLLECTION_NAME, password: 'Testw@rd1'})
+      .send({name: COLLECTION_NAME, password: COLLECTION_PASSWORD})
       .expect(200)
       .end((err, response) => {
         if(err) {
           assert.fail('error displaying homepage:', err);
         }
         assert(response.text.match(/Potato/), 'set title on response object to collection name');
-        const { payload } = getSessionStorageObject(response.text);
+        const { token, payload } = getSessionStorageObject(response.text);
         const expectedPayload = JSON.stringify({
           coffees: [],
           blends: [],
@@ -67,6 +68,23 @@ describe('login', () => {
           lastSync: 'never'
         });
         assert.strictEqual(expectedPayload, payload, 'JSON payload strings match');
+        assert.notEqual(token, 'undefined', 'token string set');
+        done();
+      });
+  });
+
+  it('prevents login for bad password', (done) => {
+    request(app)
+      .post('/login')
+      .type('form')
+      .send({name: COLLECTION_NAME, password: 'badpotatoes'})
+      .expect(401)
+      .end((err, response) => {
+        if(err) {
+          assert.fail('error displaying login:', err);
+        }
+        assert(response.text.match(/Invalid\spassword\./), 'displays invalid password error');
+        assert.deepEqual({}, getSessionStorageObject(response.text), 'session storage payload not set');
         done();
       });
   });

@@ -4,6 +4,7 @@ var jwt = require('jwt-simple');
 var jwtAuth = require('../jwtauth.js');
 var bcrypt = require('bcrypt-nodejs');
 var async = require('async');
+import { getTokenFromLogin } from '../authorization';
 
 var router = express.Router();
 
@@ -23,23 +24,33 @@ router.post('/login', (req, res) => {
   const app = req.app;
   const { name, password } = req.body;
   const userCollection = stripSpecialChars(name);
-  let bcryptPass;
 
-  var getCollectionUtility = db.get(userCollection).findOne({'util':'util'})
+  let getCollectionUtility = db.get(userCollection).findOne({'util':'util'})
     .then(utility => utility)
     .catch(function(error) {
       console.log(error);
       res.render('login', {errorMessage: 'Database doesn\'t exist or there\'s an error'});
     });
 
-  getCollectionUtility.then(() => {
+  let getToken = getCollectionUtility.then(utility => {
+    return getTokenFromLogin(userCollection, password, utility.pass);
+  });
+
+  getToken.then(token => {
     let payload = {
       coffees: [],
       blends: [],
       containers: [],
       lastSync: 'never'
     };
-    res.render('index', { title: userCollection, payload: JSON.stringify(payload) });
+    res.render('index', {
+      title: userCollection,
+      payload: JSON.stringify(payload),
+      token
+    });
+  })
+  .catch(() => {
+    res.status(401).render('login', {errorMessage: 'Invalid password.'});
   });
 });
 
