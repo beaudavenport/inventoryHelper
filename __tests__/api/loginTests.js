@@ -66,7 +66,7 @@ describe('login', () => {
           containers: [],
           lastSync: 'never'
         });
-        assert.strictEqual(expectedPayload, JSON.stringify(payload), 'JSON payload strings match');
+        assert.strictEqual(expectedPayload, payload, 'JSON payload strings match');
         done();
       });
   });

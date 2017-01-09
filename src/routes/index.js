@@ -33,7 +33,13 @@ router.post('/login', (req, res) => {
     });
 
   getCollectionUtility.then(() => {
-    res.render('index', { title: userCollection });
+    let payload = {
+      coffees: [],
+      blends: [],
+      containers: [],
+      lastSync: 'never'
+    };
+    res.render('index', { title: userCollection, payload: JSON.stringify(payload) });
   });
 });
 

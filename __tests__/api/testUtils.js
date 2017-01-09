@@ -1,10 +1,11 @@
 export function getSessionStorageObject(responseText) {
-  let sessionStorageStrings = responseText.match(/sessionStorage\.setItem\(\'[a-zA-Z]+\'\,\s\'[a-zA-Z]+\'\)/g);
+  let sessionStorageStrings = responseText.match(/sessionStorage\.setItem\(\'[a-zA-Z]+\'\,\s\'.*?(?=\'\)\;)/g);
   let sessionStorageObject = {};
   sessionStorageStrings.forEach(sessionStorageString => {
-    let keyValuePair = sessionStorageString.match(/'[a-zA-Z]+\'/g);
-    let key = keyValuePair[0].substring(1, keyValuePair[0].length - 1);
-    let value = keyValuePair[1].substring(1, keyValuePair[1].length - 1);
+    let sessionStorageRegex = /\(\'([a-zA-Z]+)\'\,\s\'(.*)/g;
+    let match = sessionStorageRegex.exec(sessionStorageString);
+    let key = match[1];
+    let value = match[2];
     sessionStorageObject[key] = value;
   });
   return sessionStorageObject;
