@@ -9,7 +9,6 @@ const COLLECTION_NAME = 'Potato';
 const COLLECTION_PASSWORD = 'Testw@rd1';
 
 describe('login', () => {
-
   before((done) => {
     db.get(COLLECTION_NAME).drop()
       .then(() => {

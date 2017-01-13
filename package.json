@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "node ./lib/bin/www",
-    "test": "mocha --compilers js:babel-core/register __tests__ --recursive",
+    "test": "mocha --compilers js:babel-core/register __tests__ --recursive --timeout=15000",
     "build": "babel src --out-dir lib --copy-files"
   },
   "dependencies": {

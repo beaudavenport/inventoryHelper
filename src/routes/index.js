@@ -1,12 +1,13 @@
-var express = require('express');
-var moment = require('moment');
-var jwt = require('jwt-simple');
-var jwtAuth = require('../jwtauth.js');
-var bcrypt = require('bcrypt-nodejs');
-var async = require('async');
+import express from 'express';
+import moment from 'moment';
+import jwt from 'jwt-simple';
+import jwtAuth from '../jwtauth.js';
+import bcrypt from 'bcrypt-nodejs';
+import async from 'async';
+
 import { getTokenFromLogin } from '../authorization';
 
-var router = express.Router();
+let router = express.Router();
 
 //basic regex strip special characters function (no whitespace allowed here)
 var stripSpecialChars = function(original) {
@@ -152,7 +153,7 @@ router.post('/login', (req, res) => {
 // });
 
 // upon create, set up new collection, then render page
-router.post('/create', function(req, res) {
+router.post('/create', (req, res) => {
     var db = req.db;
     var app = req.app;
     var newCollection = stripSpecialChars(req.body.newName);
@@ -166,9 +167,9 @@ router.post('/create', function(req, res) {
     var passPhrase = req.body.isHuman;
 
     if (passPhrase === 'notHuman') {
-        res.render('login', {errorMessage: 'Humans only please.'});
+        res.status(401).render('login', {errorMessage: 'Humans only please.'});
     } else if (!passReg.test(newPassword)) {
-        res.render('login', {errorMessage: 'invalid password...'});
+        res.status(401).render('login', {errorMessage: 'Invalid password.'});
     } else {
         //{strict:true} prevents duplicate collection creation.
         db.createCollection(newCollection, {strict: true}, function(err, collection) {
