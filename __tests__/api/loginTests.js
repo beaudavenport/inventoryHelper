@@ -48,7 +48,7 @@ describe('login', () => {
       });
   });
 
-  it('logs in existing collection', (done) => {
+  it('logs in existing collection and bootstraps jwt token', (done) => {
     request(app)
       .post('/login')
       .type('form')
