@@ -1,21 +1,18 @@
 import express from 'express';
-import moment from 'moment';
-import jwt from 'jwt-simple';
 import jwtAuth from '../jwtauth.js';
-import bcrypt from 'bcrypt-nodejs';
 
 import { getTokenFromLogin, createHashedPassword, createToken } from '../authorization';
 
-let router = express.Router();
+const router = express.Router();
 
 //basic regex strip special characters function (no whitespace allowed here)
-var stripSpecialChars = function(original) {
-    return original.replace(/[^\w]/gi, '');
-};
+function stripSpecialChars(original) {
+  return original.replace(/[^\w]/gi, '');
+}
 
 // GET home page
 router.get('/', function(req, res) {
-    res.render('login');
+  res.render('login');
 });
 
 // upon login, check credentials, then create JWT token and render main application page
@@ -85,12 +82,11 @@ router.post('/create', (req, res) => {
             res.render('index', {
               title: newCollectionName,
               payload: JSON.stringify({coffees: [], blends: [], containers: [], lastSync: 'never' }),
-              token: createToken(hashedPassword)
+              token: createToken(newCollectionName)
             });
           });
       })
-      .catch((error) => {
-        console.error(error);
+      .catch(() => {
         res.render('login', {errorMessage: 'Database already exists or is unavailable'});
       });
   }
@@ -98,15 +94,21 @@ router.post('/create', (req, res) => {
 
 //upon delete collection, delete collection and render login page
 router.post('/delete', jwtAuth, function(req, res) {
-    var db = req.db;
-    var requestedCollection = req.inventoryName;
-    db.collection(requestedCollection).drop(function(err, collection) {
-        if (err) {
-            res.render('login', {errorMessage: 'Delete Database failed. Please try again.'});
-        } else {
-            res.render('login', {errorMessage: requestedCollection + ' was successfully deleted.'});
-        }
-    });
+  const db = req.dbNew;
+  const requestedCollection = req.inventoryName;
+  const collection = db.get(requestedCollection);
+  collection.findOne({'util':'util'}).then((utilDoc) => {
+    if(utilDoc === null) {
+      throw new Error(`${requestedCollection} does not exist`);
+    }
+    return collection.drop();
+  })
+  .then(() => {
+    res.status(200).render('login', {errorMessage: requestedCollection + ' was successfully deleted.'});
+  })
+  .catch(() => {
+    res.status(404).render('login', {errorMessage: 'Delete Database failed. Please try again.'});
+  });
 });
 
 

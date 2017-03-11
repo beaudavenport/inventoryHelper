@@ -9,7 +9,7 @@ const COLLECTION_NAME = 'Potato';
 const COLLECTION_PASSWORD = 'Testw@rd1';
 
 describe('create', () => {
-  before((done) => {
+  beforeEach((done) => {
     db.get(COLLECTION_NAME).drop()
       .then(() => {
         done();

@@ -15,9 +15,9 @@ module.exports = function(req, res, next) {
             req.inventoryName = decodedToken.iss;
             next();
         } catch(err) {
-            return next();
-        } 
+            return next(err);
+        }
     } else {
-        next();    
+        next();
     }
-}; 
+};
