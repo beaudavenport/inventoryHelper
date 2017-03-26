@@ -14,16 +14,18 @@ var router = express.Router();
 router.all('/*', jwtAuth);
 
 //get requests with 'type' specified filter results by category, returning a sub-collection
-router.get('/:type', function(req, res) {
-    var type = req.params.type;
-    var db = req.db;
-    var requestedCollection = req.inventoryName;
-    db.collection(requestedCollection).find({category: type}).toArray(function(err, items) {
-        if(!err) {
-            res.json(items);
-        } else {
-            res.end('An error occured.');
-        }
+
+router.get('/:type', (req, res) => {
+  const type = req.params.type;
+  const db = req.dbNew;
+  const inventoryName = req.inventoryName;
+
+  db.get(inventoryName).find({type})
+    .then(resultSet => {
+      res.json(resultSet);
+    })
+    .catch(err => {
+      res.status(404).json({error: err});
     });
 });
 
@@ -60,7 +62,7 @@ router.put('/:id', function(req, res) {
     var itemUpdate = req.body;
     //remove '_id' field from request body to prevent conflict during update
     var itemID = ObjectID(req.params.id);
-    delete itemUpdate._id;  
+    delete itemUpdate._id;
     var db = req.db;
     var requestedCollection = req.inventoryName;
     db.collection(requestedCollection).update({_id: itemID}, itemUpdate, {safe: true}, function(error, result, status) {
