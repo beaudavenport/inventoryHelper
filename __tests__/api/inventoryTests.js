@@ -1,8 +1,8 @@
 import mocha from 'mocha';
 import assert from 'assert';
 import request from 'supertest';
-import app from '../../src/app';
-import db from '../../src/db';
+import app from '../../src/api/app';
+import db from '../../src/api/db';
 import { getSessionStorageObject } from './testUtils';
 
 const COLLECTION_NAME = 'Potato';
