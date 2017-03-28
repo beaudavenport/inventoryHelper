@@ -2,7 +2,7 @@ import mocha from 'mocha';
 import assert from 'assert';
 import request from 'supertest';
 import app from '../../src/app';
-import db from '../../src/dbNew';
+import db from '../../src/db';
 import { getSessionStorageObject } from './testUtils';
 import { createToken } from '../../src/authorization';
 

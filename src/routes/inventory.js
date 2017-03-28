@@ -15,7 +15,7 @@ router.all('/*', jwtAuth);
 
 router.get('/:type', (req, res) => {
   const type = req.params.type;
-  const db = req.dbNew;
+  const db = req.db;
   const inventoryName = req.inventoryName;
 
   db.get(inventoryName).find({type})
@@ -30,7 +30,7 @@ router.get('/:type', (req, res) => {
 //get requests with an id specified return a single result by ObjectID
 router.get('/:id', (req, res) => {
   const id = req.params.id;
-  const db = req.dbNew;
+  const db = req.db;
   const inventoryName = req.inventoryName;
 
   db.get(inventoryName).findOne({_id: id})
@@ -45,7 +45,7 @@ router.get('/:id', (req, res) => {
 //post requests have a 'category' field specified client-side for later retrieval by category
 router.post('/', (req, res) => {
   const newItem = req.body;
-  const db = req.dbNew;
+  const db = req.db;
   const inventoryName = req.inventoryName;
 
   db.get(inventoryName).insert(newItem, {safe: true})
@@ -61,7 +61,7 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
   const update = req.body;
   const id = req.params.id;
-  const db = req.dbNew;
+  const db = req.db;
   const inventoryName = req.inventoryName;
   const inventory = db.get(inventoryName);
 
@@ -80,7 +80,7 @@ router.put('/:id', (req, res) => {
 //delete single result by ObjectID
 router.delete('/:id', (req, res) => {
   const id = req.params.id;
-  const db = req.dbNew;
+  const db = req.db;
   const inventoryName = req.inventoryName;
 
   db.collection(inventoryName).remove({_id: id})
@@ -94,7 +94,7 @@ router.delete('/:id', (req, res) => {
 
 //update time of last 'Sync to database' event
 router.put('/sync/:id', (req, res) => {
-  const db = req.dbNew;
+  const db = req.db;
   const inventoryName = req.inventoryName;
   const inventory = db.get(inventoryName);
 

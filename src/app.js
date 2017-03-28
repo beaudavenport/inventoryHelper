@@ -9,7 +9,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var db = require('./db');
-var dbNew = require('./dbNew');
 var routes = require('./routes/index');
 var inventory = require('./routes/inventory');
 
@@ -31,7 +30,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req,res,next){
   req.db = db;
-  req.dbNew = dbNew;
   req.app = app;
   next();
 });

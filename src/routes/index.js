@@ -17,7 +17,7 @@ router.get('/', function(req, res) {
 
 // upon login, check credentials, then create JWT token and render main application page
 router.post('/login', (req, res) => {
-  const db = req.dbNew;
+  const db = req.db;
   const { name, password } = req.body;
   const userCollection = stripSpecialChars(name);
 
@@ -54,7 +54,7 @@ router.post('/login', (req, res) => {
 
 // upon create, set up new collection, then render page
 router.post('/create', (req, res) => {
-  const db = req.dbNew;
+  const db = req.db;
   const { newName, newPassword, isHuman } = req.body;
   const newCollectionName = stripSpecialChars(newName);
 
@@ -94,7 +94,7 @@ router.post('/create', (req, res) => {
 
 //upon delete collection, delete collection and render login page
 router.post('/delete', jwtAuth, function(req, res) {
-  const db = req.dbNew;
+  const db = req.db;
   const requestedCollection = req.inventoryName;
   const collection = db.get(requestedCollection);
   collection.findOne({'util':'util'}).then((utilDoc) => {
