@@ -15,7 +15,7 @@ describe('inventory', () => {
     db.get(COLLECTION_NAME).drop()
       .then(() => {
         request(app)
-          .post('/create')
+          .post('/v1/create')
           .type('form')
           .send({isHuman: 'isHuman', newName: COLLECTION_NAME, newPassword: COLLECTION_PASSWORD})
           .end((err, response) => {

@@ -16,8 +16,9 @@ router.get('/', function(req, res) {
 });
 
 // upon login, check credentials, then create JWT token and render main application page
-router.post('/login', (req, res) => {
+router.post('/:version/login', (req, res) => {
   const db = req.db;
+  const version = req.params.version;
   const { name, password } = req.body;
   const userCollection = stripSpecialChars(name);
 
@@ -40,7 +41,7 @@ router.post('/login', (req, res) => {
           containers: resultSet.filter(result => result.category === 'container'),
           lastSync: resultSet.find(result => result.date === 'date')
         };
-        res.render('index', {
+        res.render(`${version}Index`, {
           title: userCollection,
           payload: JSON.stringify(payload),
           token
@@ -53,8 +54,9 @@ router.post('/login', (req, res) => {
 });
 
 // upon create, set up new collection, then render page
-router.post('/create', (req, res) => {
+router.post('/:version/create', (req, res) => {
   const db = req.db;
+  const version = req.params.version;
   const { newName, newPassword, isHuman } = req.body;
   const newCollectionName = stripSpecialChars(newName);
 
@@ -80,7 +82,7 @@ router.post('/create', (req, res) => {
           ], {safe:true})
           .then((records) => {
             const syncRecord = records.find(record => record.date === 'date');
-            res.render('index', {
+            res.render(`${version}Index`, {
               title: newCollectionName,
               payload: JSON.stringify({coffees: [], blends: [], containers: [], lastSync: syncRecord }),
               token: createToken(newCollectionName)

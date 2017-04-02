@@ -33,7 +33,7 @@ describe('login', () => {
 
   it('creates new collection', (done) => {
     request(app)
-      .post('/create')
+      .post('/v1/create')
       .type('form')
       .send({newName: COLLECTION_NAME, newPassword: COLLECTION_PASSWORD})
       .expect(200)
@@ -50,7 +50,7 @@ describe('login', () => {
 
   it('logs in existing collection and bootstraps jwt token', (done) => {
     request(app)
-      .post('/login')
+      .post('/v1/login')
       .type('form')
       .send({name: COLLECTION_NAME, password: COLLECTION_PASSWORD})
       .expect(200)
@@ -73,7 +73,7 @@ describe('login', () => {
 
   it('prevents login for bad password', (done) => {
     request(app)
-      .post('/login')
+      .post('/v1/login')
       .type('form')
       .send({name: COLLECTION_NAME, password: 'badpotatoes'})
       .expect(401)
@@ -91,7 +91,7 @@ describe('login', () => {
     db.get(COLLECTION_NAME).insert([{category: 'blend'}, {category: 'coffee'}, {category: 'container'}])
     .then(() => {
       request(app)
-        .post('/login')
+        .post('/v1/login')
         .type('form')
         .send({name: COLLECTION_NAME, password: COLLECTION_PASSWORD})
         .expect(200)

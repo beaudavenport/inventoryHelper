@@ -3,9 +3,10 @@ import React from 'react';
 class App extends React.Component {
 
   render() {
-    const stuff = sessionStorage.getItem('payload');
+    const bootstrappedData = JSON.parse(sessionStorage.getItem('payload'));
+    const content = Object.keys(bootstrappedData);
     return (
-      <div>{JSON.parse(stuff)}</div>
+      <div>{content}</div>
     );
   }
 }

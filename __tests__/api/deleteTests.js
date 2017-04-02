@@ -16,7 +16,7 @@ describe('delete', () => {
     db.get(COLLECTION_NAME).drop()
       .then(() => {
         request(app)
-          .post('/create')
+          .post('/v1/create')
           .type('form')
           .send({isHuman: 'isHuman', newName: COLLECTION_NAME, newPassword: COLLECTION_PASSWORD})
           .end((err, response) => {
@@ -51,7 +51,7 @@ describe('delete', () => {
     return db.get(COLLECTION_NAME).insert([{category: 'blend'}, {category: 'coffee'}, {category: 'container'}])
       .then(() => {
         request(app)
-          .delete('/login')
+          .post('/login')
           .type('form')
           .send({inventoryName: 'thingsUntrue', access_token: token})
           .expect(404)

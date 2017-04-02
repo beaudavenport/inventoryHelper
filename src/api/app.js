@@ -35,6 +35,7 @@ app.use(function(req,res,next){
 });
 
 app.use('/', routes);
+app.use('/:version/inventory', inventory);
 app.use('/inventory', inventory);
 
 /// catch 404 and forwarding to error handler

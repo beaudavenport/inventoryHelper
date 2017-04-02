@@ -21,7 +21,7 @@ describe('create', () => {
 
   it('prevents login for bots', (done) => {
     request(app)
-      .post('/create')
+      .post('/v1/create')
       .type('form')
       .send({isHuman: 'notHuman', newName: ''})
       .expect(401)
@@ -37,7 +37,7 @@ describe('create', () => {
 
   it('prevents login for bad password', (done) => {
     request(app)
-      .post('/create')
+      .post('/v1/create')
       .type('form')
       .send({isHuman: 'isHuman', newName: '', newPassword: 'potato'})
       .expect(401)
@@ -55,7 +55,7 @@ describe('create', () => {
     db.create(COLLECTION_NAME, {strict: true}).find()
       .then(() => {
         request(app)
-          .post('/create')
+          .post('/v1/create')
           .type('form')
           .send({isHuman: 'isHuman', newName: '', newPassword: 'potato'})
           .expect(401)
@@ -72,7 +72,7 @@ describe('create', () => {
 
   it('renders newly created collection and bootstraps jwt token', (done) => {
     request(app)
-      .post('/create')
+      .post('/v1/create')
       .type('form')
       .send({isHuman: 'isHuman', newName: COLLECTION_NAME, newPassword: COLLECTION_PASSWORD})
       .expect(200)
