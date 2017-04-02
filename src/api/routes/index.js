@@ -32,13 +32,13 @@ router.post('/login', (req, res) => {
   });
 
   getToken.then(token => {
-    db.get(userCollection).find({category: { $in: ['coffee', 'blend', 'container']}})
+    db.get(userCollection).find({ $or: [ {category: { $in: ['coffee', 'blend', 'container']}}, { 'date': 'date'} ] })
       .then(resultSet => {
         let payload = {
           coffees: resultSet.filter(result => result.category === 'coffee'),
           blends: resultSet.filter(result => result.category === 'blend'),
           containers: resultSet.filter(result => result.category === 'container'),
-          lastSync: 'never'
+          lastSync: resultSet.find(result => result.date === 'date')
         };
         res.render('index', {
           title: userCollection,
@@ -75,13 +75,14 @@ router.post('/create', (req, res) => {
       .then(hashedPassword => {
         return newCollection.insert(
           [
-                  {'util' : 'util', 'pass' : hashedPassword},
-                  {'date' : 'date', 'lastSync' : 'never'}
+            {'util' : 'util', 'pass' : hashedPassword},
+            {'date' : 'date', 'lastSync' : 'never'}
           ], {safe:true})
-          .then(() => {
+          .then((records) => {
+            const syncRecord = records.find(record => record.date === 'date');
             res.render('index', {
               title: newCollectionName,
-              payload: JSON.stringify({coffees: [], blends: [], containers: [], lastSync: 'never' }),
+              payload: JSON.stringify({coffees: [], blends: [], containers: [], lastSync: syncRecord }),
               token: createToken(newCollectionName)
             });
           });

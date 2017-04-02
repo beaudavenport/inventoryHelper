@@ -81,14 +81,13 @@ describe('create', () => {
           assert.fail('error displaying homepage:', err);
         }
         assert(response.text.match(/Potato/), 'set title on response object to collection name');
-        const { token, payload } = getSessionStorageObject(response.text);
-        const expectedPayload = JSON.stringify({
-          coffees: [],
-          blends: [],
-          containers: [],
-          lastSync: 'never'
-        });
-        assert.strictEqual(expectedPayload, payload, 'JSON payload strings match');
+        const { payload, token } = getSessionStorageObject(response.text);
+        const { coffees, blends, containers, lastSync } = JSON.parse(payload);
+        assert.strictEqual(0, coffees.length, 'coffee record returned');
+        assert.strictEqual(0, blends.length, 'coffee record returned');
+        assert.strictEqual(0, containers.length, 'coffee record returned');
+        assert.strictEqual('never', lastSync.lastSync);
+        assert.ok(lastSync._id);
         assert.notEqual(token, 'undefined', 'token string set');
         done();
       });
