@@ -8,7 +8,7 @@
     "start": "node ./lib/bin/www",
     "test": "set jwtString='foo' & mocha --compilers js:babel-core/register __tests__ --recursive --timeout=15000",
     "build": "babel src/api --out-dir lib --copy-files",
-    "build:client": "webpack"
+    "build:client": "webpack --watch --progress --colors"
   },
   "dependencies": {
     "async": "^0.9.0",
