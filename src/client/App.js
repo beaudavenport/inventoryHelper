@@ -1,4 +1,6 @@
 import React from 'react';
+import SingleOriginTable from './SingleOriginTable';
+import BlendTable from './BlendTable';
 
 class App extends React.Component {
 
@@ -6,7 +8,10 @@ class App extends React.Component {
     const bootstrappedData = JSON.parse(sessionStorage.getItem('payload'));
     const content = Object.keys(bootstrappedData);
     return (
-      <div>{content}</div>
+      <div>
+        <SingleOriginTable />
+        <BlendTable />
+      </div>
     );
   }
 }
