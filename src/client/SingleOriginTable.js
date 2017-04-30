@@ -2,29 +2,27 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { updateCoffee } from './reducers';
+import SingleOriginRow from './SingleOriginRow';
 
 class SingleOriginTable extends React.Component {
   render() {
-    const singleOriginCoffeeRows = this.props.singleOriginCoffees.map(singleOriginCoffee => {
-      const updateGreenWeight = (e) => {
-        const formattedWeight = e.target.value ? parseFloat(e.target.value) : 0;
-        this.props.updateCoffee({_id, greenWeight: formattedWeight});
-      };
-      const updateRoastedWeight = (e) => {
-        const formattedWeight = e.target.value ? parseFloat(e.target.value) : 0;
-        this.props.updateCoffee({_id, roastedWeight: formattedWeight});
-      };
+    const updateGreenWeight = (_id, e) => {
+      const formattedWeight = e.target.value ? parseFloat(e.target.value) : 0;
+      this.props.updateCoffee({_id, greenWeight: formattedWeight});
+    };
+    const updateRoastedWeight = (_id, e) => {
+      const formattedWeight = e.target.value ? parseFloat(e.target.value) : 0;
+      this.props.updateCoffee({_id, roastedWeight: formattedWeight});
+    };
 
-      const {_id = 0, name = 'New Coffee', origin = 'Origin', greenWeight = 0, roastedWeight = 0, totalWeight = 0} = singleOriginCoffee;
-      return (
-        <tr>
-          <td><h3>{name}</h3><h4>{origin}</h4></td>
-          <td><input type="text" onChange={updateGreenWeight} placeholder={greenWeight} /></td>
-          <td><input type="text" onChange={updateRoastedWeight} placeholder={roastedWeight} /></td>
-          <td>{totalWeight.toFixed(2)}</td>
-        </tr>
-      );
+    const singleOriginCoffeeRows = this.props.singleOriginCoffees.map(singleOriginCoffee => {
+      return (<SingleOriginRow
+        singleOriginCoffee={singleOriginCoffee}
+        updateGreenWeight={updateGreenWeight}
+        updateRoastedWeight={updateRoastedWeight}
+      />);
     });
+
     return (
       <table className="table">
         <thead>

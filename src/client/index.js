@@ -11,7 +11,7 @@ const preloadedState = {
   singleOriginCoffees: bootstrappedData.coffees
 };
 
-const store = createStore(coffees, preloadedState);
+const store = createStore(coffees, preloadedState, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 render(
   <Provider store={store}>
