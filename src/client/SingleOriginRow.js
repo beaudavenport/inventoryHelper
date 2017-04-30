@@ -1,9 +1,15 @@
 import React from 'react';
 
-function SingleOriginRow({singleOriginCoffee, updateGreenWeight, updateRoastedWeight}) {
+function SingleOriginRow({singleOriginCoffee, updateCoffee}) {
   const {_id = 0, name = 'New Coffee', origin = 'Origin', greenWeight = 0, roastedWeight = 0, totalWeight = 0} = singleOriginCoffee;
-  const updateGreenWeightWithId = (e) =>  updateGreenWeight(_id, e.target.value);
-  const updateRoastedWeightWithId = (e) => updateRoastedWeight(_id, e.target.value);
+  const updateGreenWeightWithId = (e) => {
+    const formattedWeight = e.target.value ? parseFloat(e.target.value) : 0;
+    updateCoffee({_id, greenWeight: formattedWeight});
+  };
+  const updateRoastedWeightWithId = (e) => {
+    const formattedWeight = e.target.value ? parseFloat(e.target.value) : 0;
+    updateCoffee({_id, roastedWeight: formattedWeight});
+  };
 
   return (
     <tr>

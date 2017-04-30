@@ -15,4 +15,16 @@ describe('SingleOriginTable', () => {
     const singleOriginRow = wrapper.dive().find(SingleOriginRow);
     assert.deepEqual(singleOriginCoffee, singleOriginRow.prop('singleOriginCoffee'));
   });
+
+  it('passes an updateWeight action to singleOriginRow', () => {
+    const singleOriginCoffee = {_id: 'blah'};
+    const mockStore = configureStore()({singleOriginCoffees: [singleOriginCoffee]});
+    const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
+
+    const singleOriginRow = wrapper.dive().find(SingleOriginRow);
+    const updateCoffee = singleOriginRow.prop('updateCoffee');
+    updateCoffee({_id: 'blah', name: 'potato'});
+
+    assert.deepEqual(mockStore.getActions()[0], { type: 'UPDATE_COFFEE', coffee: {_id: 'blah', name: 'potato'}});
+  });
 });
