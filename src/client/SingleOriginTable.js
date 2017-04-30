@@ -6,17 +6,17 @@ import SingleOriginRow from './SingleOriginRow';
 
 class SingleOriginTable extends React.Component {
   render() {
-    const updateGreenWeight = (_id, e) => {
-      const formattedWeight = e.target.value ? parseFloat(e.target.value) : 0;
+    const updateGreenWeight = (_id, weight) => {
+      const formattedWeight = weight ? parseFloat(weight) : 0;
       this.props.updateCoffee({_id, greenWeight: formattedWeight});
     };
-    const updateRoastedWeight = (_id, e) => {
-      const formattedWeight = e.target.value ? parseFloat(e.target.value) : 0;
+    const updateRoastedWeight = (_id, weight) => {
+      const formattedWeight = weight ? parseFloat(weight) : 0;
       this.props.updateCoffee({_id, roastedWeight: formattedWeight});
     };
 
-    const singleOriginCoffeeRows = this.props.singleOriginCoffees.map(singleOriginCoffee => {
-      return (<SingleOriginRow
+    const singleOriginCoffeeRows = this.props.singleOriginCoffees.map((singleOriginCoffee, index) => {
+      return (<SingleOriginRow key={`so-row-${index}`}
         singleOriginCoffee={singleOriginCoffee}
         updateGreenWeight={updateGreenWeight}
         updateRoastedWeight={updateRoastedWeight}
