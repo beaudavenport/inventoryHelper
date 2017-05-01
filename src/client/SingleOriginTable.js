@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { updateCoffee } from './reducers';
+import { updateCoffee } from './reducers/singleOriginCoffees';
 import SingleOriginRow from './SingleOriginRow';
 
 class SingleOriginTable extends React.Component {

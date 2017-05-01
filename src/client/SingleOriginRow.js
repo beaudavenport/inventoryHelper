@@ -10,10 +10,12 @@ function SingleOriginRow({singleOriginCoffee, updateCoffee}) {
     const formattedWeight = e.target.value ? parseFloat(e.target.value) : 0;
     updateCoffee({_id, roastedWeight: formattedWeight});
   };
-
+  const updateName = (e) => {
+    updateCoffee({_id, name: e.target.value});
+  };
   return (
     <tr>
-      <td><h3>{name}</h3><h4>{origin}</h4></td>
+      <td><input onChange={updateName} placeholder={name}></input><input placeholder={origin}></input></td>
       <td><input className="green-weight" type="text" onChange={updateGreenWeightWithId} placeholder={greenWeight} /></td>
       <td><input className="roasted-weight" type="text" onChange={updateRoastedWeightWithId} placeholder={roastedWeight} /></td>
       <td>{totalWeight.toFixed(2)}</td>
