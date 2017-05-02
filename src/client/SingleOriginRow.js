@@ -18,7 +18,7 @@ function SingleOriginRow({singleOriginCoffee, updateCoffee}) {
       <td><input onChange={updateName} placeholder={name}></input><input placeholder={origin}></input></td>
       <td><input className="green-weight" type="text" onChange={updateGreenWeightWithId} placeholder={greenWeight} /></td>
       <td><input className="roasted-weight" type="text" onChange={updateRoastedWeightWithId} placeholder={roastedWeight} /></td>
-      <td>{totalWeight.toFixed(2)}</td>
+      <td>{parseInt(totalWeight).toFixed(2)}</td>
     </tr>
   );
 }

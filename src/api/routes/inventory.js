@@ -64,7 +64,6 @@ router.put('/:id', (req, res) => {
   const db = req.db;
   const inventoryName = req.inventoryName;
   const inventory = db.get(inventoryName);
-
   inventory.update({_id: id}, update)
     .then(() => {
       return inventory.findOne({_id: id})

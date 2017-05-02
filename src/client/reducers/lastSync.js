@@ -8,7 +8,7 @@ export function sync() {
           'Content-Type': 'application/json',
           'x-access-token': sessionStorage.getItem('token')
         },
-        body: coffee
+        body: JSON.stringify(coffee)
       });
     });
     return Promise.all(coffeeRequests)
@@ -21,8 +21,9 @@ export function sync() {
           }
         });
       })
-      .then(() => {
-        dispatch({type: 'SAVE_SUCCESSFUL'});
+      .then(rawResponse => rawResponse.json())
+      .then(lastSync => {
+        dispatch({type: 'SAVE_SUCCESSFUL', payload: lastSync});
       });
   };
 }
@@ -30,7 +31,7 @@ export function sync() {
 export default (state = {}, action) => {
   switch (action.type) {
     case 'SAVE_SUCCESSFUL':
-      return { ...action.payload.lastSync };
+      return { ...action.payload };
     default:
       return state;
   }
