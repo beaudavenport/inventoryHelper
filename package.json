@@ -43,6 +43,7 @@
     "eslint-plugin-mocha": "^4.8.0",
     "eslint-plugin-react": "^6.0.0",
     "extract-text-webpack-plugin": "^2.1.0",
+    "fetch-mock": "^5.10.0",
     "mocha": "^3.2.0",
     "react": "^15.4.2",
     "react-addons-test-utils": "^15.5.1",
