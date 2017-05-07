@@ -27,4 +27,15 @@ describe('SingleOriginTable', () => {
 
     assert.deepEqual(mockStore.getActions()[0], { type: 'UPDATE_COFFEE', coffee: {_id: 'blah', name: 'potato'}});
   });
+
+  it('displays a row with an add coffee button', () => {
+    const mockStore = configureStore()({singleOriginCoffees: []});
+    const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
+
+    const newCoffeeButton = wrapper.dive().find('.add-coffee');
+    const addCoffee = newCoffeeButton.prop('onClick');
+    addCoffee();
+
+    assert.deepEqual(mockStore.getActions()[0], { type: 'ADD_COFFEE'});
+  });
 });

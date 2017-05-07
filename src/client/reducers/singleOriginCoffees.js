@@ -1,4 +1,13 @@
+import Guid from 'guid';
+
+const ADD_COFFEE = 'ADD_COFFEE';
 const UPDATE_COFFEE = 'UPDATE_COFFEE';
+
+export function addCoffee() {
+  return {
+    type: ADD_COFFEE
+  };
+}
 
 export function updateCoffee(coffee) {
   return {
@@ -15,6 +24,10 @@ function calculateTotalWeight(greenWeight, roastedWeight) {
 
 export default (state = [], action) => {
   switch(action.type) {
+    case ADD_COFFEE:
+      const newCoffee = { _id: Guid.raw(), greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true};
+      return [newCoffee, ...state];
+
     case UPDATE_COFFEE:
       return state.map(coffee => {
           if (coffee._id === action.coffee._id) {
