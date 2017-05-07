@@ -18,7 +18,7 @@ export default (state = [], action) => {
     case UPDATE_COFFEE:
       return state.map(coffee => {
           if (coffee._id === action.coffee._id) {
-            const newCoffee = { ...coffee, ...action.coffee };
+            const newCoffee = { ...coffee, ...action.coffee, isDirty: true };
             return { ...newCoffee, totalWeight: calculateTotalWeight(newCoffee.greenWeight, newCoffee.roastedWeight) }
           } else {
             return coffee;

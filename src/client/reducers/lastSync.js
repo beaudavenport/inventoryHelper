@@ -1,26 +1,16 @@
+import { updateInventoryItem, updateSync } from '../apiClient';
+
 export function sync() {
   return (dispatch, getState) => {
     const { singleOriginCoffees, lastSync } = getState();
-    const coffeeRequests = singleOriginCoffees.map(coffee => {
-      return fetch(`/inventory/${coffee._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': sessionStorage.getItem('token')
-        },
-        body: JSON.stringify(coffee)
-      });
+    const coffeesToUpdate = singleOriginCoffees.filter(coffee => coffee.isDirty);
+    const coffeeRequests = coffeesToUpdate.map(coffee => {
+      const { isDirty, ...coffeePayload } = coffee;
+      return updateInventoryItem(coffeePayload);
     });
+
     return Promise.all(coffeeRequests)
-      .then(() => {
-        return fetch(`/inventory/sync/${lastSync._id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': sessionStorage.getItem('token')
-          }
-        });
-      })
+      .then(() => updateSync(lastSync))
       .then(rawResponse => rawResponse.json())
       .then(lastSync => {
         dispatch({type: 'SAVE_SUCCESSFUL', payload: lastSync});
