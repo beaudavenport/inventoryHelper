@@ -1,6 +1,7 @@
 import React from 'react';
 import mocha from 'mocha';
 import assert from 'assert';
+import Guid from 'guid';
 import { shallow } from 'enzyme';
 import configureStore from 'redux-mock-store';
 import SingleOriginTable from '../../src/client/SingleOriginTable';
@@ -16,7 +17,7 @@ describe('SingleOriginTable', () => {
     assert.deepEqual(singleOriginCoffee, singleOriginRow.prop('singleOriginCoffee'));
   });
 
-  it('passes an updateWeight action to singleOriginRow', () => {
+  it('passes an updateCoffee action to singleOriginRow', () => {
     const singleOriginCoffee = {_id: 'blah'};
     const mockStore = configureStore()({singleOriginCoffees: [singleOriginCoffee]});
     const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
@@ -25,7 +26,10 @@ describe('SingleOriginTable', () => {
     const updateCoffee = singleOriginRow.prop('updateCoffee');
     updateCoffee({_id: 'blah', name: 'potato'});
 
-    assert.deepEqual(mockStore.getActions()[0], { type: 'UPDATE_COFFEE', coffee: {_id: 'blah', name: 'potato'}});
+    const action = mockStore.getActions()[0];
+    assert.strictEqual(action.type, 'UPDATE_COFFEE');
+    assert.strictEqual(action.payload._id, 'blah');
+    assert.strictEqual(action.payload.name, 'potato');
   });
 
   it('displays a row with an add coffee button', () => {
@@ -36,6 +40,7 @@ describe('SingleOriginTable', () => {
     const addCoffee = newCoffeeButton.prop('onClick');
     addCoffee();
 
-    assert.deepEqual(mockStore.getActions()[0], { type: 'ADD_COFFEE'});
+    const action = mockStore.getActions()[0];
+    assert.strictEqual(action.type, 'ADD_COFFEE');
   });
 });
