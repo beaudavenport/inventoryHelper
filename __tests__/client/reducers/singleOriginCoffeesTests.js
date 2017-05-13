@@ -30,7 +30,7 @@ describe('singleOriginCoffees', () => {
         const result = singleOriginCoffees(oldCoffeeList, action);
         const {_id, ...newCoffeeProps} = result[0];
         assert.strictEqual(Guid.isGuid(_id), true);
-        assert.deepEqual(newCoffeeProps, { greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true });
+        assert.deepEqual(newCoffeeProps, { category: 'coffee', greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true });
         assert.deepEqual(result[1], {_id: 789, greenWeight: 10, roastedWeight: 11, totalWeight: 21});
       });
     });

@@ -9,6 +9,17 @@ export function updateInventoryItem(inventoryItem) {
   });
 }
 
+export function addInventoryItem(inventoryItem) {
+  return fetch('/inventory', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-access-token': sessionStorage.getItem('token')
+    },
+    body: JSON.stringify(inventoryItem)
+  });
+}
+
 export function updateSync(syncItem) {
   return fetch(`/inventory/sync/${syncItem._id}`, {
     method: 'PUT',

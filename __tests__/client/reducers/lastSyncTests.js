@@ -21,6 +21,7 @@ describe('lastSync', () => {
 
     beforeEach(() => {
       fetchMock.put('express:/inventory/:id', {});
+      fetchMock.post('express:/inventory', {});
       fetchMock.put('express:/inventory/sync/:id', syncUpdate);
       getStateStub = sinon.stub();
       dispatchStub = sinon.stub();
@@ -34,6 +35,38 @@ describe('lastSync', () => {
     });
 
     describe('sync', () => {
+      it('should call to ADD all new coffees', () => {
+        const coffee1 = {_id: 78, thing: 'thing', isNew: true, isDirty: true};
+        const expectedCoffee1Body = JSON.stringify({thing: 'thing'});
+        const coffee2 =  {_id: 90, otherThing: 'better thing', isNew: true};
+        const expectedCoffee2Body = JSON.stringify({otherThing: 'better thing'});
+
+        getStateStub.returns({
+          singleOriginCoffees: [coffee1, coffee2],
+          lastSync: {_id: 8}
+        });
+
+        return sync()(dispatchStub, getStateStub)
+          .then(() => {
+            const coffeePost1 = getFetchMockCallInfo(fetchMock.calls().matched[0]);
+            const coffeePost2 =  getFetchMockCallInfo(fetchMock.calls().matched[1]);
+            const syncPut =  getFetchMockCallInfo(fetchMock.calls().matched[2]);
+
+            assert.strictEqual(coffeePost1.url, '/inventory');
+            assert.strictEqual(coffeePost1.tokenHeader, 'tokenString');
+            assert.deepEqual(coffeePost1.body, expectedCoffee1Body);
+
+            assert.strictEqual(coffeePost2.url, '/inventory');
+            assert.strictEqual(coffeePost2.tokenHeader, 'tokenString');
+            assert.deepEqual(coffeePost2.body, expectedCoffee2Body);
+
+            assert.strictEqual(syncPut.url, '/inventory/sync/8');
+            assert.strictEqual(syncPut.tokenHeader, 'tokenString');
+
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'SAVE_SUCCESSFUL', payload: syncUpdate});
+          });
+      });
+
       it('should call to PUT all updated coffees', () => {
         const coffee1 = {_id: 78, thing: 'thing', isDirty: true};
         const expectedCoffee1Body = JSON.stringify({_id: 78, thing: 'thing'});
@@ -66,21 +99,25 @@ describe('lastSync', () => {
           });
       });
 
-      it('should not call to PUT coffees that are not updated', () => {
+      it('should not call to PUT coffees that are not updated or are new', () => {
         const coffee1 = {_id: 78, thing: 'thing'};
         const coffee2 =  {_id: 90, otherThing: 'better thing', isDirty: true};
+        const coffee3 =  {_id: 45, otherThing: 'better thing', isDirty: true, isNew: true};
+
         getStateStub.returns({
-          singleOriginCoffees: [coffee1, coffee2],
+          singleOriginCoffees: [coffee1, coffee2, coffee3],
           lastSync: {_id: 8}
         });
 
         return sync()(dispatchStub, getStateStub)
           .then(() => {
-            assert.strictEqual(fetchMock.calls().matched.length, 2);
+            assert.strictEqual(fetchMock.calls().matched.length, 3);
 
-            const coffeePut1 = getFetchMockCallInfo(fetchMock.calls().matched[0]);
-            const syncPut =  getFetchMockCallInfo(fetchMock.calls().matched[1]);
+            const coffeePost = getFetchMockCallInfo(fetchMock.calls().matched[0]);
+            const coffeePut1 = getFetchMockCallInfo(fetchMock.calls().matched[1]);
+            const syncPut =  getFetchMockCallInfo(fetchMock.calls().matched[2]);
 
+            assert.strictEqual(coffeePost.url, '/inventory');
             assert.strictEqual(coffeePut1.url, '/inventory/90');
             assert.strictEqual(syncPut.url, '/inventory/sync/8');
             assert.deepEqual(dispatchStub.args[0][0], {type: 'SAVE_SUCCESSFUL', payload: syncUpdate});
@@ -88,7 +125,7 @@ describe('lastSync', () => {
       });
     });
   });
-  
+
   describe('reducer', () => {
     describe('SAVE_SUCCESSFUL', () => {
       it('should return update syncItem', () => {

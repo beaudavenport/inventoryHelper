@@ -25,7 +25,7 @@ function calculateTotalWeight(greenWeight, roastedWeight) {
 export default (state = [], action) => {
   switch(action.type) {
     case ADD_COFFEE:
-      const newCoffee = { _id: Guid.raw(), greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true};
+      const newCoffee = { _id: Guid.raw(), category: 'coffee', greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true};
       return [newCoffee, ...state];
 
     case UPDATE_COFFEE:
