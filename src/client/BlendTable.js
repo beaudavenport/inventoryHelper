@@ -1,10 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { getBlends } from './reducers/inventory';
+import BlendRow from './BlendRow';
 
 class BlendTable extends React.Component {
 
   render() {
-    const bootstrappedData = JSON.parse(sessionStorage.getItem('payload'));
-    const content = Object.keys(bootstrappedData);
+    const { blends } = this.props;
+    
     return (
       <table>
         <thead>
@@ -12,10 +16,21 @@ class BlendTable extends React.Component {
             <td>Blend</td>
             <td>Weight</td>
           </tr>
+          <BlendRow blend={blends[0]} />
         </thead>
       </table>
     );
   }
 }
 
-export default BlendTable;
+const mapStateToProps = (state) => {
+  return {
+    blends: getBlends(state)
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  // return bindActionCreators({ addCoffee, updateCoffee }, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(BlendTable);

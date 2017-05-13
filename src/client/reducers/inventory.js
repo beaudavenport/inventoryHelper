@@ -23,6 +23,12 @@ export function getCoffees(state) {
   });
 }
 
+export function getBlends(state) {
+  return state.inventory.filter(item => {
+    return item.category === 'blend';
+  });
+}
+
 export default (state = [], action) => {
   switch(action.type) {
     case ADD_INVENTORY_ITEM:

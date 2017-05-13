@@ -1,7 +1,7 @@
 import mocha from 'mocha';
 import assert from 'assert';
 import Guid from 'guid';
-import inventory, { addCoffee, updateCoffee, getCoffees } from '../../../src/client/reducers/inventory';
+import inventory, { addCoffee, updateCoffee, getCoffees, getBlends } from '../../../src/client/reducers/inventory';
 
 describe('inventory', () => {
   describe('actions', () => {
@@ -28,17 +28,34 @@ describe('inventory', () => {
   });
 
   describe('selectors', () => {
-    it('returns all coffee items', () => {
-      const coffeeItem = {_id: 89, category: 'coffee', things: 'stuff'};
-      const otherItem = {_id: 78, category: 'potatoes', stuff: 'weird'};
-      const state = {
-        inventory: [ coffeeItem, otherItem ]
-      };
+    describe('getCoffees', () => {
+      it('returns all coffee items', () => {
+        const coffeeItem = {_id: 89, category: 'coffee', things: 'stuff'};
+        const otherItem = {_id: 78, category: 'potatoes', stuff: 'weird'};
+        const state = {
+          inventory: [ coffeeItem, otherItem ]
+        };
 
-      const result = getCoffees(state);
+        const result = getCoffees(state);
 
-      assert.strictEqual(result.length, 1);
-      assert.strictEqual(result[0], coffeeItem);
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0], coffeeItem);
+      });
+    });
+
+    describe('getBlends', () => {
+      it('returns all blend items', () => {
+        const otherItem = {_id: 90, category: 'potatoes', things: 'stuff'};
+        const blendItem = {_id: 56, category: 'blend', stuff: 'weird'};
+        const state = {
+          inventory: [ otherItem, blendItem ]
+        };
+
+        const result = getBlends(state);
+
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0], blendItem);
+      });
     });
   });
 
