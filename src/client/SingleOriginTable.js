@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { addCoffee, updateCoffee } from './reducers/singleOriginCoffees';
+import { addCoffee, updateCoffee, getCoffees } from './reducers/inventory';
 import SingleOriginRow from './SingleOriginRow';
 
 class SingleOriginTable extends React.Component {
@@ -36,7 +36,7 @@ class SingleOriginTable extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    singleOriginCoffees: state.singleOriginCoffees
+    singleOriginCoffees: getCoffees(state)
   };
 };
 

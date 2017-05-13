@@ -42,7 +42,7 @@ describe('lastSync', () => {
         const expectedCoffee2Body = JSON.stringify({otherThing: 'better thing'});
 
         getStateStub.returns({
-          singleOriginCoffees: [coffee1, coffee2],
+          inventory: [coffee1, coffee2],
           lastSync: {_id: 8}
         });
 
@@ -74,7 +74,7 @@ describe('lastSync', () => {
         const expectedCoffee2Body = JSON.stringify({_id: 90, otherThing: 'better thing'});
 
         getStateStub.returns({
-          singleOriginCoffees: [coffee1, coffee2],
+          inventory: [coffee1, coffee2],
           lastSync: {_id: 8}
         });
 
@@ -105,7 +105,7 @@ describe('lastSync', () => {
         const coffee3 =  {_id: 45, otherThing: 'better thing', isDirty: true, isNew: true};
 
         getStateStub.returns({
-          singleOriginCoffees: [coffee1, coffee2, coffee3],
+          inventory: [coffee1, coffee2, coffee3],
           lastSync: {_id: 8}
         });
 

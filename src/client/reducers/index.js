@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
-import singleOriginCoffees from './singleOriginCoffees';
+import inventory from './inventory';
 import lastSync from './lastSync';
 
 export default combineReducers({
-  singleOriginCoffees,
+  inventory,
   lastSync
 });

@@ -9,8 +9,8 @@ import SingleOriginRow from '../../src/client/SingleOriginRow';
 
 describe('SingleOriginTable', () => {
   it('displays a single origin row when there is one single origin coffee', () => {
-    const singleOriginCoffee = {_id: 'blah'};
-    const mockStore = configureStore()({singleOriginCoffees: [singleOriginCoffee]});
+    const singleOriginCoffee = {_id: 'blah', category: 'coffee'};
+    const mockStore = configureStore()({inventory: [singleOriginCoffee]});
     const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
 
     const singleOriginRow = wrapper.dive().find(SingleOriginRow);
@@ -18,8 +18,8 @@ describe('SingleOriginTable', () => {
   });
 
   it('passes an updateCoffee action to singleOriginRow', () => {
-    const singleOriginCoffee = {_id: 'blah'};
-    const mockStore = configureStore()({singleOriginCoffees: [singleOriginCoffee]});
+    const singleOriginCoffee = {_id: 'blah', category: 'coffee'};
+    const mockStore = configureStore()({inventory: [singleOriginCoffee]});
     const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
 
     const singleOriginRow = wrapper.dive().find(SingleOriginRow);
@@ -27,13 +27,13 @@ describe('SingleOriginTable', () => {
     updateCoffee({_id: 'blah', name: 'potato'});
 
     const action = mockStore.getActions()[0];
-    assert.strictEqual(action.type, 'UPDATE_COFFEE');
+    assert.strictEqual(action.type, 'UPDATE_INVENTORY_ITEM');
     assert.strictEqual(action.payload._id, 'blah');
     assert.strictEqual(action.payload.name, 'potato');
   });
 
   it('displays a row with an add coffee button', () => {
-    const mockStore = configureStore()({singleOriginCoffees: []});
+    const mockStore = configureStore()({inventory: []});
     const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
 
     const newCoffeeButton = wrapper.dive().find('.add-coffee');
@@ -41,6 +41,6 @@ describe('SingleOriginTable', () => {
     addCoffee();
 
     const action = mockStore.getActions()[0];
-    assert.strictEqual(action.type, 'ADD_COFFEE');
+    assert.strictEqual(action.type, 'ADD_INVENTORY_ITEM');
   });
 });

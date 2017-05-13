@@ -9,13 +9,13 @@ import rootReducer from './reducers';
 
 const bootstrappedData = JSON.parse(sessionStorage.getItem('payload'));
 const preloadedState = {
-  singleOriginCoffees: bootstrappedData.coffees,
+  inventory: bootstrappedData.coffees,
   lastSync: bootstrappedData.lastSync
 };
 
 const store = createStore(
   rootReducer,
-  preloadedState, 
+  preloadedState,
   compose(applyMiddleware(thunk), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 );
 

@@ -1,28 +1,34 @@
 import Guid from 'guid';
 
-const ADD_COFFEE = 'ADD_COFFEE';
-const UPDATE_COFFEE = 'UPDATE_COFFEE';
+const ADD_INVENTORY_ITEM = 'ADD_INVENTORY_ITEM';
+const UPDATE_INVENTORY_ITEM = 'UPDATE_INVENTORY_ITEM';
 
 export function addCoffee() {
   return {
-    type: ADD_COFFEE,
+    type: ADD_INVENTORY_ITEM,
     payload: { _id: Guid.raw(), category: 'coffee', greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true}
   };
 }
 
 export function updateCoffee(coffee) {
   return {
-    type: UPDATE_COFFEE,
+    type: UPDATE_INVENTORY_ITEM,
     payload: {...coffee, isDirty: true}
   };
 }
 
+export function getCoffees(state) {
+  return state.inventory.filter(item => {
+    return item.category === 'coffee';
+  });
+}
+
 export default (state = [], action) => {
   switch(action.type) {
-    case ADD_COFFEE:
+    case ADD_INVENTORY_ITEM:
       return [action.payload, ...state];
 
-    case UPDATE_COFFEE:
+    case UPDATE_INVENTORY_ITEM:
       return state.map(coffee => {
           if (coffee._id === action.payload._id) {
             return { ...coffee, ...action.payload }

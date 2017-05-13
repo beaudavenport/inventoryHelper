@@ -2,19 +2,19 @@ import { addInventoryItem, updateInventoryItem, updateSync } from '../apiClient'
 
 export function sync() {
   return (dispatch, getState) => {
-    const { singleOriginCoffees, lastSync } = getState();
-    const coffeesToUpdate = singleOriginCoffees.filter(coffee => coffee.isDirty && !coffee.isNew);
-    const coffeesToAdd = singleOriginCoffees.filter(coffee => coffee.isNew);
-    const coffeeAddRequests = coffeesToAdd.map(coffee => {
-      const { _id, isDirty, isNew, ...coffeePayload } = coffee;
-      return addInventoryItem(coffeePayload);
+    const { inventory, lastSync } = getState();
+    const itemsToUpdate = inventory.filter(item => item.isDirty && !item.isNew);
+    const itemsToAdd = inventory.filter(item => item.isNew);
+    const itemAddRequests = itemsToAdd.map(item => {
+      const { _id, isDirty, isNew, ...itemPayload } = item;
+      return addInventoryItem(itemPayload);
     });
-    const coffeeUpdateRequests = coffeesToUpdate.map(coffee => {
-      const { isDirty, ...coffeePayload } = coffee;
-      return updateInventoryItem(coffeePayload);
+    const itemUpdateRequests = itemsToUpdate.map(item => {
+      const { isDirty, ...itemPayload } = item;
+      return updateInventoryItem(itemPayload);
     });
 
-    return Promise.all([...coffeeAddRequests, ...coffeeUpdateRequests])
+    return Promise.all([...itemAddRequests, ...itemUpdateRequests])
       .then(() => updateSync(lastSync))
       .then(rawResponse => rawResponse.json())
       .then(lastSync => {
