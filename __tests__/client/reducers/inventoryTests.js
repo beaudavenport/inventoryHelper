@@ -1,7 +1,13 @@
 import mocha from 'mocha';
 import assert from 'assert';
 import Guid from 'guid';
-import inventory, { addCoffee, updateCoffee, getCoffees, getBlends } from '../../../src/client/reducers/inventory';
+import inventory, {
+  addCoffee,
+  updateCoffee,
+  addBlend,
+  updateBlend,
+  getCoffees,
+  getBlends } from '../../../src/client/reducers/inventory';
 
 describe('inventory', () => {
   describe('actions', () => {
@@ -23,6 +29,27 @@ describe('inventory', () => {
         const {_id, ...newCoffeeProps} = result.payload;
         assert.strictEqual(Guid.isGuid(_id), true);
         assert.deepEqual(newCoffeeProps, { category: 'coffee', greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true });
+      });
+    });
+
+    describe('updateBlend', () => {
+      it('returns an UPDATE_INVENTORY_ITEM action with blend marked as dirty', () => {
+        const coffee = {_id: 789, weight: 89};
+        const result = updateBlend(coffee);
+
+        assert.strictEqual(result.type, 'UPDATE_INVENTORY_ITEM');
+        assert.deepEqual(result.payload, {_id: 789, weight: 89, isDirty: true});
+      });
+    });
+
+    describe('addBlend', () => {
+      it('returns an ADD_INVENTORY_ITEM action with default blend marked as new', () => {
+        const result = addBlend();
+
+        assert.strictEqual(result.type, 'ADD_INVENTORY_ITEM');
+        const {_id, ...newBlendProps} = result.payload;
+        assert.strictEqual(Guid.isGuid(_id), true);
+        assert.deepEqual(newBlendProps, { category: 'blend', weight: 0, isNew: true });
       });
     });
   });

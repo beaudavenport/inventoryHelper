@@ -17,6 +17,20 @@ export function updateCoffee(coffee) {
   };
 }
 
+export function addBlend() {
+  return {
+    type: ADD_INVENTORY_ITEM,
+    payload: { _id: Guid.raw(), category: 'blend', weight: 0, isNew: true}
+  };
+}
+
+export function updateBlend(blend) {
+  return {
+    type: UPDATE_INVENTORY_ITEM,
+    payload: {...blend, isDirty: true}
+  };
+}
+
 export function getCoffees(state) {
   return state.inventory.filter(item => {
     return item.category === 'coffee';
