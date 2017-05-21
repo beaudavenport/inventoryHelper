@@ -43,4 +43,19 @@ describe('SingleOriginTable', () => {
     const action = mockStore.getActions()[0];
     assert.strictEqual(action.type, 'ADD_INVENTORY_ITEM');
   });
+
+  it('displays total for all coffees', () => {
+    const coffee1 = {_id: 'stuff', category: 'coffee', greenWeight: 5.00, roastedWeight: 1.09 };
+    const coffee2 = {_id: 'stuff', category: 'coffee', greenWeight: 6.89, roastedWeight: 2.50};
+    const mockStore = configureStore()({inventory: [coffee1, coffee2]});
+    const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
+
+    const totalGreenWeight = wrapper.dive().find('.total-green-weight');
+    const totalRoastedWeight = wrapper.dive().find('.total-roasted-weight');
+    const totalCoffeeWeight = wrapper.dive().find('.total-coffee-weight');
+
+    assert.strictEqual(totalGreenWeight.text(), '11.89');
+    assert.strictEqual(totalRoastedWeight.text(), '3.59');
+    assert.strictEqual(totalCoffeeWeight.text(), '15.48');
+  });
 });

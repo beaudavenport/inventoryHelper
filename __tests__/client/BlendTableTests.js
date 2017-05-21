@@ -43,4 +43,15 @@ describe('BlendTable', () => {
     const action = mockStore.getActions()[0];
     assert.strictEqual(action.type, 'ADD_INVENTORY_ITEM');
   });
+
+  it('displays total for all blends', () => {
+    const blend1 = {_id: 'stuff', category: 'blend', weight: 1.89};
+    const blend2 = {_id: 'stuff', category: 'blend', weight: 2.11};
+    const mockStore = configureStore()({inventory: [blend1, blend2]});
+    const wrapper = shallow(<BlendTable store={mockStore}/>);
+
+    const totalWeight = wrapper.dive().find('.total-blend-weight');
+
+    assert.strictEqual(totalWeight.text(), '4.00');
+  });
 });

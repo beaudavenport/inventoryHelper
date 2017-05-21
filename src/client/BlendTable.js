@@ -14,6 +14,7 @@ class BlendTable extends React.Component {
       />);
     });
     const addBlendButtonRow = <tr><td><button className="add-blend" onClick={() => addBlend()}>Add Blend</button></td></tr>;
+    const totalWeight = blends.reduce((acc, blend) => acc + blend.weight, 0);
 
     return (
       <table className="table">
@@ -21,10 +22,18 @@ class BlendTable extends React.Component {
           <tr>
             <td>Blend</td>
             <td>Weight</td>
+            <td>Total</td>
           </tr>
-          {blendRows}
-          {addBlendButtonRow}
-        </thead>
+          </thead>
+          <tbody>
+            {blendRows}
+            {addBlendButtonRow}
+            <tr>
+              <td>Total Weights:</td>
+              <td>{parseFloat(totalWeight).toFixed(2)}</td>
+              <td className="total-blend-weight">{parseFloat(totalWeight).toFixed(2)}</td>
+            </tr>
+          </tbody>
       </table>
     );
   }

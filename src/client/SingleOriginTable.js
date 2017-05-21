@@ -6,14 +6,20 @@ import SingleOriginRow from './SingleOriginRow';
 
 class SingleOriginTable extends React.Component {
   render() {
-    const { addCoffee, updateCoffee } = this.props;
-    const singleOriginCoffeeRows = this.props.singleOriginCoffees.map((singleOriginCoffee) => {
+    const { addCoffee, updateCoffee, singleOriginCoffees } = this.props;
+    const singleOriginCoffeeRows = singleOriginCoffees.map((singleOriginCoffee) => {
       return (<SingleOriginRow key={`so-row-${singleOriginCoffee._id}`}
         singleOriginCoffee={singleOriginCoffee}
         updateCoffee={updateCoffee}
       />);
     });
     const addCoffeeButtonRow = <tr><td><button className="add-coffee" onClick={() => addCoffee()}>Add Coffee</button></td></tr>;
+    const coffeeWeights = singleOriginCoffees.reduce((acc, coffee) => {
+      return {
+        roasted: acc.roasted + coffee.roastedWeight,
+        green: acc.green + coffee.greenWeight
+      };
+    }, {green: 0, roasted: 0});
 
     return (
       <table className="table">
@@ -28,6 +34,12 @@ class SingleOriginTable extends React.Component {
         <tbody>
           {singleOriginCoffeeRows}
           {addCoffeeButtonRow}
+          <tr>
+            <td>Total Weights:</td>
+            <td className="total-green-weight">{parseFloat(coffeeWeights.green).toFixed(2)}</td>
+            <td className="total-roasted-weight">{parseFloat(coffeeWeights.roasted).toFixed(2)}</td>
+            <td className="total-coffee-weight">{parseFloat(coffeeWeights.green + coffeeWeights.roasted).toFixed(2)}</td>
+          </tr>
         </tbody>
       </table>
     );

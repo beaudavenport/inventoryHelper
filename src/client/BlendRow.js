@@ -14,6 +14,7 @@ function BlendRow({blend, updateBlend}) {
     <tr>
       <td><input onChange={updateName} placeholder={name}></input><input placeholder={origin}></input></td>
       <td><input className="blend-weight" type="text" onChange={updateWeightWithId} placeholder={weight} /></td>
+      <td>{parseFloat(weight).toFixed(2)}</td>
     </tr>
   );
 }
