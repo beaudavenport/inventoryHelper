@@ -7,8 +7,8 @@ import SingleOriginRow from './SingleOriginRow';
 class SingleOriginTable extends React.Component {
   render() {
     const { addCoffee, updateCoffee } = this.props;
-    const singleOriginCoffeeRows = this.props.singleOriginCoffees.map((singleOriginCoffee, index) => {
-      return (<SingleOriginRow key={`so-row-${index}`}
+    const singleOriginCoffeeRows = this.props.singleOriginCoffees.map((singleOriginCoffee) => {
+      return (<SingleOriginRow key={`so-row-${singleOriginCoffee._id}`}
         singleOriginCoffee={singleOriginCoffee}
         updateCoffee={updateCoffee}
       />);

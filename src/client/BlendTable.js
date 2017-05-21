@@ -7,8 +7,8 @@ import BlendRow from './BlendRow';
 class BlendTable extends React.Component {
   render() {
     const { addBlend, updateBlend, blends } = this.props;
-    const blendRows = blends.map((blend, index) => {
-      return (<BlendRow key={`blend-row-${index}`}
+    const blendRows = blends.map((blend) => {
+      return (<BlendRow key={`blend-row-${blend._id}`}
         blend={blend}
         updateBlend={updateBlend}
       />);
