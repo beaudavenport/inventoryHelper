@@ -6,8 +6,11 @@ import inventory, {
   updateCoffee,
   addBlend,
   updateBlend,
+  addContainer,
+  updateContainer,
   getCoffees,
-  getBlends } from '../../../src/client/reducers/inventory';
+  getBlends,
+  getContainers } from '../../../src/client/reducers/inventory';
 
 describe('inventory', () => {
   describe('actions', () => {
@@ -52,6 +55,27 @@ describe('inventory', () => {
         assert.deepEqual(newBlendProps, { category: 'blend', weight: 0, isNew: true });
       });
     });
+
+    describe('updateContainer', () => {
+      it('returns an UPDATE_INVENTORY_ITEM action with container marked as dirty', () => {
+        const container = {_id: 56, weight: 78};
+        const result = updateContainer(container);
+
+        assert.strictEqual(result.type, 'UPDATE_INVENTORY_ITEM');
+        assert.deepEqual(result.payload, {_id: 56, weight: 78, isDirty: true});
+      });
+    });
+
+    describe('addContainer', () => {
+      it('returns an ADD_INVENTORY_ITEM action with default container marked as new', () => {
+        const result = addContainer();
+
+        assert.strictEqual(result.type, 'ADD_INVENTORY_ITEM');
+        const {_id, ...newContainerProps} = result.payload;
+        assert.strictEqual(Guid.isGuid(_id), true);
+        assert.deepEqual(newContainerProps, { category: 'container', weight: 0, isNew: true });
+      });
+    });
   });
 
   describe('selectors', () => {
@@ -82,6 +106,21 @@ describe('inventory', () => {
 
         assert.strictEqual(result.length, 1);
         assert.strictEqual(result[0], blendItem);
+      });
+    });
+
+    describe('getContainers', () => {
+      it('returns all container items', () => {
+        const otherItem = {_id: 90, category: 'potatoes', things: 'stuff'};
+        const containerItem = {_id: 56, category: 'container', stuff: 'weird'};
+        const state = {
+          inventory: [ otherItem, containerItem ]
+        };
+
+        const result = getContainers(state);
+
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0], containerItem);
       });
     });
   });

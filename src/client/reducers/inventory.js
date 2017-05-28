@@ -31,6 +31,20 @@ export function updateBlend(blend) {
   };
 }
 
+export function addContainer() {
+  return {
+    type: ADD_INVENTORY_ITEM,
+    payload: { _id: Guid.raw(), category: 'container', weight: 0, isNew: true}
+  };
+}
+
+export function updateContainer(blend) {
+  return {
+    type: UPDATE_INVENTORY_ITEM,
+    payload: {...blend, isDirty: true}
+  };
+}
+
 export function getCoffees(state) {
   return state.inventory.filter(item => {
     return item.category === 'coffee';
@@ -40,6 +54,12 @@ export function getCoffees(state) {
 export function getBlends(state) {
   return state.inventory.filter(item => {
     return item.category === 'blend';
+  });
+}
+
+export function getContainers(state) {
+  return state.inventory.filter(item => {
+    return item.category === 'container';
   });
 }
 

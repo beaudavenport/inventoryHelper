@@ -10,9 +10,9 @@ import Navbar from './Navbar';
 import rootReducer from './reducers';
 
 const bootstrappedData = JSON.parse(sessionStorage.getItem('payload'));
-const { coffees, blends, lastSync } = bootstrappedData;
+const { coffees, blends, containers, lastSync } = bootstrappedData;
 const preloadedState = {
-  inventory: [...coffees, ...blends],
+  inventory: [...coffees, ...blends, ...containers],
   lastSync: lastSync
 };
 
