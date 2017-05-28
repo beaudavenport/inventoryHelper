@@ -3,7 +3,9 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
+import { BrowserRouter, Route } from 'react-router-dom';
 import App from './App';
+import ContainerPage from './ContainerPage';
 import Navbar from './Navbar';
 import rootReducer from './reducers';
 
@@ -22,10 +24,13 @@ const store = createStore(
 
 render(
   <Provider store={store}>
-    <div>
-      <Navbar />
-      <App />
-    </div>
+    <BrowserRouter basename="/v2/login" >
+      <div>
+        <Navbar />
+        <Route exact path="/" component={App} />
+        <Route exact path="/containers" component={ContainerPage} />
+      </div>
+    </BrowserRouter>
   </Provider>,
   document.getElementById('main')
 );
