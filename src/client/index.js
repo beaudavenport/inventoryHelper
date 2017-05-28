@@ -8,6 +8,7 @@ import App from './App';
 import ContainerPage from './ContainerPage';
 import Navbar from './Navbar';
 import rootReducer from './reducers';
+import css from './styles/index.scss';
 
 const bootstrappedData = JSON.parse(sessionStorage.getItem('payload'));
 const { coffees, blends, containers, lastSync } = bootstrappedData;
