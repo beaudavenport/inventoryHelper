@@ -33,6 +33,9 @@ class SingleOriginRow extends React.Component {
     const updateName = (value) => {
       updateCoffee({_id, name: value});
     };
+    const updateOrigin = (value) => {
+      updateCoffee({_id, origin: value});
+    };
     const openGreenCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'green', calcBarName: 'Green', calcBarOnChange: updateGreenWeightWithId});
     const openRoastedCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'roasted', calcBarName: 'Roasted', calcBarOnChange: updateRoastedWeightWithId});
 
@@ -43,7 +46,8 @@ class SingleOriginRow extends React.Component {
         <td colSpan="4">
           <div className="table-row">
             <div>
-              <input onChange={updateName} placeholder={name}></input><input placeholder={origin}></input>
+              <input className="name" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
+              <input className="origin" onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
             </div>
             <div>
               <input className="green-weight" type="text" onChange={(e) => updateGreenWeightWithId(e.target.value)} placeholder={greenWeight} />

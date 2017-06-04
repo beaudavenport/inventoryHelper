@@ -22,6 +22,36 @@ describe('SingleOriginRow', () => {
     assert.deepEqual(updateCoffee.args[0][0], {_id: 5678, greenWeight: 3.56, totalWeight: 59.06});
   });
 
+  it('displays name with onChange', () => {
+    const updateCoffee = sinon.spy();
+    const singleOriginCoffee = {_id: 5678, roastedWeight: 55.5};
+    const wrapper = shallow(<SingleOriginRow
+      singleOriginCoffee={singleOriginCoffee}
+      updateCoffee={updateCoffee}
+    />);
+
+    const onChange = wrapper.find('.name').prop('onChange');
+    const inputEvent = { target: { value: 'Great Scott'} };
+    onChange(inputEvent);
+
+    assert.deepEqual(updateCoffee.args[0][0], {_id: 5678, name: 'Great Scott'});
+  });
+
+  it('displays origin with onChange', () => {
+    const updateCoffee = sinon.spy();
+    const singleOriginCoffee = {_id: 5678, roastedWeight: 55.5};
+    const wrapper = shallow(<SingleOriginRow
+      singleOriginCoffee={singleOriginCoffee}
+      updateCoffee={updateCoffee}
+    />);
+
+    const onChange = wrapper.find('.origin').prop('onChange');
+    const inputEvent = { target: { value: 'Nova Scotia'} };
+    onChange(inputEvent);
+
+    assert.deepEqual(updateCoffee.args[0][0], {_id: 5678, origin: 'Nova Scotia'});
+  });
+
   it('displays roastedWeight column with onChange that updates with calculated roastedWeight', () => {
     const updateCoffee = sinon.spy();
     const singleOriginCoffee = {_id: 5678, greenWeight: 90};
@@ -71,6 +101,7 @@ describe('SingleOriginRow', () => {
     calcBarUpdateFunc(9.6);
 
     assert.strictEqual(calcBar.prop('name'), 'Green');
+    assert.strictEqual(calcBar.prop('type'), 'green');
     assert.deepEqual(updateCoffee.args[0][0], {_id: 5678, greenWeight: 9.6, totalWeight: 9.6});
   });
 
@@ -89,6 +120,7 @@ describe('SingleOriginRow', () => {
     calcBarUpdateFunc(5.6);
 
     assert.strictEqual(calcBar.prop('name'), 'Roasted');
+    assert.strictEqual(calcBar.prop('type'), 'roasted');
     assert.deepEqual(updateCoffee.args[0][0], {_id: 9999, roastedWeight: 5.6, totalWeight: 5.6});
   });
 });
