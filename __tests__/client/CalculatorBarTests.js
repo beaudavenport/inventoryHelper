@@ -50,38 +50,42 @@ describe('CalculatorBar', () => {
     );
   });
 
-  it('passes callback to update tare and update global weight', () => {
+  it('passes callback to update tare and update global weight with new total', () => {
     const updateWeight = sinon.spy();
     const wrapper = shallow(<CalculatorBar updateWeight={updateWeight} />);
     wrapper.setState({calculatorRows: [
       {id: 781, weight: 5.3, tare: 1},
+      {id: 66, weight: 10.5, tare: 1.5}
     ]});
-    const calcRow = wrapper.find(CalculatorRow);
+    const calcRow = wrapper.find(CalculatorRow).at(0);
     const updateTare = calcRow.prop('updateTare');
 
     updateTare(2.25);
 
-    assert.deepEqual(wrapper.state('calculatorRows'),
-      [{id: 781, weight: 5.3, tare: 2.25}]
-    );
-    assert.deepEqual(updateWeight.args[0][0], 3.05);
+    assert.deepEqual(wrapper.state('calculatorRows'), [
+      {id: 781, weight: 5.3, tare: 2.25},
+      {id: 66, weight: 10.5, tare: 1.5}
+    ]);
+    assert.deepEqual(updateWeight.args[0][0], 12.05);
   });
 
-  it('passes callback to update weight and update global weight', () => {
+  it('passes callback to update weight and update global weight with new total', () => {
     const updateWeight = sinon.spy();
     const wrapper = shallow(<CalculatorBar updateWeight={updateWeight}/>);
     wrapper.setState({calculatorRows: [
       {id: 781, weight: 1, tare: 15.5},
+      {id: 66, weight: 10.5, tare: 1.5}
     ]});
-    const calcRow = wrapper.find(CalculatorRow);
+    const calcRow = wrapper.find(CalculatorRow).at(0);
     const updateWeightFunc = calcRow.prop('updateWeight');
 
     updateWeightFunc(664.5);
 
-    assert.deepEqual(wrapper.state('calculatorRows'),
-      [{id: 781, weight: 664.5, tare: 15.5}]
-    );
-    assert.deepEqual(updateWeight.args[0][0], 649.00);
+    assert.deepEqual(wrapper.state('calculatorRows'), [
+      {id: 781, weight: 664.5, tare: 15.5},
+      {id: 66, weight: 10.5, tare: 1.5}
+    ]);
+    assert.deepEqual(updateWeight.args[0][0], 658.00);
   });
 
   it('passes calculated netWeight to row', () => {
