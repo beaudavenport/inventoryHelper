@@ -1,6 +1,7 @@
 import React from 'react';
 import mocha from 'mocha';
 import assert from 'assert';
+import sinon from 'sinon';
 import Guid from 'guid';
 import { shallow } from 'enzyme';
 import configureStore from 'redux-mock-store';
@@ -49,34 +50,38 @@ describe('CalculatorBar', () => {
     );
   });
 
-  it('passes callback to update tare', () => {
-    const wrapper = shallow(<CalculatorBar />);
+  it('passes callback to update tare and update global weight', () => {
+    const updateWeight = sinon.spy();
+    const wrapper = shallow(<CalculatorBar updateWeight={updateWeight} />);
     wrapper.setState({calculatorRows: [
-      {id: 781, weight: 1, tare: 1},
+      {id: 781, weight: 5.3, tare: 1},
     ]});
     const calcRow = wrapper.find(CalculatorRow);
     const updateTare = calcRow.prop('updateTare');
 
-    updateTare(899.3);
+    updateTare(2.25);
 
     assert.deepEqual(wrapper.state('calculatorRows'),
-      [{id: 781, weight: 1, tare: 899.3}]
+      [{id: 781, weight: 5.3, tare: 2.25}]
     );
+    assert.deepEqual(updateWeight.args[0][0], 3.05);
   });
 
-  it('passes callback to update weight', () => {
-    const wrapper = shallow(<CalculatorBar />);
+  it('passes callback to update weight and update global weight', () => {
+    const updateWeight = sinon.spy();
+    const wrapper = shallow(<CalculatorBar updateWeight={updateWeight}/>);
     wrapper.setState({calculatorRows: [
-      {id: 781, weight: 1, tare: 1},
+      {id: 781, weight: 1, tare: 15.5},
     ]});
     const calcRow = wrapper.find(CalculatorRow);
-    const updateWeight = calcRow.prop('updateWeight');
+    const updateWeightFunc = calcRow.prop('updateWeight');
 
-    updateWeight(664.5);
+    updateWeightFunc(664.5);
 
     assert.deepEqual(wrapper.state('calculatorRows'),
-      [{id: 781, weight: 664.5, tare: 1}]
+      [{id: 781, weight: 664.5, tare: 15.5}]
     );
+    assert.deepEqual(updateWeight.args[0][0], 649.00);
   });
 
   it('passes calculated netWeight to row', () => {

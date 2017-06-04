@@ -9,13 +9,13 @@ export default function CalculatorRow(props) {
   });
 
   return (
-    <div>
+    <div className="calculator-row">
       <button onClick={deleteFunc} className="delete-row btn btn-danger">X</button>
-      <p className="net-weight">{parseFloat(netWeight).toFixed(2)}</p>
+      <input onChange={event => updateWeight(event.target.value)} placeholder="Enter gross weight"></input>
       <select onChange={event => updateTare(event.target.value)}>
         {options}
       </select>
-      <input onChange={event => updateWeight(event.target.value)} placeholder="Enter gross weight"></input>
+      <p className="net-weight">{parseFloat(netWeight).toFixed(2)}</p>
     </div>
   );
 }

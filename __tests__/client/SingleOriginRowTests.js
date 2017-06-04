@@ -57,32 +57,38 @@ describe('SingleOriginRow', () => {
   });
 
   it('displays calculator bar when selected for greenWeight', () => {
+    const updateCoffee = sinon.spy();
     const singleOriginCoffee = {_id: 5678};
     const wrapper = shallow(<SingleOriginRow
       singleOriginCoffee={singleOriginCoffee}
+      updateCoffee={updateCoffee}
     />);
-    const onGreenChange = wrapper.find('.green-weight').prop('onChange');
     const greenCalcButton = wrapper.find('.btn').at(0);
-
     greenCalcButton.simulate('click');
 
     const calcBar = wrapper.find(CalculatorBar);
+    const calcBarUpdateFunc = calcBar.prop('updateWeight');
+    calcBarUpdateFunc(9.6);
+
     assert.strictEqual(calcBar.prop('name'), 'Green');
-    assert.strictEqual(calcBar.prop('updateWeight'), onGreenChange);
+    assert.deepEqual(updateCoffee.args[0][0], {_id: 5678, greenWeight: 9.6, totalWeight: 9.6});
   });
 
   it('displays calculator bar when selected for roastedWeight', () => {
+    const updateCoffee = sinon.spy();
     const singleOriginCoffee = {_id: 9999};
     const wrapper = shallow(<SingleOriginRow
       singleOriginCoffee={singleOriginCoffee}
+      updateCoffee={updateCoffee}
     />);
-    const onRoastedChange = wrapper.find('.roasted-weight').prop('onChange');
     const roastedCalcButton = wrapper.find('.btn').at(1);
-
     roastedCalcButton.simulate('click');
 
     const calcBar = wrapper.find(CalculatorBar);
+    const calcBarUpdateFunc = calcBar.prop('updateWeight');
+    calcBarUpdateFunc(5.6);
+
     assert.strictEqual(calcBar.prop('name'), 'Roasted');
-    assert.strictEqual(calcBar.prop('updateWeight'), onRoastedChange);
+    assert.deepEqual(updateCoffee.args[0][0], {_id: 9999, roastedWeight: 5.6, totalWeight: 5.6});
   });
 });

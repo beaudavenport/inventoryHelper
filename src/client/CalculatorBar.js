@@ -28,12 +28,16 @@ export class CalculatorBar extends React.Component {
 
     const updateTare = (id, value) => {
       const newCalcRows = calculatorRows.map(calcRow => calcRow.id === id ? {...calcRow, tare: value} : calcRow);
+      const newTotal = newCalcRows.reduce((acc, calcRow) => acc + (calcRow.weight - calcRow.tare), 0);
       this.setState({calculatorRows: newCalcRows});
+      updateWeight(newTotal);
     };
 
     const updateGrossWeight = (id, value) => {
       const newCalcRows = calculatorRows.map(calcRow => calcRow.id === id ? {...calcRow, weight: value} : calcRow);
+      const newTotal = newCalcRows.reduce((acc, calcRow) => acc + (calcRow.weight - calcRow.tare), 0);
       this.setState({calculatorRows: newCalcRows});
+      updateWeight(newTotal);
     };
 
     const calcRowComponents = calculatorRows.map((calcRow) => {
