@@ -13,13 +13,14 @@ class SingleOriginRow extends React.Component {
     this.state = {
       isCalcBarOpen: false,
       calcBarOnChange: null,
+      calcBarType: null,
       calcBarName: null
     };
   }
 
   render() {
     const {singleOriginCoffee, updateCoffee} = this.props;
-    const { isCalcBarOpen, calcBarOnChange, calcBarName } = this.state;
+    const { isCalcBarOpen, calcBarOnChange, calcBarType, calcBarName } = this.state;
     const {_id = 0, name = 'New Coffee', origin = 'Origin', greenWeight = 0, roastedWeight = 0, totalWeight = 0} = singleOriginCoffee;
     const updateGreenWeightWithId = (value) => {
       const newGreenWeight = value ? parseFloat(value) : 0;
@@ -32,10 +33,10 @@ class SingleOriginRow extends React.Component {
     const updateName = (value) => {
       updateCoffee({_id, name: value});
     };
-    const openGreenCalcBar = () => this.setState({isCalcBarOpen: true, calcBarName: 'Green', calcBarOnChange: updateGreenWeightWithId});
-    const openRoastedCalcBar = () => this.setState({isCalcBarOpen: true, calcBarName: 'Roasted', calcBarOnChange: updateRoastedWeightWithId});
+    const openGreenCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'green', calcBarName: 'Green', calcBarOnChange: updateGreenWeightWithId});
+    const openRoastedCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'roasted', calcBarName: 'Roasted', calcBarOnChange: updateRoastedWeightWithId});
 
-    const calcBar = isCalcBarOpen ? <CalculatorBar name={calcBarName} updateWeight={calcBarOnChange} /> : null;
+    const calcBar = isCalcBarOpen ? <CalculatorBar name={calcBarName} type={calcBarType} updateWeight={calcBarOnChange} /> : null;
 
     return (
       <tr>

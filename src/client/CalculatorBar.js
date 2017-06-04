@@ -12,41 +12,45 @@ export class CalculatorBar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      calculatorRows: [
-        createEmptyCalcRow()
-      ]
+      [props.type]: [createEmptyCalcRow()]
     };
   }
 
+  componentWillReceiveProps(newProps) {
+    const rowsByNewType = this.state[newProps.type];
+    if(!rowsByNewType || rowsByNewType.length === 0) {
+      this.setState({[newProps.type]: [createEmptyCalcRow()]});
+    }
+  }
+
   render() {
-    const { name, updateWeight, containers } = this.props;
-    const { calculatorRows } = this.state;
+    const { name, type, updateWeight, containers } = this.props;
+    const rowsByType = this.state[type] || [];
 
     const removeRow = (id) => {
-      this.setState({calculatorRows: calculatorRows.filter(calcRow => calcRow.id !== id)});
+      this.setState({[type]: rowsByType.filter(calcRow => calcRow.id !== id)});
     };
 
     const updateTare = (id, value) => {
-      const newCalcRows = calculatorRows.map(calcRow => calcRow.id === id ? {...calcRow, tare: value} : calcRow);
+      const newCalcRows = rowsByType.map(calcRow => calcRow.id === id ? {...calcRow, tare: value} : calcRow);
       const newTotal = newCalcRows.reduce((acc, calcRow) => acc + (calcRow.weight - calcRow.tare), 0);
-      this.setState({calculatorRows: newCalcRows});
+      this.setState({[type]: newCalcRows});
       updateWeight(newTotal);
     };
 
     const updateGrossWeight = (id, value) => {
-      const newCalcRows = calculatorRows.map(calcRow => calcRow.id === id ? {...calcRow, weight: value} : calcRow);
+      const newCalcRows = rowsByType.map(calcRow => calcRow.id === id ? {...calcRow, weight: value} : calcRow);
       const newTotal = newCalcRows.reduce((acc, calcRow) => acc + (calcRow.weight - calcRow.tare), 0);
-      this.setState({calculatorRows: newCalcRows});
+      this.setState({[type]: newCalcRows});
       updateWeight(newTotal);
     };
 
-    const calcRowComponents = calculatorRows.map((calcRow) => {
-      const netWeight = parseFloat(calcRow.weight) - parseFloat(calcRow.tare);
+    const calcRowComponents = rowsByType.map((calcRow) => {
       return (
         <CalculatorRow
                 key={calcRow.id}
                 containers={containers}
-                netWeight={netWeight}
+                calcRowDatum={calcRow}
                 deleteFunc={() => removeRow(calcRow.id)}
                 updateTare={(value) => updateTare(calcRow.id, value)}
                 updateWeight={(value) => updateGrossWeight(calcRow.id, value)}
@@ -55,8 +59,9 @@ export class CalculatorBar extends React.Component {
     });
 
     const addRow = () => {
-      this.setState({calculatorRows: [...calculatorRows, createEmptyCalcRow()]});
+      this.setState({[type]: [...rowsByType, createEmptyCalcRow()]});
     };
+
     return(
       <div>
         <h3>{`Calculate Weight for: ${name}`}</h3>

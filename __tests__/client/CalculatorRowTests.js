@@ -6,18 +6,34 @@ import { shallow } from 'enzyme';
 import CalculatorRow from '../../src/client/CalculatorRow';
 
 describe('CalculatorRow', () => {
-  it('displays netWeight', () => {
-    const wrapper = shallow(<CalculatorRow containers={[]} netWeight={9.87} />);
+  it('displays current tare, gross weight, and netWeight', () => {
+    const calcRowDatum = { id: 999, weight: 8.5, tare: 1.4};
+    const wrapper = shallow(<CalculatorRow containers={[]}  calcRowDatum={calcRowDatum} />);
+
+    const grossWeightInput = wrapper.find('.gross-weight');
+    const tareInput = wrapper.find('.tare-input');
     const netWeight = wrapper.find('.net-weight');
 
-    assert.strictEqual(netWeight.text(), '9.87');
+    assert.strictEqual(grossWeightInput.prop('placeholder'), calcRowDatum.weight);
+    assert.strictEqual(tareInput.prop('placeholder'), calcRowDatum.tare);
+    assert.strictEqual(netWeight.text(), '7.10');
+  });
+
+  it('defaults to select container that matches tare weight', () => {
+    const calcRowDatum = { id: 999, weight: 8.5, tare: 1.4};
+    const container = { _id: 111, name: 'meatSack', weight: 1.4};
+    const otherContainer = { _id: 222, name: 'holefilled', weight: 15};
+
+    const wrapper = shallow(<CalculatorRow containers={[container, otherContainer]}  calcRowDatum={calcRowDatum} />);
+    const selectContainer = wrapper.find('select');
+    assert.strictEqual(selectContainer.prop('defaultValue'), container.weight);
   });
 
   it('displays containers in select menu', () => {
     const container1 = {name: 'foo', weight: 98};
     const container2 = {name: 'bag', weight: 56};
     const containers = [container1, container2];
-    const wrapper = shallow(<CalculatorRow containers={containers} />);
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={containers} />);
 
     const options = wrapper.find('option');
     assert.deepEqual(options.at(0).prop('value'), container1.weight);
@@ -28,8 +44,18 @@ describe('CalculatorRow', () => {
 
   it('calls to updateTare with selected container weight', () => {
     const updateTare = sinon.spy();
-    const wrapper = shallow(<CalculatorRow containers={[]} updateTare={updateTare} />);
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={[]} updateTare={updateTare} />);
     const selectContainer = wrapper.find('select');
+
+    selectContainer.simulate('change', {target: {value: 987.89}});
+
+    assert.deepEqual(updateTare.args[0][0], 987.89);
+  });
+
+  it('calls to updateTare with input tare weight', () => {
+    const updateTare = sinon.spy();
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={[]} updateTare={updateTare} />);
+    const selectContainer = wrapper.find('.tare-input');
 
     selectContainer.simulate('change', {target: {value: 987.89}});
 
@@ -38,8 +64,8 @@ describe('CalculatorRow', () => {
 
   it('calls to updateWeight with input weight', () => {
     const updateWeight = sinon.spy();
-    const wrapper = shallow(<CalculatorRow containers={[]} updateWeight={updateWeight} />);
-    const grossWeightInput = wrapper.find('input');
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={[]} updateWeight={updateWeight} />);
+    const grossWeightInput = wrapper.find('.gross-weight');
 
     grossWeightInput.simulate('change', {target: {value: 55.55}});
 
@@ -48,7 +74,7 @@ describe('CalculatorRow', () => {
 
   it('calls to delete when delete button clicked', () => {
     const deleteFunc = sinon.spy();
-    const wrapper = shallow(<CalculatorRow containers={[]} deleteFunc={deleteFunc} />);
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={[]} deleteFunc={deleteFunc} />);
     const deleteButton = wrapper.find('.delete-row');
 
     deleteButton.simulate('click');
