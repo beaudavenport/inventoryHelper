@@ -1,16 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { addBlend, updateBlend, getBlends } from './reducers/inventory';
+import { addBlend, updateBlend, getBlends, flagForDeletion } from './reducers/inventory';
 import BlendRow from './BlendRow';
 
 class BlendTable extends React.Component {
   render() {
-    const { addBlend, updateBlend, blends } = this.props;
+    const { addBlend, updateBlend, flagForDeletion, blends } = this.props;
     const blendRows = blends.map((blend) => {
       return (<BlendRow key={`blend-row-${blend._id}`}
         blend={blend}
         updateBlend={updateBlend}
+        flagForDeletion={flagForDeletion}
       />);
     });
     const addBlendButtonRow = <tr><td><button className="add-blend" onClick={() => addBlend()}>Add Blend</button></td></tr>;
@@ -46,7 +47,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ addBlend, updateBlend }, dispatch);
+  return bindActionCreators({ addBlend, updateBlend, flagForDeletion }, dispatch);
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(BlendTable);

@@ -32,6 +32,21 @@ describe('SingleOriginTable', () => {
     assert.strictEqual(action.payload.name, 'potato');
   });
 
+  it('passes a flagForDeletion action to singleOriginRow', () => {
+    const singleOriginCoffee = {_id: 'blah', category: 'coffee'};
+    const mockStore = configureStore()({inventory: [singleOriginCoffee]});
+    const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
+
+    const singleOriginRow = wrapper.dive().find(SingleOriginRow);
+    const flagForDeletion = singleOriginRow.prop('flagForDeletion');
+    flagForDeletion(singleOriginCoffee._id);
+
+    const action = mockStore.getActions()[0];
+    assert.strictEqual(action.type, 'UPDATE_INVENTORY_ITEM');
+    assert.strictEqual(action.payload._id, 'blah');
+    assert.strictEqual(action.payload.isDeleted, true);
+  });
+
   it('displays a row with an add coffee button', () => {
     const mockStore = configureStore()({inventory: []});
     const wrapper = shallow(<SingleOriginTable store={mockStore}/>);

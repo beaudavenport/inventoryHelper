@@ -38,28 +38,35 @@ export function addContainer() {
   };
 }
 
-export function updateContainer(blend) {
+export function updateContainer(container) {
   return {
     type: UPDATE_INVENTORY_ITEM,
-    payload: {...blend, isDirty: true}
+    payload: {...container, isDirty: true}
+  };
+}
+
+export function flagForDeletion(id) {
+  return {
+    type: UPDATE_INVENTORY_ITEM,
+    payload: {_id: id, isDeleted: true}
   };
 }
 
 export function getCoffees(state) {
   return state.inventory.filter(item => {
-    return item.category === 'coffee';
+    return item.category === 'coffee' && !item.isDeleted;
   });
 }
 
 export function getBlends(state) {
   return state.inventory.filter(item => {
-    return item.category === 'blend';
+    return item.category === 'blend' && !item.isDeleted;
   });
 }
 
 export function getContainers(state) {
   return state.inventory.filter(item => {
-    return item.category === 'container';
+    return item.category === 'container' && !item.isDeleted;
   });
 }
 

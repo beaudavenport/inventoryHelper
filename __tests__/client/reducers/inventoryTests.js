@@ -8,6 +8,7 @@ import inventory, {
   updateBlend,
   addContainer,
   updateContainer,
+  flagForDeletion,
   getCoffees,
   getBlends,
   getContainers } from '../../../src/client/reducers/inventory';
@@ -76,15 +77,26 @@ describe('inventory', () => {
         assert.deepEqual(newContainerProps, { category: 'container', weight: 0, isNew: true });
       });
     });
+
+    describe('flagForDeletion', () => {
+      it('returns an UPDATE_INVENTORY_ITEM action with item marked for deletion', () => {
+        const id = 56;
+        const result = flagForDeletion(id);
+
+        assert.strictEqual(result.type, 'UPDATE_INVENTORY_ITEM');
+        assert.deepEqual(result.payload, {_id: id, isDeleted: true});
+      });
+    });
   });
 
   describe('selectors', () => {
     describe('getCoffees', () => {
-      it('returns all coffee items', () => {
+      it('returns all coffee items that are not deleted', () => {
         const coffeeItem = {_id: 89, category: 'coffee', things: 'stuff'};
         const otherItem = {_id: 78, category: 'potatoes', stuff: 'weird'};
+        const deletedItem = {_id: 90, category: 'coffee', isDeleted: true};
         const state = {
-          inventory: [ coffeeItem, otherItem ]
+          inventory: [ coffeeItem, otherItem, deletedItem ]
         };
 
         const result = getCoffees(state);
@@ -98,8 +110,10 @@ describe('inventory', () => {
       it('returns all blend items', () => {
         const otherItem = {_id: 90, category: 'potatoes', things: 'stuff'};
         const blendItem = {_id: 56, category: 'blend', stuff: 'weird'};
+        const deletedItem = {_id: 90, category: 'blend', isDeleted: true};
+
         const state = {
-          inventory: [ otherItem, blendItem ]
+          inventory: [ otherItem, blendItem, deletedItem ]
         };
 
         const result = getBlends(state);
@@ -113,8 +127,10 @@ describe('inventory', () => {
       it('returns all container items', () => {
         const otherItem = {_id: 90, category: 'potatoes', things: 'stuff'};
         const containerItem = {_id: 56, category: 'container', stuff: 'weird'};
+        const deletedItem = {_id: 90, category: 'container', isDeleted: true};
+
         const state = {
-          inventory: [ otherItem, containerItem ]
+          inventory: [ otherItem, containerItem, deletedItem ]
         };
 
         const result = getContainers(state);

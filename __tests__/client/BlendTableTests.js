@@ -32,6 +32,21 @@ describe('BlendTable', () => {
     assert.strictEqual(action.payload.name, 'potato');
   });
 
+  it('passes a flagForDeletion action to blendRow', () => {
+    const blend = {_id: 'blah', category: 'blend'};
+    const mockStore = configureStore()({inventory: [blend]});
+    const wrapper = shallow(<BlendTable store={mockStore}/>);
+
+    const blendRow = wrapper.dive().find(BlendRow);
+    const flagForDeletion = blendRow.prop('flagForDeletion');
+    flagForDeletion(blend._id);
+
+    const action = mockStore.getActions()[0];
+    assert.strictEqual(action.type, 'UPDATE_INVENTORY_ITEM');
+    assert.strictEqual(action.payload._id, 'blah');
+    assert.strictEqual(action.payload.isDeleted, true);
+  });
+
   it('displays a row with an add blend button', () => {
     const mockStore = configureStore()({inventory: []});
     const wrapper = shallow(<BlendTable store={mockStore}/>);

@@ -1,16 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { addCoffee, updateCoffee, getCoffees } from './reducers/inventory';
+import { addCoffee, updateCoffee, getCoffees, flagForDeletion } from './reducers/inventory';
 import SingleOriginRow from './SingleOriginRow';
 
 class SingleOriginTable extends React.Component {
   render() {
-    const { addCoffee, updateCoffee, singleOriginCoffees } = this.props;
+    const { addCoffee, updateCoffee, flagForDeletion, singleOriginCoffees } = this.props;
     const singleOriginCoffeeRows = singleOriginCoffees.map((singleOriginCoffee) => {
       return (<SingleOriginRow key={`so-row-${singleOriginCoffee._id}`}
         singleOriginCoffee={singleOriginCoffee}
         updateCoffee={updateCoffee}
+        flagForDeletion={flagForDeletion}
       />);
     });
     const addCoffeeButtonRow = <tr><td><button className="add-coffee" onClick={() => addCoffee()}>Add Coffee</button></td></tr>;
@@ -53,7 +54,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ addCoffee, updateCoffee }, dispatch);
+  return bindActionCreators({ addCoffee, updateCoffee, flagForDeletion }, dispatch);
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SingleOriginTable);
