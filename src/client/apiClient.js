@@ -20,6 +20,16 @@ export function addInventoryItem(inventoryItem) {
   });
 }
 
+export function deleteInventoryItem(id) {
+  return fetch(`/inventory/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-access-token': sessionStorage.getItem('token')
+    }
+  });
+}
+
 export function updateSync(syncItem) {
   return fetch(`/inventory/sync/${syncItem._id}`, {
     method: 'PUT',

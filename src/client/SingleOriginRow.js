@@ -19,7 +19,7 @@ class SingleOriginRow extends React.Component {
   }
 
   render() {
-    const {singleOriginCoffee, updateCoffee} = this.props;
+    const {singleOriginCoffee, updateCoffee, flagForDeletion} = this.props;
     const { isCalcBarOpen, calcBarOnChange, calcBarType, calcBarName } = this.state;
     const {_id = 0, name = 'New Coffee', origin = 'Origin', greenWeight = 0, roastedWeight = 0, totalWeight = 0} = singleOriginCoffee;
     const updateGreenWeightWithId = (value) => {
@@ -36,6 +36,10 @@ class SingleOriginRow extends React.Component {
     const updateOrigin = (value) => {
       updateCoffee({_id, origin: value});
     };
+    const deleteCoffee = () => {
+      flagForDeletion(_id);
+    };
+
     const openGreenCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'green', calcBarName: 'Green', calcBarOnChange: updateGreenWeightWithId});
     const openRoastedCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'roasted', calcBarName: 'Roasted', calcBarOnChange: updateRoastedWeightWithId});
 
@@ -46,16 +50,19 @@ class SingleOriginRow extends React.Component {
         <td colSpan="4">
           <div className="table-row">
             <div>
+              <button className="btn btn-danger delete" onClick={deleteCoffee}>X</button>
+            </div>
+            <div>
               <input className="name" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
               <input className="origin" onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
             </div>
             <div>
               <input className="green-weight" type="text" onChange={(e) => updateGreenWeightWithId(e.target.value)} placeholder={greenWeight} />
-              <button className="btn btn-block" onClick={openGreenCalcBar}>Calculate...</button>
+              <button className="green btn btn-block" onClick={openGreenCalcBar}>Calculate...</button>
             </div>
             <div>
               <input className="roasted-weight" type="text" onChange={(e) => updateRoastedWeightWithId(e.target.value)} placeholder={roastedWeight} />
-              <button className="btn btn-block" onClick={openRoastedCalcBar}>Calculate...</button>
+              <button className="roasted btn btn-block" onClick={openRoastedCalcBar}>Calculate...</button>
             </div>
             <div>{parseFloat(totalWeight).toFixed(2)}</div>
           </div>

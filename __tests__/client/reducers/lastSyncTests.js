@@ -22,6 +22,7 @@ describe('lastSync', () => {
     beforeEach(() => {
       fetchMock.put('express:/inventory/:id', {});
       fetchMock.post('express:/inventory', {});
+      fetchMock.delete('express:/inventory/:id', {});
       fetchMock.put('express:/inventory/sync/:id', syncUpdate);
       getStateStub = sinon.stub();
       dispatchStub = sinon.stub();
@@ -93,6 +94,32 @@ describe('lastSync', () => {
             assert.deepEqual(coffeePut2.body, expectedCoffee2Body);
 
             assert.strictEqual(syncPut.url, '/inventory/sync/8');
+            assert.strictEqual(syncPut.tokenHeader, 'tokenString');
+
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'SAVE_SUCCESSFUL', payload: syncUpdate});
+          });
+      });
+
+      it('should call to DELETE all coffees flagged for deletion', () => {
+        const coffee1 = {_id: 1111, thing: 'ooooo', isDeleted: true};
+        const coffee2 =  {_id: 90, otherThing: 'not dead yet!'};
+
+        getStateStub.returns({
+          inventory: [coffee1, coffee2],
+          lastSync: {_id: 6666}
+        });
+
+        return sync()(dispatchStub, getStateStub)
+          .then(() => {
+            assert.strictEqual(fetchMock.calls().matched.length, 2);
+
+            const coffeeDelete = getFetchMockCallInfo(fetchMock.calls().matched[0]);
+            const syncPut =  getFetchMockCallInfo(fetchMock.calls().matched[1]);
+
+            assert.strictEqual(coffeeDelete.url, '/inventory/1111');
+            assert.strictEqual(coffeeDelete.tokenHeader, 'tokenString');
+
+            assert.strictEqual(syncPut.url, '/inventory/sync/6666');
             assert.strictEqual(syncPut.tokenHeader, 'tokenString');
 
             assert.deepEqual(dispatchStub.args[0][0], {type: 'SAVE_SUCCESSFUL', payload: syncUpdate});

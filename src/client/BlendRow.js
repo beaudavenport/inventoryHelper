@@ -10,7 +10,7 @@ class BlendRow extends React.Component {
   }
 
   render() {
-    const {blend, updateBlend} = this.props;
+    const {blend, updateBlend, flagForDeletion} = this.props;
     const {isCalcBarOpen} = this.state;
     const {_id = 0, name = 'New Blend', origin = 'Origin', weight = 0} = blend;
     const updateWeightWithId = (value) => {
@@ -23,6 +23,9 @@ class BlendRow extends React.Component {
     const updateOrigin = (value) => {
       updateBlend({_id, origin: value});
     };
+    const deleteBlend = () => {
+      flagForDeletion(_id);
+    };
     const openCalcBar = () => this.setState({isCalcBarOpen: true});
 
     const calcBar = isCalcBarOpen ? <CalculatorBar name="Blend" type="blend" updateWeight={updateWeightWithId} /> : null;
@@ -30,6 +33,9 @@ class BlendRow extends React.Component {
     return (
       <tr>
         <td colSpan="3">
+          <div>
+            <button className="btn btn-danger delete" onClick={deleteBlend}>X</button>
+          </div>
           <div className="table-row">
             <div>
               <input className="name" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
@@ -37,7 +43,7 @@ class BlendRow extends React.Component {
             </div>
             <div>
               <input className="blend-weight" type="text" onChange={(e) => updateWeightWithId(e.target.value)} placeholder={weight} />
-              <button className="btn btn-block" onClick={openCalcBar}>Calculate...</button>
+              <button className="blend btn btn-block" onClick={openCalcBar}>Calculate...</button>
             </div>
             <div>{parseFloat(weight).toFixed(2)}</div>
           </div>

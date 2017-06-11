@@ -7,6 +7,20 @@ import SingleOriginRow from '../../src/client/SingleOriginRow';
 import CalculatorBar from '../../src/client/CalculatorBar';
 
 describe('SingleOriginRow', () => {
+  it('displays delete button that flags item for deletion', () => {
+    const flagForDeletion = sinon.spy();
+    const singleOriginCoffee = {_id: 555, roastedWeight: 44.5};
+    const wrapper = shallow(<SingleOriginRow
+      singleOriginCoffee={singleOriginCoffee}
+      flagForDeletion={flagForDeletion}
+    />);
+
+    const deleteButton = wrapper.find('button.delete');
+    deleteButton.simulate('click');
+
+    assert.strictEqual(flagForDeletion.args[0][0], singleOriginCoffee._id);
+  });
+
   it('displays greenWeight column with onChange that updates with calculated roastedWeight', () => {
     const updateCoffee = sinon.spy();
     const singleOriginCoffee = {_id: 5678, roastedWeight: 55.5};
@@ -93,7 +107,7 @@ describe('SingleOriginRow', () => {
       singleOriginCoffee={singleOriginCoffee}
       updateCoffee={updateCoffee}
     />);
-    const greenCalcButton = wrapper.find('.btn').at(0);
+    const greenCalcButton = wrapper.find('button.green');
     greenCalcButton.simulate('click');
 
     const calcBar = wrapper.find(CalculatorBar);
@@ -112,7 +126,7 @@ describe('SingleOriginRow', () => {
       singleOriginCoffee={singleOriginCoffee}
       updateCoffee={updateCoffee}
     />);
-    const roastedCalcButton = wrapper.find('.btn').at(1);
+    const roastedCalcButton = wrapper.find('button.roasted');
     roastedCalcButton.simulate('click');
 
     const calcBar = wrapper.find(CalculatorBar);

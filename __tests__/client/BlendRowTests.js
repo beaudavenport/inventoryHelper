@@ -7,6 +7,20 @@ import BlendRow from '../../src/client/BlendRow';
 import CalculatorBar from '../../src/client/CalculatorBar';
 
 describe('BlendRow', () => {
+  it('displays delete button that flags item for deletion', () => {
+    const flagForDeletion = sinon.spy();
+    const blend = {_id: 333};
+    const wrapper = shallow(<BlendRow
+      blend={blend}
+      flagForDeletion={flagForDeletion}
+    />);
+
+    const deleteButton = wrapper.find('button.delete');
+    deleteButton.simulate('click');
+
+    assert.strictEqual(flagForDeletion.args[0][0], blend._id);
+  });
+
   it('displays name with onChange', () => {
     const updateBlend = sinon.spy();
     const blend = {_id: 5678};
@@ -75,7 +89,7 @@ describe('BlendRow', () => {
       updateBlend={updateBlend}
     />);
 
-    const calcButton = wrapper.find('.btn');
+    const calcButton = wrapper.find('button.blend');
     calcButton.simulate('click');
 
     const calcBar = wrapper.find(CalculatorBar);
