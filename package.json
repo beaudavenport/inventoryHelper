@@ -9,7 +9,7 @@
     "test": "set jwtString='foo' & mocha --compilers js:babel-core/register __tests__ --recursive --timeout=15000",
     "test:api": "set jwtString='foo' & mocha --compilers js:babel-core/register __tests__/api --recursive --timeout=15000",
     "test:client": "mocha --compilers js:babel-core/register __tests__/client --recursive --timeout=15000",
-    "build": "babel src/api --out-dir lib --copy-files",
+    "build:api": "babel src/api --watch --out-dir lib --copy-files",
     "build:client": "webpack --watch --progress --colors"
   },
   "dependencies": {

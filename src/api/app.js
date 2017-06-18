@@ -10,6 +10,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var db = require('./db');
 var routes = require('./routes/index');
+var v2Routes = require('./routes/v2Routes');
 var inventory = require('./routes/inventory');
 
 var app = express();
@@ -34,9 +35,13 @@ app.use(function(req,res,next){
   next();
 });
 
-app.use('/', routes);
+app.use('/v2', v2Routes);
 app.use('/:version/inventory', inventory);
 app.use('/inventory', inventory);
+app.use('/', routes);
+app.use('/*', function(req, res) {
+  res.redirect('/login');
+});
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
