@@ -11,44 +11,16 @@ const COLLECTION_PASSWORD = 'Testw@rd1';
 describe('inventory', () => {
   let token;
 
-  beforeEach((done) => {
-    db.get(COLLECTION_NAME).drop()
+  beforeEach(() => {
+    return db.get(COLLECTION_NAME).drop()
       .then(() => {
-        request(app)
+        return request(app)
           .post('/v1/create')
           .type('form')
           .send({isHuman: 'isHuman', newName: COLLECTION_NAME, newPassword: COLLECTION_PASSWORD})
-          .end((err, response) => {
-            if(err) {
-              assert.fail('error displaying homepage:', err);
-            }
-            token = getSessionStorageObject(response.text).token;
-            done();
-          });
-      });
-  });
-
-  it('GET with type returns all items with specific type', () => {
-    const type = 'Guacamole';
-    const record1 = {type, stuff: 'stuff'};
-    const record2 = {type, thing: 'potato'};
-    const record3 = {type: 'not right', item: 'who cares'};
-
-    db.get(COLLECTION_NAME).insert([record1, record2, record3])
-      .then(() => {
-        return request(app)
-          .get(`/inventory/${type}`)
-          .set('x-access-token', token)
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
           .expect(200)
           .then((response) => {
-            assert.strictEqual(response.body.length, 2);
-            assert.strictEqual(response.body[0].stuff, record1.stuff);
-            assert.strictEqual(response.body[1].thing, record2.thing);
-          })
-          .catch((err) => {
-            assert.fail('Error fetching inventory: ', err);
+            token = getSessionStorageObject(response.text).token;
           });
       });
   });
@@ -57,19 +29,33 @@ describe('inventory', () => {
     const record1 = {stuff: 'stuff'};
     const record2 = {stuff: 'bad stuff'};
 
-    db.get(COLLECTION_NAME).insert([record1, record2])
+    return db.get(COLLECTION_NAME).insert([record1, record2])
       .then(() => {
         return request(app)
           .get(`/inventory/${record1._id}`)
           .set('x-access-token', token)
           .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
           .expect(200)
+          .expect('Content-Type', /json/)
           .then((response) => {
             assert.strictEqual(response.body.stuff, record1.stuff);
-          })
-          .catch((err) => {
-            assert.fail('Error fetching inventory: ', err);
+          });
+      });
+  });
+
+  it('GET with id for utility record returns 404', () => {
+    const record1 = {'util': 'util', stuff: 'stuff'};
+
+    return db.get(COLLECTION_NAME).insert([record1])
+      .then(() => {
+        return request(app)
+          .get(`/inventory/${record1._id}`)
+          .set('x-access-token', token)
+          .set('Accept', 'application/json')
+          .expect(404)
+          .expect('Content-Type', /json/)
+          .then((response) => {
+            assert.deepEqual(response.body, {error: 'record does not exist'});
           });
       });
   });
@@ -97,9 +83,6 @@ describe('inventory', () => {
             assert.strictEqual(result.type, newItem.type);
             assert.strictEqual(result.thing, newItem.thing);
           });
-      })
-      .catch((err) => {
-        assert.fail('Error fetching inventory: ', err);
       });
   });
 
@@ -112,9 +95,9 @@ describe('inventory', () => {
       .then(() => {
         return request(app)
           .put(`/inventory/${itemToUpdate._id}`)
-          .send({thing: 'NEW information'})
           .set('x-access-token', token)
           .set('Accept', 'application/json')
+          .send({thing: 'NEW information'})
           .expect(200)
           .then((response) => {
             assert.strictEqual(response.body.thing, 'NEW information');
@@ -126,11 +109,36 @@ describe('inventory', () => {
                 assert.strictEqual(result.thing, 'NEW information');
               });
           });
-      })
-      .catch((err) => {
-        assert.fail('Error fetching inventory: ', err);
       });
   });
+
+  it('PUT for utility record returns 404', () => {
+    const itemToUpdate = {
+      type: 'Cucumber',
+      'util': 'util',
+      thing: 'OLD information'
+    };
+    return db.get(COLLECTION_NAME).insert(itemToUpdate)
+      .then(() => {
+        return request(app)
+          .put(`/inventory/${itemToUpdate._id}`)
+          .set('x-access-token', token)
+          .set('Accept', 'application/json')
+          .send({thing: 'NEW information'})
+          .expect(404)
+          .expect('Content-Type', /json/)
+          .then((response) => {
+            assert.deepEqual(response.body, {error: 'record does not exist'});
+          })
+          .then(() => {
+            return db.get(COLLECTION_NAME).findOne({_id: itemToUpdate._id})
+              .then((result) => {
+                assert.strictEqual(result.thing, 'OLD information');
+              });
+          });
+      });
+  });
+
 
   it('DELETE with id deletes item by _id', () => {
     const record = {stuff: 'stuff'};
@@ -151,9 +159,6 @@ describe('inventory', () => {
               .then((result) => {
                 assert.strictEqual(result, null);
               });
-          })
-          .catch((err) => {
-            assert.fail('Error fetching inventory: ', err);
           });
       });
   });
@@ -170,9 +175,6 @@ describe('inventory', () => {
             assert.ok(response.body.lastSync);
             assert.notEqual(response.body.lastSync, 'never');
           });
-      })
-      .catch((err) => {
-        assert.fail('Error fetching inventory: ', err);
       });
   });
 });

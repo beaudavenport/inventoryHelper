@@ -33,8 +33,11 @@ router.get('/:id', (req, res) => {
   const db = req.db;
   const inventoryName = req.inventoryName;
 
-  db.get(inventoryName).findOne({_id: id})
+  db.get(inventoryName).findOne({$and: [{_id: id}, { 'util': { $not: { $eq: 'util' } } }] })
     .then(result => {
+      if(!result) {
+        res.status(404).json({error: 'record does not exist'});
+      }
       res.json(result);
     })
     .catch(err => {
@@ -64,16 +67,16 @@ router.put('/:id', (req, res) => {
   const db = req.db;
   const inventoryName = req.inventoryName;
   const inventory = db.get(inventoryName);
-  inventory.update({_id: id}, update)
-    .then(() => {
-      return inventory.findOne({_id: id})
-        .then(result => {
-          res.json(result);
-        });
+  return inventory.findOne({$and: [{_id: id}, { 'util': { $not: { $eq: 'util' } } }] })
+    .then(result => {
+      if(!result) {
+        throw new Error('record does not exist');
+      }
     })
-    .catch(err => {
-      res.status(404).json({error: err});
-    });
+    .then(() => inventory.update({_id: id}, update))
+    .then(() => inventory.findOne({_id: id}))
+    .then(result => res.json(result))
+    .catch(err => res.status(404).json({error: err.message}));
 });
 
 //delete single result by ObjectID
