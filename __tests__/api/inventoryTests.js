@@ -25,6 +25,30 @@ describe('inventory', () => {
       });
   });
 
+  it('GET with no parameters returns all inventory data', () => {
+    const coffeeData = [{category: 'coffee'}, {category: 'coffee', stuff: 'ooo!'}];
+    const blendData = [{category: 'blend', stuff: 'thing'}, {category: 'blend', stuff: 'other'}];
+    const containerData = [{category: 'container', stuff: 1}, {category: 'container'}];
+    const badRecord = {stuff: 'bad stuff'};
+    const allRecords = [...coffeeData, ...blendData, ...containerData, badRecord];
+    return db.get(COLLECTION_NAME).insert(allRecords)
+      .then(() => {
+        return request(app)
+          .get('/inventory')
+          .set('x-access-token', token)
+          .set('Accept', 'application/json')
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .then((response) => {
+            const { coffees, blends, containers, lastSync } = response.body;
+            assert.strictEqual(coffees.length, 2);
+            assert.strictEqual(blends.length, 2);
+            assert.strictEqual(containers.length, 2);
+            assert.strictEqual(lastSync.lastSync, 'never');
+          });
+      });
+  });
+
   it('GET with id returns specific item by _id', () => {
     const record1 = {stuff: 'stuff'};
     const record2 = {stuff: 'bad stuff'};
@@ -158,6 +182,32 @@ describe('inventory', () => {
             return db.get(COLLECTION_NAME).findOne({_id: record._id})
               .then((result) => {
                 assert.strictEqual(result, null);
+              });
+          });
+      });
+  });
+
+  it('DELETE for utility record returns 404', () => {
+    const itemToDelete = {
+      type: 'Acorn Squash',
+      'util': 'util',
+      thing: 'OLD information'
+    };
+    return db.get(COLLECTION_NAME).insert(itemToDelete)
+      .then(() => {
+        return request(app)
+          .delete(`/inventory/${itemToDelete._id}`)
+          .set('x-access-token', token)
+          .set('Accept', 'application/json')
+          .expect(404)
+          .expect('Content-Type', /json/)
+          .then((response) => {
+            assert.deepEqual(response.body, {error: 'record does not exist'});
+          })
+          .then(() => {
+            return db.get(COLLECTION_NAME).findOne({_id: itemToDelete._id})
+              .then((result) => {
+                assert.strictEqual(result.thing, 'OLD information');
               });
           });
       });

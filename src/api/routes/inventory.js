@@ -13,14 +13,19 @@ router.all('/*', jwtAuth);
 
 //get requests with 'type' specified filter results by category, returning a sub-collection
 
-router.get('/:type', (req, res) => {
-  const type = req.params.type;
+router.get('/', (req, res) => {
   const db = req.db;
   const inventoryName = req.inventoryName;
 
-  db.get(inventoryName).find({type})
+  db.get(inventoryName).find({ $or: [ {category: { $in: ['coffee', 'blend', 'container']}}, { 'date': 'date'} ] })
     .then(resultSet => {
-      res.json(resultSet);
+      let payload = {
+        coffees: resultSet.filter(result => result.category === 'coffee'),
+        blends: resultSet.filter(result => result.category === 'blend'),
+        containers: resultSet.filter(result => result.category === 'container'),
+        lastSync: resultSet.find(result => result.date === 'date')
+      };
+      res.json(payload);
     })
     .catch(err => {
       res.status(404).json({error: err});
@@ -84,13 +89,18 @@ router.delete('/:id', (req, res) => {
   const id = req.params.id;
   const db = req.db;
   const inventoryName = req.inventoryName;
-
-  db.collection(inventoryName).remove({_id: id})
-    .then(() => {
-      res.json({_id: id});
+  const inventory = db.get(inventoryName);
+  return inventory.findOne({$and: [{_id: id}, { 'util': { $not: { $eq: 'util' } } }] })
+    .then(result => {
+      if(!result) {
+        throw new Error('record does not exist');
+      }
+      return result;
     })
+    .then(result => inventory.remove(result))
+    .then(() => res.json({_id: id}))
     .catch(err => {
-      res.status(404).json({error: err});
+      res.status(404).json({error: err.message});
     });
 });
 
