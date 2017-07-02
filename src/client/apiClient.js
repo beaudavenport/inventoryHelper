@@ -49,3 +49,14 @@ export function fetchAllData() {
     }
   });
 }
+
+export function sendLogin(name, password) {
+  return fetch('/v2/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-access-token': sessionStorage.getItem('token')
+    },
+    body: JSON.stringify({name: name, password: password})
+  });
+}

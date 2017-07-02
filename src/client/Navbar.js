@@ -1,10 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { login } from './reducers/inventory';
 import { Link } from 'react-router-dom';
 import SaveButton from './SaveButton';
+import LoginBar from './LoginBar';
 
-class Navbar extends React.Component {
+export class Navbar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -13,12 +15,12 @@ class Navbar extends React.Component {
   }
 
   render() {
-    const loginBarToggle = () => this.setState({loginBarOpen: !this.state.loginBarOpen});
+    const { loginBarOpen } = this.state;
+    const { login } = this.props;
+
+    const loginBarToggle = () => this.setState({loginBarOpen: !loginBarOpen});
     const collectionName = this.props.metadata.collectionName || 'New Inventory';
-    let loginBar = null;
-    if(this.state.loginBarOpen) {
-      loginBar = <div className="login-bar">Great Scott!</div>;
-    }
+    const loginBar = loginBarOpen ? <LoginBar login={login}/> : null;
 
     return (
       <div>
@@ -44,6 +46,8 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => {};
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({login}, dispatch);
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
