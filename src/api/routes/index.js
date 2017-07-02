@@ -15,12 +15,6 @@ router.get('/', function(req, res) {
   res.render('login');
 });
 
-router.get('/v2(/)?*', (req, res) => {
-  res.render('v2Index', {
-    title: 'New Collection'
-  });
-});
-
 // upon login, check credentials, then create JWT token and render main application page
 router.post('/:version/login', (req, res) => {
   const db = req.db;
