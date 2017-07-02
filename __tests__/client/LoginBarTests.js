@@ -7,20 +7,19 @@ import { shallow } from 'enzyme';
 import LoginBar from '../../src/client/LoginBar';
 
 describe('LoginBar', () => {
-  it('calls to login action with collection name and password', () => {
-    const loginAction = sinon.spy();
+  it('calls to action with collection name and password', () => {
+    const action = sinon.spy();
 
-    const wrapper = shallow(<LoginBar login={loginAction} />);
+    const wrapper = shallow(<LoginBar action={action} message="Get some potato" buttonText="doit"/>);
     const loginButton = wrapper.find('.btn.login');
+    const loginMessage = wrapper.find('.login-message');
     wrapper.instance().name = {value: 'potato'};
     wrapper.instance().password = {value: 'foo'};
     loginButton.simulate('click');
 
-    assert.strictEqual(loginAction.args[0][0], 'potato');
-    assert.strictEqual(loginAction.args[0][1], 'foo');
-  });
-
-  it('calls to create action with collection name and password', () => {
-
+    assert.strictEqual(action.args[0][0], 'potato');
+    assert.strictEqual(action.args[0][1], 'foo');
+    assert.strictEqual(loginMessage.text(), 'Get some potato');
+    assert.strictEqual(loginButton.text(), 'doit');
   });
 });

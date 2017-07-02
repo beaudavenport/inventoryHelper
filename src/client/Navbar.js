@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { login } from './reducers/inventory';
+import { login, createNew } from './reducers/inventory';
 import { Link } from 'react-router-dom';
 import SaveButton from './SaveButton';
 import LoginBar from './LoginBar';
@@ -10,17 +10,24 @@ export class Navbar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loginBarOpen: false
+      loginBarChoice: null
     };
   }
 
   render() {
-    const { loginBarOpen } = this.state;
-    const { login } = this.props;
+    const { loginBarChoice } = this.state;
+    const { login, createNew } = this.props;
 
-    const loginBarToggle = () => this.setState({loginBarOpen: !loginBarOpen});
+    const loginToggle = () => this.setState({loginBarChoice: 'login'});
+    const createToggle = () => this.setState({loginBarChoice: 'create'});
     const collectionName = this.props.metadata.collectionName || 'New Inventory';
-    const loginBar = loginBarOpen ? <LoginBar login={login}/> : null;
+
+    let loginBar = null;
+    if(loginBarChoice === 'login') {
+      loginBar = <LoginBar action={login} message='Login' buttonText="Login"/>;
+    } else if (loginBarChoice === 'create') {
+      loginBar = <LoginBar action={createNew} message='Create new inventory' buttonText="Create"/>;
+    }
 
     return (
       <div>
@@ -31,7 +38,8 @@ export class Navbar extends React.Component {
           <ul className="navbar-nav">
             <li className="nav-item"><Link to="/containers" className="nav-link">Containers</Link></li>
             <li className="nav-item"><SaveButton /></li>
-            <li className="nav-item"><button className="login-toggle" onClick={loginBarToggle}>Login Pane</button></li>
+            <li className="nav-item"><button className="login-toggle" onClick={loginToggle}>Login</button></li>
+            <li className="nav-item"><button className="create-toggle" onClick={createToggle}>Create</button></li>
           </ul>
         </nav>
         {loginBar}
@@ -47,7 +55,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({login}, dispatch);
+  return bindActionCreators({login, createNew}, dispatch);
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

@@ -54,9 +54,18 @@ export function sendLogin(name, password) {
   return fetch('/v2/login', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'x-access-token': sessionStorage.getItem('token')
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({name: name, password: password})
+  });
+}
+
+export function sendCreate(name, password) {
+  return fetch('/v2/create', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({newName: name, newPassword: password})
   });
 }

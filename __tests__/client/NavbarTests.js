@@ -24,7 +24,7 @@ describe('Navbar', () => {
     assert.strictEqual(collectionName.text(), 'GreatBigPotatoes');
   });
 
-  it('displays login/create bar when selected', () => {
+  it('displays login panel when login selected', () => {
     const loginSpy = sinon.spy();
     const wrapper = shallow(<Navbar login={loginSpy} metadata={{}}/>);
 
@@ -32,6 +32,21 @@ describe('Navbar', () => {
     loginButton.simulate('click');
 
     const loginBar = wrapper.find(LoginBar);
-    assert.strictEqual(loginBar.prop('login'), loginSpy);
+    assert.strictEqual(loginBar.prop('action'), loginSpy);
+    assert.strictEqual(loginBar.prop('message'), 'Login');
+    assert.strictEqual(loginBar.prop('buttonText'), 'Login');
+  });
+
+  it('displays create panel when create selected', () => {
+    const createNewSpy = sinon.spy();
+    const wrapper = shallow(<Navbar createNew={createNewSpy} metadata={{}}/>);
+
+    const createButton = wrapper.find('.create-toggle');
+    createButton.simulate('click');
+
+    const loginBar = wrapper.find(LoginBar);
+    assert.strictEqual(loginBar.prop('action'), createNewSpy);
+    assert.strictEqual(loginBar.prop('message'), 'Create new inventory');
+    assert.strictEqual(loginBar.prop('buttonText'), 'Create');
   });
 });

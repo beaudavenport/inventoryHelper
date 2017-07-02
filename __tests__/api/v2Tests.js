@@ -101,38 +101,6 @@ describe('v2 endpoints', () => {
   });
 
   describe('POST create', () => {
-    it('logs in existing collection and returns jwt token', (done) => {
-      request(app)
-        .post('/v2/login')
-        .set('Accept', 'application/json')
-        .send({name: COLLECTION_NAME, password: COLLECTION_PASSWORD})
-        .expect(200)
-        .end((err, response) => {
-          if(err) {
-            assert.fail('error logging in:', err);
-          }
-          const { token, title } = response.body;
-          assert.notEqual(token, 'undefined', 'token string set');
-          assert.strictEqual(title, COLLECTION_NAME, 'returned name');
-          done();
-        });
-    });
-
-    it('prevents creation for bots', (done) => {
-      request(app)
-        .post('/v2/create')
-        .set('Accept', 'application/json')
-        .send({isHuman: 'notHuman', newName: ''})
-        .expect(401)
-        .end((err, response) => {
-          if(err) {
-            assert.fail('error displaying login:', err);
-          }
-          assert.deepEqual(response.body, { error: 'Humans only please.'}, 'displays bot error');
-          done();
-        });
-    });
-
     it('prevents creation for bad password', (done) => {
       request(app)
         .post('/v2/create')
@@ -163,19 +131,23 @@ describe('v2 endpoints', () => {
         });
     });
 
-    it('renders newly created collection and returns jwt token', (done) => {
-      request(app)
+    it('renders newly created collection and returns jwt token', () => {
+      return request(app)
         .post('/v2/create')
         .set('Accept', 'application/json')
         .send({isHuman: 'isHuman', newName: 'NEWNAME', newPassword: COLLECTION_PASSWORD})
-        .end((err, response) => {
-          if(err) {
-            assert.fail('error displaying homepage:', err);
-          }
+        .expect(200)
+        .then((response) => {
           const { token, title } = response.body;
           assert.notEqual(token, 'undefined', 'token string set');
           assert.strictEqual(title, 'NEWNAME', 'returned name');
-          done();
+        })
+        .then(() => {
+          return db.get(COLLECTION_NAME).findOne({metadata: true})
+            .then((result) => {
+              assert.strictEqual(result.lastSync, 'never');
+              assert.strictEqual(result.collectionName, COLLECTION_NAME);
+            });
         });
     });
   });

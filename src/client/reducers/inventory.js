@@ -1,5 +1,5 @@
 import Guid from 'guid';
-import { fetchAllData, sendLogin } from '../apiClient';
+import { fetchAllData, sendLogin, sendCreate } from '../apiClient';
 import { setCredentials }  from '../CredentialProvider';
 
 const ADD_INVENTORY_ITEM = 'ADD_INVENTORY_ITEM';
@@ -9,6 +9,17 @@ const UPDATE_ALL_INVENTORY_ITEMS = 'UPDATE_ALL_INVENTORY_ITEMS';
 export function login(name, password) {
   return ((dispatch) => {
     return sendLogin(name, password)
+      .then((rawResponse) => rawResponse.json())
+      .then((result) => {
+        setCredentials(result.token);
+        return fetchAllItems()(dispatch);
+      });
+  });
+}
+
+export function createNew(name, password) {
+  return ((dispatch) => {
+    return sendCreate(name, password)
       .then((rawResponse) => rawResponse.json())
       .then((result) => {
         setCredentials(result.token);

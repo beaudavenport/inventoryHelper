@@ -42,17 +42,14 @@ router.post('/login', (req, res) => {
 
 router.post('/create', (req, res) => {
   const db = req.db;
-  const { newName, newPassword, isHuman } = req.body;
+  const { newName, newPassword } = req.body;
   const newCollectionName = stripSpecialChars(newName);
 
   //Password must contain at least 8 characters including a capital letter,
   //a number, a special character, and cannot have harmful characters.
   const passReg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%?&][^\s{}<>#*,;()|]{8,}/;
 
-  // a hidden form field is used to protect against bots. "notHuman" is changed to "human" client-side.
-  if (isHuman === 'notHuman') {
-    res.status(401).json({error: 'Humans only please.'});
-  } else if (!passReg.test(newPassword)) {
+  if (!passReg.test(newPassword)) {
     res.status(401).json({error: 'Invalid password.'});
   } else {
     //{strict:true} prevents duplicate collection creation.
@@ -67,7 +64,7 @@ router.post('/create', (req, res) => {
       .then(hashedPassword => {
         return newCollection.insert([
               {'util' : 'util', 'pass' : hashedPassword},
-              {'date' : 'date', 'lastSync' : 'never'}
+              {metadata : true, 'lastSync' : 'never', collectionName: newCollectionName}
         ], {safe:true})
         .then(() => {
           res.json({
