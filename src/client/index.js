@@ -5,31 +5,26 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { BrowserRouter, Route } from 'react-router-dom';
 import App from './App';
+import MainCalculator from './MainCalculator';
 import ContainerPage from './ContainerPage';
 import Navbar from './Navbar';
 import rootReducer from './reducers';
 import css from './styles/index.scss';
 
-const bootstrappedData = JSON.parse(sessionStorage.getItem('payload'));
-const { coffees, blends, containers, lastSync } = bootstrappedData;
-const preloadedState = {
-  inventory: [...coffees, ...blends, ...containers],
-  lastSync: lastSync
-};
-
 const store = createStore(
   rootReducer,
-  preloadedState,
   compose(applyMiddleware(thunk), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 );
 
 render(
   <Provider store={store}>
-    <BrowserRouter basename="/v2/login" >
+    <BrowserRouter basename="/v2" >
       <div>
         <Navbar />
-        <Route exact path="/" component={App} />
-        <Route exact path="/containers" component={ContainerPage} />
+        <App>
+          <Route exact path="/" component={MainCalculator} />
+          <Route exact path="/containers" component={ContainerPage} />
+        </App>
       </div>
     </BrowserRouter>
   </Provider>,

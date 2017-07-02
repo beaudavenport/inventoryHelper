@@ -39,3 +39,13 @@ export function updateSync(syncItem) {
     }
   });
 }
+
+export function fetchAllData() {
+  return fetch('/inventory', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-access-token': sessionStorage.getItem('token')
+    }
+  });
+}

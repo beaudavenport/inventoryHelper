@@ -1,7 +1,20 @@
 import Guid from 'guid';
+import { fetchAllData } from '../apiClient';
 
 const ADD_INVENTORY_ITEM = 'ADD_INVENTORY_ITEM';
 const UPDATE_INVENTORY_ITEM = 'UPDATE_INVENTORY_ITEM';
+const UPDATE_ALL_INVENTORY_ITEMS = 'UPDATE_ALL_INVENTORY_ITEMS';
+
+export function fetchAllItems() {
+  return ((dispatch) => {
+    return fetchAllData()
+      .then((rawResponse) => rawResponse.json())
+      .then((result) => {
+        dispatch({ type: UPDATE_ALL_INVENTORY_ITEMS, payload: result });
+        dispatch({ type: 'UPDATE_SYNC', payload: result.lastSync });
+      });
+  });
+}
 
 export function addCoffee() {
   return {
@@ -72,6 +85,10 @@ export function getContainers(state) {
 
 export default (state = [], action) => {
   switch(action.type) {
+    case UPDATE_ALL_INVENTORY_ITEMS:
+      const { coffees, blends, containers } = action.payload;
+      return [...coffees, ...blends, ...containers];
+
     case ADD_INVENTORY_ITEM:
       return [action.payload, ...state];
 

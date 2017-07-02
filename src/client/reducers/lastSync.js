@@ -26,14 +26,14 @@ export function sync() {
       .then(() => updateSync(lastSync))
       .then(rawResponse => rawResponse.json())
       .then(lastSync => {
-        dispatch({type: 'SAVE_SUCCESSFUL', payload: lastSync});
+        dispatch({type: 'UPDATE_SYNC', payload: lastSync});
       });
   };
 }
 
 export default (state = {}, action) => {
   switch (action.type) {
-    case 'SAVE_SUCCESSFUL':
+    case 'UPDATE_SYNC':
       return { ...action.payload };
     default:
       return state;

@@ -64,7 +64,7 @@ describe('lastSync', () => {
             assert.strictEqual(syncPut.url, '/inventory/sync/8');
             assert.strictEqual(syncPut.tokenHeader, 'tokenString');
 
-            assert.deepEqual(dispatchStub.args[0][0], {type: 'SAVE_SUCCESSFUL', payload: syncUpdate});
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_SYNC', payload: syncUpdate});
           });
       });
 
@@ -96,7 +96,7 @@ describe('lastSync', () => {
             assert.strictEqual(syncPut.url, '/inventory/sync/8');
             assert.strictEqual(syncPut.tokenHeader, 'tokenString');
 
-            assert.deepEqual(dispatchStub.args[0][0], {type: 'SAVE_SUCCESSFUL', payload: syncUpdate});
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_SYNC', payload: syncUpdate});
           });
       });
 
@@ -122,7 +122,7 @@ describe('lastSync', () => {
             assert.strictEqual(syncPut.url, '/inventory/sync/6666');
             assert.strictEqual(syncPut.tokenHeader, 'tokenString');
 
-            assert.deepEqual(dispatchStub.args[0][0], {type: 'SAVE_SUCCESSFUL', payload: syncUpdate});
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_SYNC', payload: syncUpdate});
           });
       });
 
@@ -147,18 +147,18 @@ describe('lastSync', () => {
             assert.strictEqual(coffeePost.url, '/inventory');
             assert.strictEqual(coffeePut1.url, '/inventory/90');
             assert.strictEqual(syncPut.url, '/inventory/sync/8');
-            assert.deepEqual(dispatchStub.args[0][0], {type: 'SAVE_SUCCESSFUL', payload: syncUpdate});
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_SYNC', payload: syncUpdate});
           });
       });
     });
   });
 
   describe('reducer', () => {
-    describe('SAVE_SUCCESSFUL', () => {
+    describe('UPDATE_SYNC', () => {
       it('should return update syncItem', () => {
         const oldSync = {thing: 'old', cruft: 'stuff'};
         const newSync = {thing: 'updated'};
-        const action = {type: 'SAVE_SUCCESSFUL', payload: newSync};
+        const action = {type: 'UPDATE_SYNC', payload: newSync};
 
         assert.deepEqual(lastSync(oldSync, action), newSync);
       });

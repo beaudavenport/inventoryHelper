@@ -1,7 +1,11 @@
 import mocha from 'mocha';
 import assert from 'assert';
 import Guid from 'guid';
+import sinon from 'sinon';
+import isomorphicFetch from 'isomorphic-fetch';
+import fetchMock from 'fetch-mock';
 import inventory, {
+  fetchAllItems,
   addCoffee,
   updateCoffee,
   addBlend,
@@ -15,6 +19,44 @@ import inventory, {
 
 describe('inventory', () => {
   describe('actions', () => {
+
+    function getFetchMockCallInfo(mockCall) {
+      return {
+        url: mockCall[0],
+        tokenHeader: mockCall[1].headers['x-access-token'],
+        body: mockCall[1].body
+      };
+    }
+
+    beforeEach(() => {
+      fetchMock.get('express:/inventory', {things: ['many things'], lastSync: {lastSync: 'sync time'}});
+      global.sessionStorage = {
+        getItem: sinon.stub().withArgs('token').returns('tokenString')
+      };
+    });
+
+    afterEach(() => {
+      fetchMock.restore();
+    });
+
+    describe('fetchAllItems', () => {
+      it('fetches all inventory items', () => {
+        const dispatchStub = sinon.stub();
+        return fetchAllItems()(dispatchStub)
+          .then(() => {
+            const allDataGet = getFetchMockCallInfo(fetchMock.calls().matched[0]);
+            const inventoryAction = dispatchStub.args[0][0];
+            const syncAction = dispatchStub.args[1][0];
+            assert.strictEqual(allDataGet.url, '/inventory');
+            assert.strictEqual(allDataGet.tokenHeader, 'tokenString');
+            assert.deepEqual(inventoryAction.payload.things, ['many things']);
+            assert.deepEqual(inventoryAction.type, 'UPDATE_ALL_INVENTORY_ITEMS');
+            assert.deepEqual(syncAction.payload.lastSync, 'sync time');
+            assert.deepEqual(syncAction.type, 'UPDATE_SYNC');
+          });
+      });
+    });
+
     describe('updateCoffee', () => {
       it('returns an UPDATE_INVENTORY_ITEM action with coffee marked as dirty', () => {
         const coffee = {_id: 789, greenWeight: 10, roastedWeight: 11};
@@ -142,6 +184,24 @@ describe('inventory', () => {
   });
 
   describe('reducer', () => {
+    describe('UPDATE_ALL_INVENTORY_ITEMS', () => {
+      it('updates all items and ignores lastSync', () => {
+        const oldInventoryItems = [{stuff: 'old'}]
+        const action = {type: 'UPDATE_ALL_INVENTORY_ITEMS', payload: {
+            coffees: [{category: 'coffee'}],
+            blends: [{category: 'blend'}, {category: 'blend'}],
+            containers: [{category: 'container'}],
+            lastSync: [{thing: 'something'}]
+          }
+        };
+
+        const result = inventory(oldInventoryItems, action);
+
+        assert.strictEqual(result.length, 4);
+        assert(!result.find((item) => item.stuff === 'old'));
+      });
+    });
+
     describe('ADD_INVENTORY_ITEM', () => {
       it('adds a coffee at the top of the list', () => {
         const oldCoffeeList = [

@@ -1,19 +1,29 @@
 import React from 'react';
-import SingleOriginTable from './SingleOriginTable';
-import BlendTable from './BlendTable';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { fetchAllItems } from './reducers/inventory';
+import { getCredentials } from './CredentialProvider';
 
-class App extends React.Component {
+export class App extends React.Component {
+  componentDidMount() {
+    const token = getCredentials();
+    if(token) {
+      this.props.fetchAllItems();
+    }
+  }
 
   render() {
-    const bootstrappedData = JSON.parse(sessionStorage.getItem('payload'));
-    const content = Object.keys(bootstrappedData);
+    const children = this.props.children;
     return (
       <div>
-        <SingleOriginTable />
-        <BlendTable />
+        {children}
       </div>
     );
   }
 }
 
-export default App;
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({ fetchAllItems }, dispatch);
+};
+
+export default connect(() => ({}), mapDispatchToProps)(App);
