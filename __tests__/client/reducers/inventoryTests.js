@@ -7,6 +7,7 @@ import fetchMock from 'fetch-mock';
 import inventory, {
   login,
   createNew,
+  logout,
   fetchAllItems,
   addCoffee,
   updateCoffee,
@@ -36,7 +37,8 @@ describe('inventory', () => {
       fetchMock.get('express:/inventory', {things: ['many things'], metadata: {lastSync: 'sync time', collectionName: 'my stuff'}});
       global.sessionStorage = {
         getItem: sinon.stub().withArgs('token').returns('tokenString'),
-        setItem: sinon.spy()
+        setItem: sinon.spy(),
+        clear: sinon.spy()
       };
     });
 
@@ -97,6 +99,15 @@ describe('inventory', () => {
             assert.strictEqual(metadataAction.payload.collectionName, 'my stuff');
             assert.deepEqual(metadataAction.type, 'UPDATE_METADATA');
           });
+      });
+    });
+
+    describe('logout', () => {
+      it('resets inventory items and removes token', () => {
+        const result = logout();
+
+        assert(sessionStorage.clear.calledOnce);
+        assert.strictEqual(result.type, 'RESET_ALL_INVENTORY_ITEMS');
       });
     });
 
@@ -291,6 +302,19 @@ describe('inventory', () => {
         const result = inventory(oldCoffeeList, action);
         assert.deepEqual(result[0], {_id: 789, importantField: 'thing', greenWeight: 500, roastedWeight: 11, totalWeight: 511, isDirty: true});
         assert.deepEqual(result[1], {_id: 999, importantField: 'ugh', greenWeight: 5, roastedWeight: 85, totalWeight: 90});
+      });
+    });
+
+    describe('RESET_ALL_INVENTORY_ITEMS', () => {
+      it('removes all inventory items', () => {
+        const oldCoffeeList = [
+          {_id: 789, importantField: 'thing', greenWeight: 10, roastedWeight: 11, totalWeight: 21 },
+          {_id: 999, importantField: 'ugh', greenWeight: 5, roastedWeight: 85, totalWeight: 90}
+        ];
+        const action = {type: 'RESET_ALL_INVENTORY_ITEMS'};
+
+        const result = inventory(oldCoffeeList, action);
+        assert.strictEqual(result.length, 0);
       });
     });
   });

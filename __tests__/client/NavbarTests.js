@@ -49,4 +49,14 @@ describe('Navbar', () => {
     assert.strictEqual(loginBar.prop('message'), 'Create new inventory');
     assert.strictEqual(loginBar.prop('buttonText'), 'Create');
   });
+
+  it('calls to logout when selected', () => {
+    const logout = sinon.spy();
+    const wrapper = shallow(<Navbar logout={logout} metadata={{}}/>);
+
+    const logoutButton = wrapper.find('.logout');
+    logoutButton.simulate('click');
+
+    assert(logout.calledOnce);
+  });
 });

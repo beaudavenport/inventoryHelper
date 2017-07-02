@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { login, createNew } from './reducers/inventory';
+import { login, createNew, logout } from './reducers/inventory';
 import { Link } from 'react-router-dom';
 import SaveButton from './SaveButton';
 import LoginBar from './LoginBar';
@@ -16,7 +16,7 @@ export class Navbar extends React.Component {
 
   render() {
     const { loginBarChoice } = this.state;
-    const { login, createNew } = this.props;
+    const { login, createNew, logout } = this.props;
 
     const loginToggle = () => this.setState({loginBarChoice: 'login'});
     const createToggle = () => this.setState({loginBarChoice: 'create'});
@@ -40,6 +40,7 @@ export class Navbar extends React.Component {
             <li className="nav-item"><SaveButton /></li>
             <li className="nav-item"><button className="login-toggle" onClick={loginToggle}>Login</button></li>
             <li className="nav-item"><button className="create-toggle" onClick={createToggle}>Create</button></li>
+            <li className="nav-item"><button className="logout" onClick={logout}>Logout</button></li>
           </ul>
         </nav>
         {loginBar}
@@ -55,7 +56,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({login, createNew}, dispatch);
+  return bindActionCreators({login, createNew, logout}, dispatch);
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

@@ -1,10 +1,11 @@
 import Guid from 'guid';
 import { fetchAllData, sendLogin, sendCreate } from '../apiClient';
-import { setCredentials }  from '../CredentialProvider';
+import { setCredentials, clearCredentials }  from '../CredentialProvider';
 
 const ADD_INVENTORY_ITEM = 'ADD_INVENTORY_ITEM';
 const UPDATE_INVENTORY_ITEM = 'UPDATE_INVENTORY_ITEM';
 const UPDATE_ALL_INVENTORY_ITEMS = 'UPDATE_ALL_INVENTORY_ITEMS';
+const RESET_ALL_INVENTORY_ITEMS = 'RESET_ALL_INVENTORY_ITEMS';
 
 export function login(name, password) {
   return ((dispatch) => {
@@ -37,6 +38,11 @@ export function fetchAllItems() {
         dispatch({ type: 'UPDATE_METADATA', payload: result.metadata });
       });
   });
+}
+
+export function logout() {
+  clearCredentials();
+  return { type: RESET_ALL_INVENTORY_ITEMS };
 }
 
 export function addCoffee() {
@@ -123,6 +129,10 @@ export default (state = [], action) => {
             return coffee;
           }
       });
+
+    case RESET_ALL_INVENTORY_ITEMS:
+      return [];
+
     default:
       return state;
   }

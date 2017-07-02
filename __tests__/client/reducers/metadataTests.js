@@ -155,12 +155,21 @@ describe('metadata', () => {
 
   describe('reducer', () => {
     describe('UPDATE_METADATA', () => {
-      it('should return update syncItem', () => {
+      it('should return updated metadata', () => {
         const oldSync = {thing: 'old', cruft: 'stuff'};
         const newSync = {thing: 'updated'};
         const action = {type: 'UPDATE_METADATA', payload: newSync};
 
         assert.deepEqual(metadata(oldSync, action), newSync);
+      });
+    });
+
+    describe('RESET_ALL_INVENTORY_ITEMS', () => {
+      it('should reset metatdata item', () => {
+        const oldSync = {thing: 'old', cruft: 'stuff'};
+        const action = {type: 'RESET_ALL_INVENTORY_ITEMS'};
+
+        assert.deepEqual(metadata(oldSync, action), {});
       });
     });
   });

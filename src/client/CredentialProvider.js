@@ -5,3 +5,7 @@ export function getCredentials() {
 export function setCredentials(token) {
   sessionStorage.setItem('token', token);
 }
+
+export function clearCredentials() {
+  sessionStorage.clear();
+}

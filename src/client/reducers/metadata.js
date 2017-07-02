@@ -35,6 +35,10 @@ export default (state = {}, action) => {
   switch (action.type) {
     case 'UPDATE_METADATA':
       return { ...action.payload };
+
+    case 'RESET_ALL_INVENTORY_ITEMS':
+      return {};
+      
     default:
       return state;
   }
