@@ -5,8 +5,6 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { BrowserRouter, Route } from 'react-router-dom';
 import App from './App';
-import MainCalculator from './MainCalculator';
-import ContainerPage from './ContainerPage';
 import Navbar from './Navbar';
 import rootReducer from './reducers';
 import css from './styles/index.scss';
@@ -21,10 +19,7 @@ render(
     <BrowserRouter basename="/v2" >
       <div>
         <Navbar />
-        <App>
-          <Route exact path="/" component={MainCalculator} />
-          <Route exact path="/containers" component={ContainerPage} />
-        </App>
+        <Route path="/" component={App} />
       </div>
     </BrowserRouter>
   </Provider>,
