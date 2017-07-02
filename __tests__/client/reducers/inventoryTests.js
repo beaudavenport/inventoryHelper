@@ -29,7 +29,7 @@ describe('inventory', () => {
     }
 
     beforeEach(() => {
-      fetchMock.get('express:/inventory', {things: ['many things'], lastSync: {lastSync: 'sync time'}});
+      fetchMock.get('express:/inventory', {things: ['many things'], metadata: {lastSync: 'sync time', collectionName: 'my stuff'}});
       global.sessionStorage = {
         getItem: sinon.stub().withArgs('token').returns('tokenString')
       };
@@ -46,13 +46,14 @@ describe('inventory', () => {
           .then(() => {
             const allDataGet = getFetchMockCallInfo(fetchMock.calls().matched[0]);
             const inventoryAction = dispatchStub.args[0][0];
-            const syncAction = dispatchStub.args[1][0];
+            const metadataAction = dispatchStub.args[1][0];
             assert.strictEqual(allDataGet.url, '/inventory');
             assert.strictEqual(allDataGet.tokenHeader, 'tokenString');
             assert.deepEqual(inventoryAction.payload.things, ['many things']);
             assert.deepEqual(inventoryAction.type, 'UPDATE_ALL_INVENTORY_ITEMS');
-            assert.deepEqual(syncAction.payload.lastSync, 'sync time');
-            assert.deepEqual(syncAction.type, 'UPDATE_SYNC');
+            assert.strictEqual(metadataAction.payload.lastSync, 'sync time');
+            assert.strictEqual(metadataAction.payload.collectionName, 'my stuff');
+            assert.deepEqual(metadataAction.type, 'UPDATE_METADATA');
           });
       });
     });
@@ -185,13 +186,13 @@ describe('inventory', () => {
 
   describe('reducer', () => {
     describe('UPDATE_ALL_INVENTORY_ITEMS', () => {
-      it('updates all items and ignores lastSync', () => {
+      it('updates all items and ignores metadata', () => {
         const oldInventoryItems = [{stuff: 'old'}]
         const action = {type: 'UPDATE_ALL_INVENTORY_ITEMS', payload: {
             coffees: [{category: 'coffee'}],
             blends: [{category: 'blend'}, {category: 'blend'}],
             containers: [{category: 'container'}],
-            lastSync: [{thing: 'something'}]
+            metadata: [{metadata: true}]
           }
         };
 
@@ -199,6 +200,7 @@ describe('inventory', () => {
 
         assert.strictEqual(result.length, 4);
         assert(!result.find((item) => item.stuff === 'old'));
+        assert(!result.find((item) => item.metadata));
       });
     });
 

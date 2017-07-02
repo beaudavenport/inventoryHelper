@@ -5,7 +5,7 @@ import { addInventoryItem,
 
 export function sync() {
   return (dispatch, getState) => {
-    const { inventory, lastSync } = getState();
+    const { inventory, metadata } = getState();
     const itemsToUpdate = inventory.filter(item => item.isDirty && !item.isNew);
     const itemsToAdd = inventory.filter(item => item.isNew);
     const itemsToDelete = inventory.filter(item => item.isDeleted);
@@ -23,17 +23,17 @@ export function sync() {
     });
 
     return Promise.all([...itemAddRequests, ...itemUpdateRequests, ...itemDeleteRequests])
-      .then(() => updateSync(lastSync))
+      .then(() => updateSync(metadata))
       .then(rawResponse => rawResponse.json())
-      .then(lastSync => {
-        dispatch({type: 'UPDATE_SYNC', payload: lastSync});
+      .then(metadata => {
+        dispatch({type: 'UPDATE_METADATA', payload: metadata});
       });
   };
 }
 
 export default (state = {}, action) => {
   switch (action.type) {
-    case 'UPDATE_SYNC':
+    case 'UPDATE_METADATA':
       return { ...action.payload };
     default:
       return state;

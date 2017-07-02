@@ -1,22 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { sync } from './reducers/lastSync';
+import { sync } from './reducers/metadata';
 
 class SaveButton extends React.Component {
   render() {
-    const { lastSync, sync } = this.props;
+    const { metadata, sync } = this.props;
     const callToSave = () => sync();
 
     return (
-      <button onClick={callToSave}>{lastSync.lastSync}</button>
+      <button onClick={callToSave}>{metadata.lastSync}</button>
     );
   }
 }
 
 const mapStateToProps = (state) => {
   return {
-    lastSync: state.lastSync
+    metadata: state.metadata
   };
 };
 

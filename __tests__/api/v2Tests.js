@@ -38,12 +38,11 @@ describe('v2 endpoints', () => {
         });
     });
 
-    it.only('renders default app regardless of sub routes in url', (done) => {
+    it('renders default app regardless of sub routes in url', (done) => {
       request(app)
         .get('/v2/potato/potato15')
         .expect(200)
         .end((err, res) => {
-          console.log(res);
           if(err) {
             assert.fail('error displaying application:', err);
           }

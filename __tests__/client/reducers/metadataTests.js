@@ -3,13 +3,13 @@ import assert from 'assert';
 import sinon from 'sinon';
 import isomorphicFetch from 'isomorphic-fetch';
 import fetchMock from 'fetch-mock';
-import lastSync, { sync } from '../../../src/client/reducers/lastSync';
+import metadata, { sync } from '../../../src/client/reducers/metadata';
 
-describe('lastSync', () => {
+describe('metadata', () => {
   describe('actions', () => {
     let getStateStub;
     let dispatchStub;
-    const syncUpdate = { syncUpdate: 'syncUpdate'};
+    const metadataUpdate = { metadataUpdate: 'metadataUpdate'};
 
     function getFetchMockCallInfo(mockCall) {
       return {
@@ -23,7 +23,7 @@ describe('lastSync', () => {
       fetchMock.put('express:/inventory/:id', {});
       fetchMock.post('express:/inventory', {});
       fetchMock.delete('express:/inventory/:id', {});
-      fetchMock.put('express:/inventory/sync/:id', syncUpdate);
+      fetchMock.put('express:/inventory/sync/:id', metadataUpdate);
       getStateStub = sinon.stub();
       dispatchStub = sinon.stub();
       global.sessionStorage = {
@@ -44,7 +44,7 @@ describe('lastSync', () => {
 
         getStateStub.returns({
           inventory: [coffee1, coffee2],
-          lastSync: {_id: 8}
+          metadata: {_id: 8}
         });
 
         return sync()(dispatchStub, getStateStub)
@@ -64,7 +64,7 @@ describe('lastSync', () => {
             assert.strictEqual(syncPut.url, '/inventory/sync/8');
             assert.strictEqual(syncPut.tokenHeader, 'tokenString');
 
-            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_SYNC', payload: syncUpdate});
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_METADATA', payload: metadataUpdate});
           });
       });
 
@@ -76,7 +76,7 @@ describe('lastSync', () => {
 
         getStateStub.returns({
           inventory: [coffee1, coffee2],
-          lastSync: {_id: 8}
+          metadata: {_id: 8}
         });
 
         return sync()(dispatchStub, getStateStub)
@@ -96,7 +96,7 @@ describe('lastSync', () => {
             assert.strictEqual(syncPut.url, '/inventory/sync/8');
             assert.strictEqual(syncPut.tokenHeader, 'tokenString');
 
-            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_SYNC', payload: syncUpdate});
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_METADATA', payload: metadataUpdate});
           });
       });
 
@@ -106,7 +106,7 @@ describe('lastSync', () => {
 
         getStateStub.returns({
           inventory: [coffee1, coffee2],
-          lastSync: {_id: 6666}
+          metadata: {_id: 6666}
         });
 
         return sync()(dispatchStub, getStateStub)
@@ -122,7 +122,7 @@ describe('lastSync', () => {
             assert.strictEqual(syncPut.url, '/inventory/sync/6666');
             assert.strictEqual(syncPut.tokenHeader, 'tokenString');
 
-            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_SYNC', payload: syncUpdate});
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_METADATA', payload: metadataUpdate});
           });
       });
 
@@ -133,7 +133,7 @@ describe('lastSync', () => {
 
         getStateStub.returns({
           inventory: [coffee1, coffee2, coffee3],
-          lastSync: {_id: 8}
+          metadata: {_id: 8}
         });
 
         return sync()(dispatchStub, getStateStub)
@@ -147,20 +147,20 @@ describe('lastSync', () => {
             assert.strictEqual(coffeePost.url, '/inventory');
             assert.strictEqual(coffeePut1.url, '/inventory/90');
             assert.strictEqual(syncPut.url, '/inventory/sync/8');
-            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_SYNC', payload: syncUpdate});
+            assert.deepEqual(dispatchStub.args[0][0], {type: 'UPDATE_METADATA', payload: metadataUpdate});
           });
       });
     });
   });
 
   describe('reducer', () => {
-    describe('UPDATE_SYNC', () => {
+    describe('UPDATE_METADATA', () => {
       it('should return update syncItem', () => {
         const oldSync = {thing: 'old', cruft: 'stuff'};
         const newSync = {thing: 'updated'};
-        const action = {type: 'UPDATE_SYNC', payload: newSync};
+        const action = {type: 'UPDATE_METADATA', payload: newSync};
 
-        assert.deepEqual(lastSync(oldSync, action), newSync);
+        assert.deepEqual(metadata(oldSync, action), newSync);
       });
     });
   });

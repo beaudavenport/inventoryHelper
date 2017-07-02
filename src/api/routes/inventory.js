@@ -17,13 +17,13 @@ router.get('/', (req, res) => {
   const db = req.db;
   const inventoryName = req.inventoryName;
 
-  db.get(inventoryName).find({ $or: [ {category: { $in: ['coffee', 'blend', 'container']}}, { 'date': 'date'} ] })
+  db.get(inventoryName).find({ $or: [ {category: { $in: ['coffee', 'blend', 'container']}}, { metadata: true} ] })
     .then(resultSet => {
       let payload = {
         coffees: resultSet.filter(result => result.category === 'coffee'),
         blends: resultSet.filter(result => result.category === 'blend'),
         containers: resultSet.filter(result => result.category === 'container'),
-        lastSync: resultSet.find(result => result.date === 'date')
+        metadata: resultSet.find(result => result.metadata)
       };
       res.json(payload);
     })
@@ -110,9 +110,9 @@ router.put('/sync/:id', (req, res) => {
   const inventoryName = req.inventoryName;
   const inventory = db.get(inventoryName);
 
-  inventory.update({'date': 'date'}, {'date':'date', 'lastSync': moment.utc().toJSON()}, {safe: true})
+  inventory.update({metadata: true}, {metadata: true, 'lastSync': moment.utc().toJSON(), collectionName: inventoryName}, {safe: true})
     .then(() => {
-      return inventory.findOne({'date': 'date'})
+      return inventory.findOne({metadata: true})
         .then(result => {
           res.json(result);
         });

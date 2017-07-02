@@ -40,11 +40,12 @@ describe('inventory', () => {
           .expect(200)
           .expect('Content-Type', /json/)
           .then((response) => {
-            const { coffees, blends, containers, lastSync } = response.body;
+            const { coffees, blends, containers, metadata } = response.body;
             assert.strictEqual(coffees.length, 2);
             assert.strictEqual(blends.length, 2);
             assert.strictEqual(containers.length, 2);
-            assert.strictEqual(lastSync.lastSync, 'never');
+            assert.strictEqual(metadata.lastSync, 'never');
+            assert.strictEqual(metadata.collectionName, COLLECTION_NAME);
           });
       });
   });
@@ -214,7 +215,7 @@ describe('inventory', () => {
   });
 
   it('PUT SYNC updates item and returns', () => {
-    return db.get(COLLECTION_NAME).insert({'date':'date'})
+    return db.get(COLLECTION_NAME).insert({metadata: true})
       .then(() => {
         return request(app)
           .put('/inventory/sync/foo')
@@ -222,8 +223,9 @@ describe('inventory', () => {
           .set('Accept', 'application/json')
           .expect(200)
           .then((response) => {
-            assert.ok(response.body.lastSync);
+            assert.ok(response.body.metadata);
             assert.notEqual(response.body.lastSync, 'never');
+            assert.strictEqual(response.body.collectionName, COLLECTION_NAME);
           });
       });
   });

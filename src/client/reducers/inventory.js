@@ -11,7 +11,7 @@ export function fetchAllItems() {
       .then((rawResponse) => rawResponse.json())
       .then((result) => {
         dispatch({ type: UPDATE_ALL_INVENTORY_ITEMS, payload: result });
-        dispatch({ type: 'UPDATE_SYNC', payload: result.lastSync });
+        dispatch({ type: 'UPDATE_METADATA', payload: result.metadata });
       });
   });
 }
