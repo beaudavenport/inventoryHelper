@@ -28,22 +28,36 @@ export class Navbar extends React.Component {
     } else if (loginBarChoice === 'create') {
       loginBar = <LoginBar action={createNew} message='Create new inventory' buttonText="Create"/>;
     }
+    const loginBarContainerClass = loginBar ? 'login-bar-container-filled' : 'login-bar-container';
+    // <button><i className="fa fa-caret-down" aria-hidden="true"></i></button>
 
     return (
       <div>
-        <nav className="navbar navbar-inverse bg-inverse">
-          <Link className="navbar-brand" to="/">
-            Inventory Helper: <span className="collection-name">{collectionName}</span>
-          </Link>
-          <ul className="navbar-nav">
-            <li className="nav-item"><Link to="/containers" className="nav-link">Containers</Link></li>
-            <li className="nav-item"><SaveButton /></li>
-            <li className="nav-item"><button className="login-toggle" onClick={loginToggle}>Login</button></li>
-            <li className="nav-item"><button className="create-toggle" onClick={createToggle}>Create</button></li>
-            <li className="nav-item"><button className="logout" onClick={logout}>Logout</button></li>
-          </ul>
+        <nav className="">
+          <div className="navbar">
+            <Link className="header" to="/">
+              Inventory Helper
+            </Link>
+            <div className="collection-bar">
+              <span className="collection-name">{collectionName}</span>
+              <button className="login-toggle nav-button" onClick={loginToggle}>Login</button>
+              <button className="create-toggle nav-button" onClick={createToggle}>Create</button>
+              <button className="logout nav-button" onClick={logout}>Logout</button>
+            </div>
+          </div>
+          <div className={loginBarContainerClass}>
+            {loginBar}
+          </div>
+          <div className="container card">
+            <ul>
+              <li><Link to="/containers" className="nav-link">Containers</Link></li>
+              <li><SaveButton /></li>
+              <li><button className="login-toggle" onClick={loginToggle}>Login</button></li>
+              <li><button className="create-toggle" onClick={createToggle}>Create</button></li>
+              <li><button className="logout" onClick={logout}>Logout</button></li>
+            </ul>
+          </div>
         </nav>
-        {loginBar}
       </div>
     );
   }

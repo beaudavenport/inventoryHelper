@@ -24,6 +24,13 @@ module.exports = {
     }, {
       test: /\.scss$/,
       loaders: ['style-loader', 'css-loader', 'sass-loader']
+    },
+    {
+      test: /\.css$/,
+      loaders: ['style-loader', 'css-loader']
+    },{
+      test: /\.(eot|svg|ttf|woff(2)?)(\?v=\d+\.\d+\.\d+)?/,
+      loaders: ['url-loader']
     }]
   },
 

@@ -1,3 +1,9 @@
+body {
+  background-color: #f3f3f3;
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+}
+
 .table-row {
   display: flex;
   justify-content: space-around;
@@ -6,4 +12,110 @@
 .calculator-row {
   display: flex;
   justify-content: space-around;
+}
+
+.navbar {
+  padding: 1.5rem;
+  color: white;
+  background-color: #333333;
+  display: flex;
+  justify-content: space-between;
+
+  ul {
+    list-style: none;
+
+    li {
+      display: inline-block;
+    }
+  }
+  .collection-bar {
+    * {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  }
+
+  .collection-name {
+      margin-right: 20px;
+      font-size: 1.6rem;
+  }
+
+  .nav-button {
+    font-size: 0.7rem;
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid #c7c7c7;
+    border-radius: 5px;
+    padding: 10px;
+    color: #c7c7c7;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &:hover, &:active {
+      color: white;
+      border: 1px solid white;
+    }
+  }
+
+  .header {
+    text-decoration: none;
+    color: white;
+    font-size: 1.6rem;
+    font-weight: 700;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@keyframes open {
+  0% {
+    max-height: 0;
+    visibility: hidden;
+  }
+
+  50% {
+    max-height: 50px;
+    visibility: hidden;
+  }
+
+  100% {
+    max-height: 100px;
+    visibility: visible;
+  }
+}
+
+.login-bar-container {
+  max-height: 0;
+  opacity: 0;
+}
+
+.login-bar-container-filled {
+  max-height: 100px;
+  animation: open .4s ease 1 normal;
+  // transition: max-height 200ms ease-in;
+  // transition-delay: .2s;
+  // animation-name: open;
+  // animation-duration: 2000ms;
+}
+
+.login-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+
+  * {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+}
+
+.card {
+  border-bottom: 1px solid #c7c7c7;
+  padding: 1.5rem;
+  margin-top: .25rem;
+  margin-left: 1.25rem;
+  margin-right: 1.25rem;
+  background-color: white;
 }

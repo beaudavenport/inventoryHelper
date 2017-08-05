@@ -7,7 +7,14 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import App from './App';
 import Navbar from './Navbar';
 import rootReducer from './reducers';
+
+import skeleton from 'skeleton.css';
+// import defaultcss from 'defaultcss';
+// defaultcss('skeleton', skeleton);
+
+import fontawesome from 'font-awesome/css/font-awesome.css';
 import css from './styles/index.scss';
+
 
 const store = createStore(
   rootReducer,

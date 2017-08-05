@@ -5,7 +5,7 @@ class LoginBar extends React.Component {
     const { action, message, buttonText } = this.props;
 
     return (
-      <div>
+      <div className="login-bar">
         <h3 className="login-message">{message}</h3>
         <input className="login-name" ref={(input) => this.name = input}/>
         <input type="password" className="login-password" ref={(input) => this.password = input}/>
