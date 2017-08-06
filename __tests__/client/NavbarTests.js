@@ -50,6 +50,22 @@ describe('Navbar', () => {
     assert.strictEqual(loginBar.prop('buttonText'), 'Create');
   });
 
+  it('passes cancel function to login or create bar', () => {
+    const wrapper = shallow(<Navbar createNew={() => {}} login={() => {}} metadata={{}}/>);
+
+    const createButton = wrapper.find('.create-toggle');
+    createButton.simulate('click');
+    const cancelFunc = wrapper.find(LoginBar).prop('cancel');
+    cancelFunc();
+    assert.strictEqual(wrapper.state().loginBarChoice, null);
+
+    const loginButton = wrapper.find('.login-toggle');
+    loginButton.simulate('click');
+    const cancelFunc2 = wrapper.find(LoginBar).prop('cancel');
+    cancelFunc2();
+    assert.strictEqual(wrapper.state().loginBarChoice, null);
+  });
+
   it('calls to logout when selected', () => {
     const logout = sinon.spy();
     const wrapper = shallow(<Navbar logout={logout} metadata={{}}/>);

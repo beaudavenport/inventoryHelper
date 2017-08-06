@@ -23,7 +23,7 @@ class SingleOriginTable extends React.Component {
     }, {green: 0, roasted: 0});
 
     return (
-      <table className="table">
+      <table className="table card">
         <thead>
           <tr>
             <td>Coffee</td>

@@ -18,15 +18,16 @@ export class Navbar extends React.Component {
     const { loginBarChoice } = this.state;
     const { login, createNew, logout } = this.props;
 
+    const cancel = () => this.setState({loginBarChoice: null});
     const loginToggle = () => this.setState({loginBarChoice: 'login'});
     const createToggle = () => this.setState({loginBarChoice: 'create'});
     const collectionName = this.props.metadata.collectionName || 'New Inventory';
 
     let loginBar = null;
     if(loginBarChoice === 'login') {
-      loginBar = <LoginBar action={login} message='Login' buttonText="Login"/>;
+      loginBar = <LoginBar cancel={cancel} action={login} message='Login' buttonText="Login"/>;
     } else if (loginBarChoice === 'create') {
-      loginBar = <LoginBar action={createNew} message='Create new inventory' buttonText="Create"/>;
+      loginBar = <LoginBar cancel={cancel} action={createNew} message='Create new inventory' buttonText="Create"/>;
     }
     const loginBarContainerClass = loginBar ? 'login-bar-container-filled' : 'login-bar-container';
     // <button><i className="fa fa-caret-down" aria-hidden="true"></i></button>
@@ -48,14 +49,9 @@ export class Navbar extends React.Component {
           <div className={loginBarContainerClass}>
             {loginBar}
           </div>
-          <div className="container card">
-            <ul>
-              <li><Link to="/containers" className="nav-link">Containers</Link></li>
-              <li><SaveButton /></li>
-              <li><button className="login-toggle" onClick={loginToggle}>Login</button></li>
-              <li><button className="create-toggle" onClick={createToggle}>Create</button></li>
-              <li><button className="logout" onClick={logout}>Logout</button></li>
-            </ul>
+          <div className="navbar">
+            <Link to="/containers" className="nav-link">Containers</Link>
+            <SaveButton />
           </div>
         </nav>
       </div>

@@ -14,21 +14,21 @@ body {
   justify-content: space-around;
 }
 
-.navbar {
-  padding: 1.5rem;
-  color: white;
+nav {
   background-color: #333333;
+  color: white;
+}
+
+.navbar {
+  padding: 1rem;
+  color: white;
   display: flex;
   justify-content: space-between;
 
-  ul {
-    list-style: none;
-
-    li {
-      display: inline-block;
-    }
-  }
   .collection-bar {
+    display: flex;
+    align-items: center;
+
     * {
       margin-left: 5px;
       margin-right: 5px;
@@ -37,31 +37,18 @@ body {
 
   .collection-name {
       margin-right: 20px;
-      font-size: 1.6rem;
-  }
-
-  .nav-button {
-    font-size: 0.7rem;
-    text-decoration: none;
-    background: transparent;
-    border: 1px solid #c7c7c7;
-    border-radius: 5px;
-    padding: 10px;
-    color: #c7c7c7;
-    text-transform: uppercase;
-    cursor: pointer;
-
-    &:hover, &:active {
-      color: white;
-      border: 1px solid white;
-    }
+      font-size: 1.5rem;
+      font-style: italic;
   }
 
   .header {
-    text-decoration: none;
-    color: white;
     font-size: 1.6rem;
     font-weight: 700;
+  }
+
+  a {
+    text-decoration: none;
+    color: white;
 
     &:hover {
       text-decoration: underline;
@@ -75,8 +62,8 @@ body {
     visibility: hidden;
   }
 
-  50% {
-    max-height: 50px;
+  80% {
+    max-height: 80px;
     visibility: hidden;
   }
 
@@ -88,16 +75,11 @@ body {
 
 .login-bar-container {
   max-height: 0;
-  opacity: 0;
 }
 
 .login-bar-container-filled {
   max-height: 100px;
   animation: open .4s ease 1 normal;
-  // transition: max-height 200ms ease-in;
-  // transition-delay: .2s;
-  // animation-name: open;
-  // animation-duration: 2000ms;
 }
 
 .login-bar {
@@ -109,6 +91,30 @@ body {
     margin-left: 5px;
     margin-right: 5px;
   }
+}
+
+.nav-button {
+  font-size: 0.7rem;
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid #c7c7c7;
+  border-radius: 5px;
+  padding: 10px;
+  color: #c7c7c7;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover, &:active {
+    color: white;
+    border: 1px solid white;
+  }
+}
+
+.input {
+  border: 1px solid #c7c7c7;
+  padding: .5rem;
+  border-radius: 3px;
+  background-color: white;
 }
 
 .card {

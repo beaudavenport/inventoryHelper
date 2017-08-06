@@ -11,7 +11,7 @@ describe('LoginBar', () => {
     const action = sinon.spy();
 
     const wrapper = shallow(<LoginBar action={action} message="Get some potato" buttonText="doit"/>);
-    const loginButton = wrapper.find('.btn.login');
+    const loginButton = wrapper.find('.login');
     const loginMessage = wrapper.find('.login-message');
     wrapper.instance().name = {value: 'potato'};
     wrapper.instance().password = {value: 'foo'};
@@ -21,5 +21,15 @@ describe('LoginBar', () => {
     assert.strictEqual(action.args[0][1], 'foo');
     assert.strictEqual(loginMessage.text(), 'Get some potato');
     assert.strictEqual(loginButton.text(), 'doit');
+  });
+
+  it('calls cancel action when clicked', () => {
+    const cancel = sinon.spy();
+
+    const wrapper = shallow(<LoginBar cancel={cancel} message="Get some squash" buttonText="doit"/>);
+    const cancelButton = wrapper.find('.nav-button.cancel');
+    cancelButton.simulate('click');
+
+    assert.ok(cancel.calledOnce);
   });
 });

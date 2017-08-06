@@ -17,7 +17,7 @@ class ContainerPage extends React.Component {
     const addContainerButtonRow = <tr><td><button className="add-container" onClick={() => addContainer()}>Add Container</button></td></tr>;
 
     return (
-      <div>
+      <div className="card">
         <h2>Edit Containers</h2>
         <table className="table">
           <thead>

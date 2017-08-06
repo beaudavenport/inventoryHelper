@@ -18,7 +18,7 @@ class BlendTable extends React.Component {
     const totalWeight = blends.reduce((acc, blend) => acc + blend.weight, 0);
 
     return (
-      <table className="table">
+      <table className="table card">
         <thead>
           <tr>
             <td>Blend</td>
