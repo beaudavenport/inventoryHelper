@@ -50,19 +50,19 @@ class SingleOriginRow extends React.Component {
         <td colSpan="4">
           <div className="table-row">
             <div>
-              <button className="btn btn-danger delete" onClick={deleteCoffee}>X</button>
+              <button className="table-button danger delete" onClick={deleteCoffee}>Delete</button>
             </div>
             <div>
-              <input className="name" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
-              <input className="origin" onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
+              <input className="name input" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
+              <input className="origin input" onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
             </div>
             <div>
-              <input className="green-weight" type="text" onChange={(e) => updateGreenWeightWithId(e.target.value)} placeholder={greenWeight} />
-              <button className="green btn btn-block" onClick={openGreenCalcBar}>Calculate...</button>
+              <input className="green-weight input" type="text" onChange={(e) => updateGreenWeightWithId(e.target.value)} placeholder={greenWeight} />
+              <button className="green table-button" onClick={openGreenCalcBar}>Calculate...</button>
             </div>
             <div>
-              <input className="roasted-weight" type="text" onChange={(e) => updateRoastedWeightWithId(e.target.value)} placeholder={roastedWeight} />
-              <button className="roasted btn btn-block" onClick={openRoastedCalcBar}>Calculate...</button>
+              <input className="roasted-weight input" type="text" onChange={(e) => updateRoastedWeightWithId(e.target.value)} placeholder={roastedWeight} />
+              <button className="roasted table-button" onClick={openRoastedCalcBar}>Calculate...</button>
             </div>
             <div>{parseFloat(totalWeight).toFixed(2)}</div>
           </div>

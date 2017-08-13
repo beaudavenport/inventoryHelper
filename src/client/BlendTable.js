@@ -14,28 +14,31 @@ class BlendTable extends React.Component {
         flagForDeletion={flagForDeletion}
       />);
     });
-    const addBlendButtonRow = <tr><td><button className="add-blend" onClick={() => addBlend()}>Add Blend</button></td></tr>;
+    const addBlendButtonRow = <tr><td colSpan="3"><button className="table-button add-blend" onClick={() => addBlend()}>Add Blend</button></td></tr>;
     const totalWeight = blends.reduce((acc, blend) => acc + blend.weight, 0);
 
     return (
-      <table className="table card">
-        <thead>
-          <tr>
-            <td>Blend</td>
-            <td>Weight</td>
-            <td>Total</td>
-          </tr>
-          </thead>
-          <tbody>
-            {blendRows}
-            {addBlendButtonRow}
+      <div className="card">
+        <h2>Blends</h2>
+        <table className="table">
+          <thead>
             <tr>
-              <td>Total Weights:</td>
-              <td>{parseFloat(totalWeight).toFixed(2)}</td>
-              <td className="total-blend-weight">{parseFloat(totalWeight).toFixed(2)}</td>
+              <td>Blend</td>
+              <td>Weight</td>
+              <td>Total</td>
             </tr>
-          </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {blendRows}
+              {addBlendButtonRow}
+              <tr>
+                <td>Total Weights:</td>
+                <td>{parseFloat(totalWeight).toFixed(2)}</td>
+                <td className="total-blend-weight">{parseFloat(totalWeight).toFixed(2)}</td>
+              </tr>
+            </tbody>
+        </table>
+      </div>
     );
   }
 }

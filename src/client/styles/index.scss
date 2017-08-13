@@ -7,6 +7,15 @@ body {
 .table-row {
   display: flex;
   justify-content: space-around;
+  align-items: center;
+
+  div {
+    width: 20%;
+  }
+
+  div:first-child {
+    width: 10%;
+  }
 }
 
 .calculator-row {
@@ -110,6 +119,28 @@ nav {
   }
 }
 
+.table-button {
+  font-size: 0.7rem;
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  color: black;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover, &:active {
+    color: #c7c7c7;
+    border: 1px solid #c7c7c7;
+  }
+}
+
+.danger {
+  border: 1px solid red;
+  color: red;
+}
+
 .input {
   border: 1px solid #c7c7c7;
   padding: .5rem;
@@ -117,11 +148,42 @@ nav {
   background-color: white;
 }
 
+table {
+  width: 100%;
+  margin-top: 10px;
+  table-layout: fixed;
+  text-align: center;
+  border-collapse: collapse;
+
+  tr, td {
+    border: 1px solid #333333;
+  }
+
+  td {
+    padding: 10px;
+  }
+
+  thead {
+      color: white;
+      background-color: #257ac1;
+  }
+
+  // tbody {
+  //   tr:nth-child(even) {
+  //     background-color: #c7c7c7;
+  //   }
+  //
+  //   tr:last-child {
+  //     background-color: white;
+  //   }
+  // }
+}
+
 .card {
   border-bottom: 1px solid #c7c7c7;
-  padding: 1.5rem;
-  margin-top: .25rem;
-  margin-left: 1.25rem;
-  margin-right: 1.25rem;
+  padding: 1rem 1.5rem;
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 1rem;
   background-color: white;
 }

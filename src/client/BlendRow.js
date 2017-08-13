@@ -33,17 +33,17 @@ class BlendRow extends React.Component {
     return (
       <tr>
         <td colSpan="3">
-          <div>
-            <button className="btn btn-danger delete" onClick={deleteBlend}>X</button>
-          </div>
           <div className="table-row">
             <div>
-              <input className="name" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
-              <input className="origin"  onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
+              <button className="table-button danger delete" onClick={deleteBlend}>X</button>
             </div>
             <div>
-              <input className="blend-weight" type="text" onChange={(e) => updateWeightWithId(e.target.value)} placeholder={weight} />
-              <button className="blend btn btn-block" onClick={openCalcBar}>Calculate...</button>
+              <input className="name input" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
+              <input className="origin input"  onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
+            </div>
+            <div>
+              <input className="blend-weight input" type="text" onChange={(e) => updateWeightWithId(e.target.value)} placeholder={weight} />
+              <button className="blend table-button" onClick={openCalcBar}>Calculate...</button>
             </div>
             <div>{parseFloat(weight).toFixed(2)}</div>
           </div>

@@ -8,21 +8,45 @@ import SingleOriginTable from '../../src/client/SingleOriginTable';
 import SingleOriginRow from '../../src/client/SingleOriginRow';
 
 describe('SingleOriginTable', () => {
-  it('displays a single origin row when there is one single origin coffee', () => {
+  it('displays a single origin row when there is one single origin coffee that is currently active row', () => {
     const singleOriginCoffee = {_id: 'blah', category: 'coffee'};
     const mockStore = configureStore()({inventory: [singleOriginCoffee]});
     const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
+    const component = wrapper.dive();
+    component.setState({activeRow: singleOriginCoffee._id});
 
-    const singleOriginRow = wrapper.dive().find(SingleOriginRow);
+    const singleOriginRow = component.find(SingleOriginRow);
     assert.deepEqual(singleOriginCoffee, singleOriginRow.prop('singleOriginCoffee'));
+  });
+
+  it('displays a normal table row with values when coffee is not active row', () => {
+    const singleOriginCoffee = {
+      _id: 'blah',
+      category: 'coffee',
+      name: 'foo',
+      origin: 'blah',
+      greenWeight: 8.9,
+      roastedWeight: 10,
+      totalWeight: 18.9
+    };
+    const mockStore = configureStore()({inventory: [singleOriginCoffee]});
+    const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
+
+    const row = wrapper.dive().find('.inactive-row');
+    assert.strictEqual(row.find('td').at(0).text(), 'foo, blah');
+    assert.strictEqual(row.find('td').at(1).text(), '8.90');
+    assert.strictEqual(row.find('td').at(2).text(), '10.00');
+    assert.strictEqual(row.find('td').at(3).text(), '18.90');
   });
 
   it('passes an updateCoffee action to singleOriginRow', () => {
     const singleOriginCoffee = {_id: 'blah', category: 'coffee'};
     const mockStore = configureStore()({inventory: [singleOriginCoffee]});
     const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
+    const component = wrapper.dive();
+    component.setState({activeRow: singleOriginCoffee._id});
 
-    const singleOriginRow = wrapper.dive().find(SingleOriginRow);
+    const singleOriginRow = component.find(SingleOriginRow);
     const updateCoffee = singleOriginRow.prop('updateCoffee');
     updateCoffee({_id: 'blah', name: 'potato'});
 
@@ -36,8 +60,10 @@ describe('SingleOriginTable', () => {
     const singleOriginCoffee = {_id: 'blah', category: 'coffee'};
     const mockStore = configureStore()({inventory: [singleOriginCoffee]});
     const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
+    const component = wrapper.dive();
+    component.setState({activeRow: singleOriginCoffee._id});
 
-    const singleOriginRow = wrapper.dive().find(SingleOriginRow);
+    const singleOriginRow = component.find(SingleOriginRow);
     const flagForDeletion = singleOriginRow.prop('flagForDeletion');
     flagForDeletion(singleOriginCoffee._id);
 

@@ -48,7 +48,7 @@ export function logout() {
 export function addCoffee() {
   return {
     type: ADD_INVENTORY_ITEM,
-    payload: { _id: Guid.raw(), category: 'coffee', greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true}
+    payload: { _id: Guid.raw(), name: 'New Coffee', origin: 'Origin', category: 'coffee', greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true}
   };
 }
 
@@ -62,7 +62,7 @@ export function updateCoffee(coffee) {
 export function addBlend() {
   return {
     type: ADD_INVENTORY_ITEM,
-    payload: { _id: Guid.raw(), category: 'blend', weight: 0, isNew: true}
+    payload: { _id: Guid.raw(), name: 'Blend', origin: 'Origin', category: 'blend', weight: 0, isNew: true}
   };
 }
 

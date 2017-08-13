@@ -147,7 +147,7 @@ describe('inventory', () => {
         assert.strictEqual(result.type, 'ADD_INVENTORY_ITEM');
         const {_id, ...newCoffeeProps} = result.payload;
         assert.strictEqual(Guid.isGuid(_id), true);
-        assert.deepEqual(newCoffeeProps, { category: 'coffee', greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true });
+        assert.deepEqual(newCoffeeProps, { category: 'coffee', name: 'New Coffee', origin: 'Origin', greenWeight: 0, roastedWeight: 0, totalWeight: 0, isNew: true });
       });
     });
 
@@ -168,7 +168,7 @@ describe('inventory', () => {
         assert.strictEqual(result.type, 'ADD_INVENTORY_ITEM');
         const {_id, ...newBlendProps} = result.payload;
         assert.strictEqual(Guid.isGuid(_id), true);
-        assert.deepEqual(newBlendProps, { category: 'blend', weight: 0, isNew: true });
+        assert.deepEqual(newBlendProps, { category: 'blend',  name: 'Blend', origin: 'Origin', weight: 0, isNew: true });
       });
     });
 
