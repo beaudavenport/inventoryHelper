@@ -43,7 +43,11 @@ class SingleOriginRow extends React.Component {
     const openGreenCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'green', calcBarName: 'Green', calcBarOnChange: updateGreenWeightWithId});
     const openRoastedCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'roasted', calcBarName: 'Roasted', calcBarOnChange: updateRoastedWeightWithId});
 
-    const calcBar = isCalcBarOpen ? <CalculatorBar name={calcBarName} type={calcBarType} updateWeight={calcBarOnChange} /> : null;
+    const calcBar = isCalcBarOpen ? <CalculatorBar name={name} type={calcBarType} updateWeight={calcBarOnChange} /> : null;
+    const greenClassName = calcBarType == 'green' ? 'active-calc' : '';
+    const greenCalcButton = calcBarType == 'green' ? <p>Calculating green weight...</p> : <button className="green table-button" onClick={openGreenCalcBar}>Calculate...</button>;
+    const roastedClassName = calcBarType == 'roasted' ? 'active-calc' : '';
+    const roastedCalcButton = calcBarType == 'roasted' ? <p>Calculating roasted weight...</p> : <button className="roasted table-button" onClick={openRoastedCalcBar}>Calculate...</button>;
 
     return (
       <tr>
@@ -56,13 +60,13 @@ class SingleOriginRow extends React.Component {
               <input className="name input" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
               <input className="origin input" onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
             </div>
-            <div>
+            <div className={greenClassName}>
               <input className="green-weight input" type="text" onChange={(e) => updateGreenWeightWithId(e.target.value)} placeholder={greenWeight} />
-              <button className="green table-button" onClick={openGreenCalcBar}>Calculate...</button>
+              {greenCalcButton}
             </div>
-            <div>
+            <div className={roastedClassName}>
               <input className="roasted-weight input" type="text" onChange={(e) => updateRoastedWeightWithId(e.target.value)} placeholder={roastedWeight} />
-              <button className="roasted table-button" onClick={openRoastedCalcBar}>Calculate...</button>
+              {roastedCalcButton}
             </div>
             <div>{parseFloat(totalWeight).toFixed(2)}</div>
           </div>

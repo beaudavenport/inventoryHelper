@@ -102,7 +102,7 @@ describe('SingleOriginRow', () => {
 
   it('displays calculator bar when selected for greenWeight', () => {
     const updateCoffee = sinon.spy();
-    const singleOriginCoffee = {_id: 5678};
+    const singleOriginCoffee = {_id: 5678, name: 'You got me'};
     const wrapper = shallow(<SingleOriginRow
       singleOriginCoffee={singleOriginCoffee}
       updateCoffee={updateCoffee}
@@ -114,14 +114,14 @@ describe('SingleOriginRow', () => {
     const calcBarUpdateFunc = calcBar.prop('updateWeight');
     calcBarUpdateFunc(9.6);
 
-    assert.strictEqual(calcBar.prop('name'), 'Green');
+    assert.strictEqual(calcBar.prop('name'), 'You got me');
     assert.strictEqual(calcBar.prop('type'), 'green');
     assert.deepEqual(updateCoffee.args[0][0], {_id: 5678, greenWeight: 9.6, totalWeight: 9.6});
   });
 
   it('displays calculator bar when selected for roastedWeight', () => {
     const updateCoffee = sinon.spy();
-    const singleOriginCoffee = {_id: 9999};
+    const singleOriginCoffee = {_id: 9999, name: 'You got them'};
     const wrapper = shallow(<SingleOriginRow
       singleOriginCoffee={singleOriginCoffee}
       updateCoffee={updateCoffee}
@@ -133,7 +133,7 @@ describe('SingleOriginRow', () => {
     const calcBarUpdateFunc = calcBar.prop('updateWeight');
     calcBarUpdateFunc(5.6);
 
-    assert.strictEqual(calcBar.prop('name'), 'Roasted');
+    assert.strictEqual(calcBar.prop('name'), 'You got them');
     assert.strictEqual(calcBar.prop('type'), 'roasted');
     assert.deepEqual(updateCoffee.args[0][0], {_id: 9999, roastedWeight: 5.6, totalWeight: 5.6});
   });

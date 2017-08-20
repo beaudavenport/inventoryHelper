@@ -43,7 +43,10 @@ class SingleOriginTable extends React.Component {
 
     return (
       <div className="card">
-        <h2>Single Origin Coffees</h2>
+        <div className="table-header">
+          <h2>Single Origin Coffees</h2>
+          <button className="table-button add-coffee" onClick={() => addCoffee()}><i className="fa fa-plus"></i> Add Coffee</button>
+        </div>
         <table className="table">
           <thead>
             <tr>
@@ -55,7 +58,6 @@ class SingleOriginTable extends React.Component {
           </thead>
           <tbody>
             {singleOriginCoffeeRows}
-            {addCoffeeButtonRow}
             <tr>
               <td>Total Weights:</td>
               <td className="total-green-weight">{parseFloat(coffeeWeights.green).toFixed(2)}</td>
