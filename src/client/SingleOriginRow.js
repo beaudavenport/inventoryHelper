@@ -51,24 +51,32 @@ class SingleOriginRow extends React.Component {
 
     return (
       <tr>
-        <td colSpan="4">
+        <td colSpan="4" className="row-edit">
+          <div className="row-edit-message">
+            <p>You are editing the coffee <span className="row-edit-name">{singleOriginCoffee.name}</span></p>
+            <button className="row-edit-message-button save" onClick={deleteCoffee}>Done</button>
+            <button className="row-edit-message-button danger delete" onClick={deleteCoffee}>Delete</button>
+          </div>
           <div className="table-row">
-            <div>
-              <button className="table-button danger delete" onClick={deleteCoffee}>Delete</button>
-            </div>
-            <div>
+            <div className="row-edit-input-column">
+              <p className="subtitle">Name and Origin</p>
               <input className="name input" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
               <input className="origin input" onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
             </div>
-            <div className={greenClassName}>
+            <div className={`row-edit-input-column ${greenClassName}`}>
+              <p className="subtitle">Green Weight</p>
               <input className="green-weight input" type="text" onChange={(e) => updateGreenWeightWithId(e.target.value)} placeholder={greenWeight} />
               {greenCalcButton}
             </div>
-            <div className={roastedClassName}>
+            <div className={`row-edit-input-column ${roastedClassName}`}>
+              <p className="subtitle">Roasted Weight</p>
               <input className="roasted-weight input" type="text" onChange={(e) => updateRoastedWeightWithId(e.target.value)} placeholder={roastedWeight} />
               {roastedCalcButton}
             </div>
-            <div>{parseFloat(totalWeight).toFixed(2)}</div>
+            <div>
+              <p className="subtitle">Total Weight</p>
+              <p>{parseFloat(totalWeight).toFixed(2)}</p>
+            </div>
           </div>
           <div className="calc-bar">
             {calcBar}
