@@ -45,19 +45,19 @@ class SingleOriginRow extends React.Component {
 
     const calcBar = isCalcBarOpen ? <CalculatorBar name={name} type={calcBarType} updateWeight={calcBarOnChange} /> : null;
     const greenClassName = calcBarType == 'green' ? 'active-calc' : '';
-    const greenCalcButton = calcBarType == 'green' ? <p>Calculating green weight...</p> : <button className="green table-button" onClick={openGreenCalcBar}>Calculate...</button>;
+    const greenCalcButton = calcBarType == 'green' ? null : <button className="green btn table-button" onClick={openGreenCalcBar}>Calculate...</button>;
     const roastedClassName = calcBarType == 'roasted' ? 'active-calc' : '';
-    const roastedCalcButton = calcBarType == 'roasted' ? <p>Calculating roasted weight...</p> : <button className="roasted table-button" onClick={openRoastedCalcBar}>Calculate...</button>;
+    const roastedCalcButton = calcBarType == 'roasted' ? null : <button className="roasted btn table-button" onClick={openRoastedCalcBar}>Calculate...</button>;
 
     return (
       <tr>
         <td colSpan="4" className="row-edit">
           <div className="row-edit-message">
-            <p>You are editing the coffee <span className="row-edit-name">{singleOriginCoffee.name}</span></p>
-            <button className="row-edit-message-button save" onClick={deleteCoffee}>Done</button>
-            <button className="row-edit-message-button danger delete" onClick={deleteCoffee}>Delete</button>
+            <p className="edit-header-text">You are editing the coffee <span className="edit-header-name">{singleOriginCoffee.name}</span></p>
+            <button className="btn row-edit-message-button save" onClick={deleteCoffee}>Done</button>
+            <button className="btn row-edit-message-button danger delete" onClick={deleteCoffee}>Delete</button>
           </div>
-          <div className="table-row">
+          <div className="editing-table-row">
             <div className="row-edit-input-column">
               <p className="subtitle">Name and Origin</p>
               <input className="name input" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
@@ -78,7 +78,7 @@ class SingleOriginRow extends React.Component {
               <p>{parseFloat(totalWeight).toFixed(2)}</p>
             </div>
           </div>
-          <div className="calc-bar">
+          <div>
             {calcBar}
           </div>
         </td>

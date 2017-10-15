@@ -63,10 +63,10 @@ export class CalculatorBar extends React.Component {
     };
 
     return(
-      <div>
-        <p>{`Calculating ${type} weight for: ${name}`}</p>
+      <div className="calc-bar">
+        <p className="edit-header-text">You are calculating <span className="edit-header-name">{type} weight</span> for: <span className="edit-header-name">{name}</span></p>
         {calcRowComponents}
-        <button className="btn new-row" onClick={addRow}>New Row</button>
+        <button className="btn table-button new-row" onClick={addRow}>New Row</button>
       </div>
     );
   }

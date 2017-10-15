@@ -4,10 +4,12 @@ body {
   margin: 0;
 }
 
-.table-row {
+.editing-table-row {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  padding-bottom: 15px;
+  padding-top: 10px;
 
   div {
     flex: 1;
@@ -15,7 +17,7 @@ body {
 }
 
 @media (max-width: 600px) {
-  .table-row {
+  .editing-table-row {
     display: block;
     div {
       width: 100%;
@@ -46,18 +48,19 @@ nav {
 
 .calc-bar {
   background-color: #f9f9f9;
-  padding-bottom: 10px;
   width: 80%;
   margin: 0 auto;
+  padding-bottom: 10px;
+  padding-top: 5px;
+  margin-top: -10px;
 }
 
 .active-calc {
-  padding-top: 10px;
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
   background-color: #f9f9f9;
-  padding-bottom: 30px;
-  margin-bottom: -30px;
+  padding-bottom: 40px;
+  margin-bottom: -10px;
 }
 
 .row-edit {
@@ -72,19 +75,28 @@ nav {
   align-items: center;
 
   p {
-    font-style: italic;
-    color: #9a9696;
-    font-size: 1rem;
     margin-right: 5px;
   }
 }
 
-.row-edit-name {
+.edit-header-text {
+  font-style: italic;
+  color: #9a9696;
+  font-size: 1rem;
+}
+
+.edit-header-name {
   font-size: 1.3rem;
   color: #333333;
 }
 
+.tare-selection {
+  display: flex;
+  justify-content: space-around;
+}
+
 .row-edit-input-column {
+  padding-top: 10px;
   input, button, p {
     display: block;
     margin: 0 auto;
@@ -103,13 +115,8 @@ nav {
   margin-left: 5px;
   padding: 7px;
   font-size: 0.6rem;
-  text-decoration: none;
-  background: transparent;
   border: 1px solid black;
-  border-radius: 5px;
   color: black;
-  text-transform: uppercase;
-  cursor: pointer;
 
   &:hover, &:active {
     color: #c7c7c7;
@@ -198,37 +205,34 @@ nav {
 }
 
 .nav-button {
-  font-size: 0.7rem;
-  text-decoration: none;
-  background: transparent;
   border: 1px solid #c7c7c7;
-  border-radius: 5px;
-  padding: 10px;
-  color: #c7c7c7;
-  text-transform: uppercase;
-  cursor: pointer;
+  background: transparent;
+  color: #333333;
 
   &:hover, &:active {
-    color: white;
+    color: #c7c7c7;
     border: 1px solid white;
   }
 }
 
 .table-button {
-  font-size: 0.7rem;
-  text-decoration: none;
-  background: transparent;
   border: 1px solid black;
-  border-radius: 5px;
-  padding: 10px;
   color: black;
-  text-transform: uppercase;
-  cursor: pointer;
 
   &:hover, &:active {
     color: #c7c7c7;
     border: 1px solid #c7c7c7;
   }
+}
+
+.btn {
+  font-size: 0.7rem;
+  text-decoration: none;
+  background: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 .danger {

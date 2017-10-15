@@ -41,9 +41,9 @@ export class Navbar extends React.Component {
             </Link>
             <div className="collection-bar">
               <span className="collection-name">{collectionName}</span>
-              <button className="login-toggle nav-button" onClick={loginToggle}>Login</button>
-              <button className="create-toggle nav-button" onClick={createToggle}>Create</button>
-              <button className="logout nav-button" onClick={logout}>Logout</button>
+              <button className="login-toggle btn nav-button" onClick={loginToggle}>Login</button>
+              <button className="create-toggle btn nav-button" onClick={createToggle}>Create</button>
+              <button className="logout btn nav-button" onClick={logout}>Logout</button>
             </div>
           </div>
           <div className={loginBarContainerClass}>

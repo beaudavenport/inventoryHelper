@@ -6,11 +6,11 @@ class LoginBar extends React.Component {
 
     return (
       <div className="login-bar">
-        <button onClick={() => cancel()} className="nav-button cancel">X</button>
+        <button onClick={() => cancel()} className="btn nav-button cancel">X</button>
         <h3 className="login-message">{message}</h3>
         <input className="input login-name" ref={(input) => this.name = input}/>
         <input type="password" className="input login-password" ref={(input) => this.password = input}/>
-        <button onClick={() => action(this.name.value, this.password.value)} className="nav-button login">{buttonText}</button>
+        <button onClick={() => action(this.name.value, this.password.value)} className="btn nav-button login">{buttonText}</button>
       </div>
     );
   }
