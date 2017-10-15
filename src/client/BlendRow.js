@@ -10,8 +10,8 @@ class BlendRow extends React.Component {
   }
 
   render() {
-    const {blend, updateBlend, flagForDeletion} = this.props;
-    const {isCalcBarOpen} = this.state;
+    const {blend, updateBlend, flagForDeletion, closeActiveRow} = this.props;
+    const { isCalcBarOpen } = this.state;
     const {_id = 0, name = 'New Blend', origin = 'Origin', weight = 0} = blend;
     const updateWeightWithId = (value) => {
       const newWeight = value ? parseFloat(value) : 0;
@@ -29,25 +29,31 @@ class BlendRow extends React.Component {
     const openCalcBar = () => this.setState({isCalcBarOpen: true});
 
     const calcBar = isCalcBarOpen ? <CalculatorBar name="Blend" type="blend" updateWeight={updateWeightWithId} /> : null;
+    const calcButton = isCalcBarOpen ? null : <button className="blend btn table-button" onClick={openCalcBar}>Calculate...</button>;
+    const activeCalcClass = isCalcBarOpen ? 'active-calc' : '';
 
     return (
       <tr>
-        <td colSpan="3">
+        <td colSpan="3" className="row-edit">
+          <div className="row-edit-message">
+            <p className="edit-header-text">You are editing the blend <span className="edit-header-name">{name}</span></p>
+            <button className="btn row-edit-message-button save" onClick={closeActiveRow}>Done</button>
+            <button className="btn row-edit-message-button danger delete" onClick={deleteBlend}>Delete</button>
+          </div>
           <div className="editing-table-row">
-            <div>
-              <button className="btn table-button danger delete" onClick={deleteBlend}>X</button>
-            </div>
-            <div>
+            <div className="row-edit-input-column">
+              <p className="subtitle">Name and Origin</p>
               <input className="name input" onChange={(e) => updateName(e.target.value)} placeholder={name}></input>
-              <input className="origin input"  onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
+              <input className="origin input" onChange={(e) => updateOrigin(e.target.value)} placeholder={origin}></input>
             </div>
-            <div>
+            <div className={`row-edit-input-column ${activeCalcClass}`}>
+              <p className="subtitle">Bulk Weight</p>
               <input className="blend-weight input" type="text" onChange={(e) => updateWeightWithId(e.target.value)} placeholder={weight} />
-              <button className="blend btn table-button" onClick={openCalcBar}>Calculate...</button>
+              {calcButton}
             </div>
             <div>{parseFloat(weight).toFixed(2)}</div>
           </div>
-          <div className="calc-bar">
+          <div>
             {calcBar}
           </div>
         </td>

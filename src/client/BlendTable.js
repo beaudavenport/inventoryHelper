@@ -5,15 +5,35 @@ import { addBlend, updateBlend, getBlends, flagForDeletion } from './reducers/in
 import BlendRow from './BlendRow';
 
 class BlendTable extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeRow: null
+    };
+  }
+
   render() {
     const { addBlend, updateBlend, flagForDeletion, blends } = this.props;
+    const { activeRow } = this.state;
+
+    const setActiveRow = (id) => this.setState({activeRow: id});
+    const resetActiveRow = () => this.setState({activeRow: null});
     const blendRows = blends.map((blend) => {
-      return (<BlendRow key={`blend-row-${blend._id}`}
-        blend={blend}
-        updateBlend={updateBlend}
-        flagForDeletion={flagForDeletion}
-      />);
+      if(blend._id === activeRow) {
+        return (<BlendRow key={`blend-row-${blend._id}`}
+          blend={blend}
+          updateBlend={updateBlend}
+          flagForDeletion={flagForDeletion}
+          closeActiveRow={resetActiveRow}
+        />);
+      }
+      return (<tr className="inactive-row" key={`blend-tr-${blend._id}`} onClick={() => setActiveRow(blend._id)}>
+          <td>{`${blend.name}, ${blend.origin}`}</td>
+          <td>{parseFloat(blend.weight).toFixed(2)}</td>
+          <td>{parseFloat(blend.weight).toFixed(2)}</td>
+          </tr>);
     });
+
     const addBlendButtonRow = <tr><td colSpan="3"><button className="btn table-button add-blend" onClick={() => addBlend()}>Add Blend</button></td></tr>;
     const totalWeight = blends.reduce((acc, blend) => acc + blend.weight, 0);
 

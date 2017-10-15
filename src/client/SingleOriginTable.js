@@ -17,12 +17,15 @@ class SingleOriginTable extends React.Component {
     const { activeRow } = this.state;
 
     const setActiveRow = (id) => this.setState({activeRow: id});
+    const resetActiveRow = () => this.setState({activeRow: null});
+
     const singleOriginCoffeeRows = singleOriginCoffees.map((singleOriginCoffee) => {
       if(singleOriginCoffee._id === activeRow) {
         return (<SingleOriginRow key={`so-row-${singleOriginCoffee._id}`}
           singleOriginCoffee={singleOriginCoffee}
           updateCoffee={updateCoffee}
           flagForDeletion={flagForDeletion}
+          closeActiveRow={resetActiveRow}
         />);
       }
       return (<tr className="inactive-row" key={`so-tr-${singleOriginCoffee._id}`} onClick={() => setActiveRow(singleOriginCoffee._id)}>

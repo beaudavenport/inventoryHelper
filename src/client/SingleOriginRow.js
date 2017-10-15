@@ -19,7 +19,7 @@ class SingleOriginRow extends React.Component {
   }
 
   render() {
-    const {singleOriginCoffee, updateCoffee, flagForDeletion} = this.props;
+    const {singleOriginCoffee, updateCoffee, flagForDeletion, closeActiveRow} = this.props;
     const { isCalcBarOpen, calcBarOnChange, calcBarType, calcBarName } = this.state;
     const {_id = 0, name = 'New Coffee', origin = 'Origin', greenWeight = 0, roastedWeight = 0, totalWeight = 0} = singleOriginCoffee;
     const updateGreenWeightWithId = (value) => {
@@ -54,7 +54,7 @@ class SingleOriginRow extends React.Component {
         <td colSpan="4" className="row-edit">
           <div className="row-edit-message">
             <p className="edit-header-text">You are editing the coffee <span className="edit-header-name">{singleOriginCoffee.name}</span></p>
-            <button className="btn row-edit-message-button save" onClick={deleteCoffee}>Done</button>
+            <button className="btn row-edit-message-button save" onClick={closeActiveRow}>Done</button>
             <button className="btn row-edit-message-button danger delete" onClick={deleteCoffee}>Delete</button>
           </div>
           <div className="editing-table-row">
