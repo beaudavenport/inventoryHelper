@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function CalculatorRow(props) {
-  const { containers, updateTare, updateWeight, calcRowDatum, deleteFunc } = props;
+  const { containers, rowNumber, updateTare, updateWeight, calcRowDatum, deleteFunc } = props;
   const options = [
     <option key={12345} value={0} disabled={true}>(No container selected)</option>,
     ...containers.map(container => {
@@ -15,9 +15,16 @@ export default function CalculatorRow(props) {
 
   return (
     <div className="calculator-row">
-      <button onClick={deleteFunc} className="btn table-button danger delete-row">Delete</button>
-      <input className="gross-weight input" onChange={event => updateWeight(event.target.value)} placeholder={calcRowDatum.weight}></input>
-      <div className="tare-selection">
+      <div>
+        <p>Container {rowNumber}</p>
+        <button onClick={deleteFunc} className="btn table-button danger delete-row">Delete</button>
+      </div>
+      <div className="row-edit-input-column">
+        <p className="subtitle">Gross Weight</p>
+        <input className="gross-weight input" onChange={event => updateWeight(event.target.value)} placeholder={calcRowDatum.weight}></input>
+      </div>
+      <div className="row-edit-input-column">
+        <p className="subtitle">Container Weight</p>
         <select defaultValue={calcRowDatum.tare} onChange={event => updateTare(event.target.value)}>
           {options}
         </select>

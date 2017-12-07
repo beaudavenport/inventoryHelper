@@ -119,7 +119,7 @@ export default (state = [], action) => {
       return [...coffees, ...blends, ...containers];
 
     case ADD_INVENTORY_ITEM:
-      return [action.payload, ...state];
+      return [ ...state, action.payload];
 
     case UPDATE_INVENTORY_ITEM:
       return state.map(coffee => {

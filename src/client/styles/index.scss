@@ -16,15 +16,6 @@ body {
   }
 }
 
-@media (max-width: 600px) {
-  .editing-table-row {
-    display: block;
-    div {
-      width: 100%;
-    }
-  }
-}
-
 .inactive-row {
   color: #7b7b7b;
 
@@ -39,6 +30,24 @@ body {
   display: flex;
   justify-content: space-around;
   align-items: center;
+
+  * {
+    flex: 1;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .editing-table-row {
+    display: block;
+    div {
+      width: 100%;
+    }
+  }
+
+  .calculator-row {
+    display: block;
+  }
 }
 
 nav {
@@ -83,6 +92,21 @@ nav {
   font-style: italic;
   color: #9a9696;
   font-size: 1rem;
+}
+
+.sticky-edit-header {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+
+  &.card {
+    width: 100%;
+    border: 1px solid #333333;
+  }
+
+  * {
+    display: inline-block;
+  }
 }
 
 .edit-header-name {

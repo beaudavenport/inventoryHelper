@@ -36,10 +36,12 @@ describe('CalculatorRow', () => {
     const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={containers} />);
 
     const options = wrapper.find('option');
-    assert.deepEqual(options.at(0).prop('value'), container1.weight);
-    assert.deepEqual(options.at(0).text(), container1.name);
-    assert.deepEqual(options.at(1).prop('value'), container2.weight);
-    assert.deepEqual(options.at(1).text(), container2.name);
+    assert.deepEqual(options.at(0).prop('value'), 0);
+    assert.deepEqual(options.at(0).text(), '(No container selected)');
+    assert.deepEqual(options.at(1).prop('value'), container1.weight);
+    assert.deepEqual(options.at(1).text(), container1.name);
+    assert.deepEqual(options.at(2).prop('value'), container2.weight);
+    assert.deepEqual(options.at(2).text(), container2.name);
   });
 
   it('calls to updateTare with selected container weight', () => {

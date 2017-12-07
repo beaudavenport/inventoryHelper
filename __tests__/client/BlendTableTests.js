@@ -8,21 +8,42 @@ import BlendTable from '../../src/client/BlendTable';
 import BlendRow from '../../src/client/BlendRow';
 
 describe('BlendTable', () => {
-  it('displays a single origin row when there is one single origin coffee', () => {
+  it('displays a blend row when there is one currently active blend', () => {
     const blend = {_id: 'blah', category: 'blend'};
     const mockStore = configureStore()({inventory: [blend]});
     const wrapper = shallow(<BlendTable store={mockStore}/>);
+    const component = wrapper.dive();
+    component.setState({activeRow: blend._id});
 
-    const blendRow = wrapper.dive().find(BlendRow);
+    const blendRow = component.find(BlendRow);
     assert.deepEqual(blend, blendRow.prop('blend'));
+  });
+
+  it('displays a normal blend row with values when blend is not active row', () => {
+    const blend = {
+      _id: 'blah',
+      category: 'blend',
+      name: 'foo',
+      origin: 'blah',
+      weight: 38.9,
+    };
+    const mockStore = configureStore()({inventory: [blend]});
+    const wrapper = shallow(<BlendTable store={mockStore}/>);
+
+    const row = wrapper.dive().find('.inactive-row');
+    assert.strictEqual(row.find('td').at(0).text(), 'foo, blah');
+    assert.strictEqual(row.find('td').at(1).text(), '38.90');
+    assert.strictEqual(row.find('td').at(2).text(), '38.90');
   });
 
   it('passes an updateBlend action to blendRow', () => {
     const blend = {_id: 'blah', category: 'blend'};
     const mockStore = configureStore()({inventory: [blend]});
     const wrapper = shallow(<BlendTable store={mockStore}/>);
+    const component = wrapper.dive();
+    component.setState({activeRow: blend._id});
 
-    const blendRow = wrapper.dive().find(BlendRow);
+    const blendRow = component.find(BlendRow);
     const updateBlend = blendRow.prop('updateBlend');
     updateBlend({_id: 'blah', name: 'potato'});
 
@@ -36,8 +57,10 @@ describe('BlendTable', () => {
     const blend = {_id: 'blah', category: 'blend'};
     const mockStore = configureStore()({inventory: [blend]});
     const wrapper = shallow(<BlendTable store={mockStore}/>);
+    const component = wrapper.dive();
+    component.setState({activeRow: blend._id});
 
-    const blendRow = wrapper.dive().find(BlendRow);
+    const blendRow = component.find(BlendRow);
     const flagForDeletion = blendRow.prop('flagForDeletion');
     flagForDeletion(blend._id);
 

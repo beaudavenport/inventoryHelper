@@ -277,7 +277,7 @@ describe('inventory', () => {
     });
 
     describe('ADD_INVENTORY_ITEM', () => {
-      it('adds a coffee at the top of the list', () => {
+      it('adds a coffee at the bottom of the list', () => {
         const oldCoffeeList = [
           {_id: 789, greenWeight: 10, roastedWeight: 11, totalWeight: 21 }
         ];
@@ -286,8 +286,8 @@ describe('inventory', () => {
 
         const result = inventory(oldCoffeeList, action);
 
-        assert.deepEqual(result[0], {_id: 14, greenWeight: 777, roastedWeight: 5, totalWeight: 67, isNew: true });
-        assert.deepEqual(result[1], {_id: 789, greenWeight: 10, roastedWeight: 11, totalWeight: 21});
+        assert.deepEqual(result[0], {_id: 789, greenWeight: 10, roastedWeight: 11, totalWeight: 21});
+        assert.deepEqual(result[1], {_id: 14, greenWeight: 777, roastedWeight: 5, totalWeight: 67, isNew: true });
       });
     });
 

@@ -45,10 +45,11 @@ export class CalculatorBar extends React.Component {
       updateWeight(newTotal);
     };
 
-    const calcRowComponents = rowsByType.map((calcRow) => {
+    const calcRowComponents = rowsByType.map((calcRow, index) => {
       return (
         <CalculatorRow
                 key={calcRow.id}
+                rowNumber={index}
                 containers={containers}
                 calcRowDatum={calcRow}
                 deleteFunc={() => removeRow(calcRow.id)}
@@ -62,9 +63,17 @@ export class CalculatorBar extends React.Component {
       this.setState({[type]: [...rowsByType, createEmptyCalcRow()]});
     };
 
+    const scrollToMe = () => {
+      this.element.scrollIntoView();
+    };
+
     return(
-      <div className="calc-bar">
+      <div className="calc-bar" ref={(element) => this.element = element }>
         <p className="edit-header-text">You are calculating <span className="edit-header-name">{type} weight</span> for: <span className="edit-header-name">{name}</span></p>
+        <div className="sticky-edit-header card">
+          <p>Calculating {type} weight for: {name}</p>
+          <button onClick={scrollToMe}>Go to</button>
+        </div>
         {calcRowComponents}
         <button className="btn table-button new-row" onClick={addRow}>New Row</button>
       </div>
