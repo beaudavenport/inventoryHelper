@@ -137,4 +137,22 @@ describe('SingleOriginRow', () => {
     assert.strictEqual(calcBar.prop('type'), 'roasted');
     assert.deepEqual(updateCoffee.args[0][0], {_id: 9999, roastedWeight: 5.6, totalWeight: 5.6});
   });
+
+  it('passes close callback to calculator bar', () => {
+    const updateCoffee = sinon.spy();
+    const singleOriginCoffee = {_id: 9999, name: 'You got them'};
+    const wrapper = shallow(<SingleOriginRow
+      singleOriginCoffee={singleOriginCoffee}
+      updateCoffee={updateCoffee}
+    />);
+    const defaultState = wrapper.state();
+    const roastedCalcButton = wrapper.find('button.roasted');
+    roastedCalcButton.simulate('click');
+
+    const calcBar = wrapper.find(CalculatorBar);
+    const closeCalcBarFunc = calcBar.prop('closeCalcBar');
+    closeCalcBarFunc();
+
+    assert.deepEqual(wrapper.state(), defaultState);
+  });
 });

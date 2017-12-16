@@ -100,4 +100,22 @@ describe('BlendRow', () => {
     assert.strictEqual(calcBar.prop('type'), 'blend');
     assert.deepEqual(updateBlend.args[0][0], {_id: 5678, weight: 9.6});
   });
+
+  it('passes close callback to calculator bar', () => {
+    const updateBlend = sinon.spy();
+    const blend = {_id: 5678};
+    const wrapper = shallow(<BlendRow
+      blend={blend}
+      updateBlend={updateBlend}
+    />);
+    const defaultState = wrapper.state();
+    const calcButton = wrapper.find('button.blend');
+    calcButton.simulate('click');
+
+    const calcBar = wrapper.find(CalculatorBar);
+    const closeCalcBarFunc = calcBar.prop('closeCalcBar');
+    closeCalcBarFunc();
+
+    assert.deepEqual(wrapper.state(), defaultState);
+  });
 });

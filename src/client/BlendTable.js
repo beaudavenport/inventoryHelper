@@ -34,7 +34,7 @@ class BlendTable extends React.Component {
           </tr>);
     });
 
-    const addBlendButtonRow = <tr><td colSpan="3"><button className="btn table-button add-blend" onClick={() => addBlend()}>Add Blend</button></td></tr>;
+    const addBlendButtonRow = <tr><td colSpan="3"><button className="btn table-button add-blend" onClick={() => addBlend()}><i className="fa fa-plus"></i> Add Blend</button></td></tr>;
     const totalWeight = blends.reduce((acc, blend) => acc + blend.weight, 0);
 
     return (

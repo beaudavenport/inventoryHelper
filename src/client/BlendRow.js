@@ -27,8 +27,9 @@ class BlendRow extends React.Component {
       flagForDeletion(_id);
     };
     const openCalcBar = () => this.setState({isCalcBarOpen: true});
+    const closeCalcBar = () => this.setState({isCalcBarOpen: false});
 
-    const calcBar = isCalcBarOpen ? <CalculatorBar name="Blend" type="blend" updateWeight={updateWeightWithId} /> : null;
+    const calcBar = isCalcBarOpen ? <CalculatorBar name="Blend" type="blend" updateWeight={updateWeightWithId} closeCalcBar={closeCalcBar} /> : null;
     const calcButton = isCalcBarOpen ? null : <button className="blend btn table-button" onClick={openCalcBar}>Calculate...</button>;
     const activeCalcClass = isCalcBarOpen ? 'active-calc' : '';
 

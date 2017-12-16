@@ -42,8 +42,9 @@ class SingleOriginRow extends React.Component {
 
     const openGreenCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'green', calcBarName: 'Green', calcBarOnChange: updateGreenWeightWithId});
     const openRoastedCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'roasted', calcBarName: 'Roasted', calcBarOnChange: updateRoastedWeightWithId});
+    const closeCalcBar = () => this.setState({isCalcBarOpen: false, calcBarType: null, calcBarName: null, calcBarOnChange: null});
 
-    const calcBar = isCalcBarOpen ? <CalculatorBar name={name} type={calcBarType} updateWeight={calcBarOnChange} /> : null;
+    const calcBar = isCalcBarOpen ? <CalculatorBar name={name} type={calcBarType} updateWeight={calcBarOnChange} closeCalcBar={closeCalcBar} /> : null;
     const greenClassName = calcBarType == 'green' ? 'active-calc' : '';
     const greenCalcButton = calcBarType == 'green' ? null : <button className="green btn table-button" onClick={openGreenCalcBar}>Calculate...</button>;
     const roastedClassName = calcBarType == 'roasted' ? 'active-calc' : '';

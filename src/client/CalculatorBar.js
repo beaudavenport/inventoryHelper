@@ -24,7 +24,7 @@ export class CalculatorBar extends React.Component {
   }
 
   render() {
-    const { name, type, updateWeight, containers } = this.props;
+    const { name, type, updateWeight, containers, closeCalcBar } = this.props;
     const rowsByType = this.state[type] || [];
 
     const removeRow = (id) => {
@@ -69,10 +69,14 @@ export class CalculatorBar extends React.Component {
 
     return(
       <div className="calc-bar" ref={(element) => this.element = element }>
-        <p className="edit-header-text">You are calculating <span className="edit-header-name">{type} weight</span> for: <span className="edit-header-name">{name}</span></p>
+        <div className="row-edit-message">
+          <p className="edit-header-text">You are calculating <span className="edit-header-name">{type} weight</span> for: <span className="edit-header-name">{name}</span></p>
+          <button className="btn row-edit-message-button save" onClick={closeCalcBar}>Done</button>
+        </div>
         <div className="sticky-edit-header card">
           <p>Calculating {type} weight for: {name}</p>
-          <button onClick={scrollToMe}>Go to</button>
+          <button className="btn row-edit-message-button" onClick={scrollToMe}>Go to</button>
+          <button className="btn row-edit-message-button" onClick={closeCalcBar}>Done</button>
         </div>
         {calcRowComponents}
         <button className="btn table-button new-row" onClick={addRow}>New Row</button>
