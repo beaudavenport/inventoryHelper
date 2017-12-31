@@ -30,7 +30,9 @@ export default function CalculatorRow(props) {
         </select>
         <input className="tare-input input" onChange={event => updateTare(event.target.value)} placeholder={calcRowDatum.tare} />
       </div>
-      <p className="net-weight">{netWeight.toFixed(2)}</p>
+      <div>
+        <p className="net-weight">{netWeight.toFixed(2)}</p>
+      </div>
     </div>
   );
 }

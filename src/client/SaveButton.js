@@ -9,7 +9,7 @@ class SaveButton extends React.Component {
     const callToSave = () => sync();
 
     return (
-      <button className="btn nav-button" onClick={callToSave}>{metadata.lastSync}</button>
+      <button className="btn nav-button" onClick={callToSave}>SAVE <span>last save: {metadata.lastSync}</span></button>
     );
   }
 }

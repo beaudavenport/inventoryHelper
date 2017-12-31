@@ -40,7 +40,6 @@ export class Navbar extends React.Component {
               Inventory Helper
             </Link>
             <div className="collection-bar">
-              <span className="collection-name">{collectionName}</span>
               <button className="login-toggle btn nav-button" onClick={loginToggle}>Login</button>
               <button className="create-toggle btn nav-button" onClick={createToggle}>Create</button>
               <button className="logout btn nav-button" onClick={logout}>Logout</button>
@@ -49,8 +48,10 @@ export class Navbar extends React.Component {
           <div className={loginBarContainerClass}>
             {loginBar}
           </div>
-          <div className="navbar">
-            <Link to="/containers" className="nav-link">Containers</Link>
+          <div className="navbar collection">
+            <span className="collection-name">{collectionName}</span>
+            <Link to="/" className="nav-link ">Home</Link>
+            <Link to="/containers" className="nav-link">Edit Containers</Link>
             <SaveButton />
           </div>
         </nav>

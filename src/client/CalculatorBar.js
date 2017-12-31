@@ -74,9 +74,11 @@ export class CalculatorBar extends React.Component {
           <button className="btn row-edit-message-button save" onClick={closeCalcBar}>Done</button>
         </div>
         <div className="sticky-edit-header card">
-          <p>Calculating {type} weight for: {name}</p>
-          <button className="btn row-edit-message-button" onClick={scrollToMe}>Go to</button>
-          <button className="btn row-edit-message-button" onClick={closeCalcBar}>Done</button>
+          <p>Calculating {type} weight for: <span className="edit-header-name">{name}</span></p>
+          <div className="button-bar">
+            <button className="btn row-edit-message-button" onClick={scrollToMe}>Go to</button>
+            <button className="btn row-edit-message-button" onClick={closeCalcBar}>Done</button>
+          </div>
         </div>
         {calcRowComponents}
         <button className="btn table-button new-row" onClick={addRow}>New Row</button>
