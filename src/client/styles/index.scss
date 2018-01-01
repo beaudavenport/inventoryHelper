@@ -191,6 +191,12 @@ nav {
     }
   }
 
+  .error-panel {
+    color: #ff7070;
+    font-size: 1.4rem;
+    font-style: italic;
+  }
+
   .collection-bar {
     display: flex;
     align-items: center;
@@ -232,10 +238,22 @@ nav {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  flex-wrap: wrap;
 
   * {
     margin-left: 5px;
     margin-right: 5px;
+  }
+
+  .login-subtitle {
+    width: 100%;
+    text-align: right;
+    margin: 0;
+    font-size: .8rem;
+    color: white;
+    font-style: italic;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 

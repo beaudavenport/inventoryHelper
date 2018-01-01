@@ -20,7 +20,7 @@ export class Navbar extends React.Component {
 
   render() {
     const { loginBarChoice } = this.state;
-    const { login, createNew, logout, metadata } = this.props;
+    const { login, createNew, logout, metadata, error } = this.props;
 
     const cancel = () => this.setState({loginBarChoice: null});
     const loginToggle = () => this.setState({loginBarChoice: 'login'});
@@ -44,9 +44,12 @@ export class Navbar extends React.Component {
     if(loginBarChoice === 'login') {
       loginBar = <LoginBar cancel={cancel} action={login} message='Login' buttonText="Login"/>;
     } else if (loginBarChoice === 'create') {
-      loginBar = <LoginBar cancel={cancel} action={createNew} message='Create new inventory' buttonText="Create"/>;
+      loginBar = <LoginBar cancel={cancel} action={createNew}
+      message='Create new inventory' buttonText="Create"/>;
     }
     const loginBarContainerClass = loginBar ? 'login-bar-container-filled' : 'login-bar-container';
+
+    const errorPanel = error != null ? <span className="error-panel"><i className="fa fa-exclamation-triangle"></i> Error: {error}</span> : null;
 
     return (
       <div>
@@ -55,6 +58,7 @@ export class Navbar extends React.Component {
             <Link className="header" to="/">
               Inventory Helper
             </Link>
+            {errorPanel}
             {navButtons}
           </div>
           <div className={loginBarContainerClass}>
@@ -74,7 +78,8 @@ export class Navbar extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    metadata: state.metadata
+    metadata: state.metadata,
+    error: state.error
   };
 };
 

@@ -1,6 +1,7 @@
 import Guid from 'guid';
 import { fetchAllData, sendLogin, sendCreate } from '../apiClient';
 import { setCredentials, clearCredentials }  from '../CredentialProvider';
+import { addError, clearError } from './error';
 
 const ADD_INVENTORY_ITEM = 'ADD_INVENTORY_ITEM';
 const UPDATE_INVENTORY_ITEM = 'UPDATE_INVENTORY_ITEM';
@@ -9,23 +10,41 @@ const RESET_ALL_INVENTORY_ITEMS = 'RESET_ALL_INVENTORY_ITEMS';
 
 export function login(name, password) {
   return ((dispatch) => {
+    dispatch(clearError());
     return sendLogin(name, password)
-      .then((rawResponse) => rawResponse.json())
-      .then((result) => {
-        setCredentials(result.token);
-        return fetchAllItems()(dispatch);
+      .then((rawResponse) => {
+        return rawResponse.json()
+          .then((result) => {
+            if(!rawResponse.ok) {
+              throw new Error(result.error);
+            }
+            setCredentials(result.token);
+            return fetchAllItems()(dispatch);
+          });
+      })
+      .catch(err => {
+        dispatch(addError(err.message));
       });
   });
 }
 
 export function createNew(name, password) {
   return ((dispatch) => {
+    dispatch(clearError());
     return sendCreate(name, password)
-      .then((rawResponse) => rawResponse.json())
-      .then((result) => {
-        setCredentials(result.token);
-        return fetchAllItems()(dispatch);
-      });
+    .then((rawResponse) => {
+      return rawResponse.json()
+        .then((result) => {
+          if(!rawResponse.ok) {
+            throw new Error(result.error);
+          }
+          setCredentials(result.token);
+          return fetchAllItems()(dispatch);
+        });
+    })
+    .catch(err => {
+      dispatch(addError(err.message));
+    });
   });
 }
 

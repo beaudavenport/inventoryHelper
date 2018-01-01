@@ -11,6 +11,7 @@ class LoginBar extends React.Component {
         <input className="input login-name" ref={(input) => this.name = input}/>
         <input type="password" className="input login-password" ref={(input) => this.password = input}/>
         <button onClick={() => action(this.name.value, this.password.value)} className="btn nav-button login">{buttonText}</button>
+        <p className="login-subtitle">(Note: Password must be at least 8 characters long and contain at least one uppercase letter, one number, and one of the following: "$@$!%?&")</p>
       </div>
     );
   }
