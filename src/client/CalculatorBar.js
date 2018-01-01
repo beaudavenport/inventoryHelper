@@ -28,7 +28,10 @@ export class CalculatorBar extends React.Component {
     const rowsByType = this.state[type] || [];
 
     const removeRow = (id) => {
-      this.setState({[type]: rowsByType.filter(calcRow => calcRow.id !== id)});
+      const newCalcRows = rowsByType.filter(calcRow => calcRow.id !== id);
+      const newTotal = newCalcRows.reduce((acc, calcRow) => acc + (calcRow.weight - calcRow.tare), 0);
+      this.setState({[type]: newCalcRows});
+      updateWeight(newTotal);
     };
 
     const updateTare = (id, value) => {

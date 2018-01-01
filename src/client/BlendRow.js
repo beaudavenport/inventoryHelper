@@ -28,18 +28,28 @@ class BlendRow extends React.Component {
     };
     const openCalcBar = () => this.setState({isCalcBarOpen: true});
     const closeCalcBar = () => this.setState({isCalcBarOpen: false});
+    const scrollToMe = () => {
+      this.element.scrollIntoView();
+    };
 
     const calcBar = isCalcBarOpen ? <CalculatorBar name="Blend" type="blend" updateWeight={updateWeightWithId} closeCalcBar={closeCalcBar} /> : null;
     const calcButton = isCalcBarOpen ? null : <button className="blend btn table-button" onClick={openCalcBar}>Calculate...</button>;
     const activeCalcClass = isCalcBarOpen ? 'active-calc' : '';
 
     return (
-      <tr>
+      <tr ref={(element) => this.element = element }>
         <td colSpan="3" className="row-edit">
           <div className="row-edit-message">
             <p className="edit-header-text">You are editing the blend <span className="edit-header-name">{name}</span></p>
             <button className="btn row-edit-message-button save" onClick={closeActiveRow}>Done</button>
             <button className="btn row-edit-message-button danger delete" onClick={deleteBlend}>Delete</button>
+          </div>
+          <div className="sticky-edit-header card">
+            <p>Editing Blend: <span className="edit-header-name">{name}</span></p>
+            <div className="button-bar">
+              <button className="btn row-edit-message-button" onClick={scrollToMe}>Go to</button>
+              <button className="btn row-edit-message-button" onClick={closeActiveRow}>Done</button>
+            </div>
           </div>
           <div className="editing-table-row">
             <div className="row-edit-input-column">

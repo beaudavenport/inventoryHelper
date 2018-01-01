@@ -43,7 +43,9 @@ class SingleOriginRow extends React.Component {
     const openGreenCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'green', calcBarName: 'Green', calcBarOnChange: updateGreenWeightWithId});
     const openRoastedCalcBar = () => this.setState({isCalcBarOpen: true, calcBarType: 'roasted', calcBarName: 'Roasted', calcBarOnChange: updateRoastedWeightWithId});
     const closeCalcBar = () => this.setState({isCalcBarOpen: false, calcBarType: null, calcBarName: null, calcBarOnChange: null});
-
+    const scrollToMe = () => {
+      this.element.scrollIntoView();
+    };
     const calcBar = isCalcBarOpen ? <CalculatorBar name={name} type={calcBarType} updateWeight={calcBarOnChange} closeCalcBar={closeCalcBar} /> : null;
     const greenClassName = calcBarType == 'green' ? 'active-calc' : '';
     const greenCalcButton = calcBarType == 'green' ? null : <button className="green btn table-button" onClick={openGreenCalcBar}>Calculate...</button>;
@@ -51,12 +53,19 @@ class SingleOriginRow extends React.Component {
     const roastedCalcButton = calcBarType == 'roasted' ? null : <button className="roasted btn table-button" onClick={openRoastedCalcBar}>Calculate...</button>;
 
     return (
-      <tr>
+      <tr ref={(element) => this.element = element }>
         <td colSpan="4" className="row-edit">
           <div className="row-edit-message">
             <p className="edit-header-text">You are editing the coffee <span className="edit-header-name">{singleOriginCoffee.name}</span></p>
             <button className="btn row-edit-message-button save" onClick={closeActiveRow}>Done</button>
             <button className="btn row-edit-message-button danger delete" onClick={deleteCoffee}>Delete</button>
+          </div>
+          <div className="sticky-edit-header card">
+            <p>Editing Coffee: <span className="edit-header-name">{name}</span></p>
+            <div className="button-bar">
+              <button className="btn row-edit-message-button" onClick={scrollToMe}>Go to</button>
+              <button className="btn row-edit-message-button" onClick={closeActiveRow}>Done</button>
+            </div>
           </div>
           <div className="editing-table-row">
             <div className="row-edit-input-column">

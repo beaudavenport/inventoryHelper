@@ -31,8 +31,9 @@ describe('CalculatorBar', () => {
     assert.strictEqual(wrapper.find(CalculatorRow).length, 2);
   });
 
-  it('removes calculator row when delete button is clicked', () => {
-    const wrapper = shallow(<CalculatorBar type="greatStuff"/>);
+  it('removes calculator row when delete button is clicked and updates weight', () => {
+    const updateWeight = sinon.spy();
+    const wrapper = shallow(<CalculatorBar type="greatStuff" updateWeight={updateWeight} />);
     wrapper.setState({greatStuff: [
       {id: 781, weight: 1, tare: 1},
       {id: 999, weight: 89, tare:45},
@@ -48,6 +49,7 @@ describe('CalculatorBar', () => {
     assert.deepEqual(wrapper.state('greatStuff'),
       [{id: 781, weight: 1, tare: 1}, {id: 900, weight: 0, tare: 0}]
     );
+    assert.deepEqual(updateWeight.args[0][0], 0.00);
   });
 
   it('passes callback to update tare and update global weight with new total', () => {
