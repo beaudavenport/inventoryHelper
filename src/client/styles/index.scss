@@ -169,22 +169,12 @@ nav {
   &.collection {
     background-color: #5a5a5a;
     flex-wrap: wrap;
-  }
-
-  .collection-bar {
-    display: flex;
     align-items: center;
-
-    * {
-      margin-left: 5px;
-      margin-right: 5px;
-    }
   }
 
   .collection-name {
       margin-right: 20px;
       font-size: 1.5rem;
-      font-style: italic;
   }
 
   .header {
@@ -194,11 +184,20 @@ nav {
 
   a {
     text-decoration: none;
-    font-style: italic;
     color: white;
 
     &:hover {
       text-decoration: underline;
+    }
+  }
+
+  .collection-bar {
+    display: flex;
+    align-items: center;
+
+    * {
+      margin-left: 5px;
+      margin-right: 5px;
     }
   }
 }
@@ -246,9 +245,26 @@ nav {
   color: #333333;
 
   &:hover, &:active {
-    color: #c7c7c7;
+    color: #a5a3a3;
     border: 1px solid white;
   }
+}
+.save-button {
+  text-align: center;
+
+  .last-save {
+    margin: 0;
+    font-size: .8rem;
+    color: white;
+    font-style: italic;
+  }
+}
+
+
+.nav-button[disabled] {
+  color: #808080;
+  background-color: #dcdcdc;
+  border: 1px solid #808080;
 }
 
 .table-button {

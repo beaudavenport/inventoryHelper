@@ -14,23 +14,39 @@ export class Navbar extends React.Component {
     };
   }
 
+  componentWillReceiveProps() {
+    this.setState({loginBarChoice: null});
+  }
+
   render() {
     const { loginBarChoice } = this.state;
-    const { login, createNew, logout } = this.props;
+    const { login, createNew, logout, metadata } = this.props;
 
     const cancel = () => this.setState({loginBarChoice: null});
     const loginToggle = () => this.setState({loginBarChoice: 'login'});
     const createToggle = () => this.setState({loginBarChoice: 'create'});
-    const collectionName = this.props.metadata.collectionName || 'New Inventory';
+    const collectionName = metadata.collectionName || 'New Inventory';
 
     let loginBar = null;
+    let navButtons = null;
+
+    if(metadata.lastSync === undefined) {
+      navButtons = (<div className="collection-bar">
+        <button className="login-toggle btn nav-button" onClick={loginToggle}>Login</button>
+        <button className="create-toggle btn nav-button" onClick={createToggle}>Create</button>
+      </div>);
+    } else {
+      navButtons = (<div className="collection-bar">
+        <button className="logout btn nav-button" onClick={logout}>Logout</button>
+      </div>);
+    }
+
     if(loginBarChoice === 'login') {
       loginBar = <LoginBar cancel={cancel} action={login} message='Login' buttonText="Login"/>;
     } else if (loginBarChoice === 'create') {
       loginBar = <LoginBar cancel={cancel} action={createNew} message='Create new inventory' buttonText="Create"/>;
     }
     const loginBarContainerClass = loginBar ? 'login-bar-container-filled' : 'login-bar-container';
-    // <button><i className="fa fa-caret-down" aria-hidden="true"></i></button>
 
     return (
       <div>
@@ -39,11 +55,7 @@ export class Navbar extends React.Component {
             <Link className="header" to="/">
               Inventory Helper
             </Link>
-            <div className="collection-bar">
-              <button className="login-toggle btn nav-button" onClick={loginToggle}>Login</button>
-              <button className="create-toggle btn nav-button" onClick={createToggle}>Create</button>
-              <button className="logout btn nav-button" onClick={logout}>Logout</button>
-            </div>
+            {navButtons}
           </div>
           <div className={loginBarContainerClass}>
             {loginBar}

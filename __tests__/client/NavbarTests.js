@@ -66,9 +66,9 @@ describe('Navbar', () => {
     assert.strictEqual(wrapper.state().loginBarChoice, null);
   });
 
-  it('calls to logout when selected', () => {
+  it('calls to logout when selected (if logged in)', () => {
     const logout = sinon.spy();
-    const wrapper = shallow(<Navbar logout={logout} metadata={{}}/>);
+    const wrapper = shallow(<Navbar logout={logout} metadata={{lastSync: 'potato'}}/>);
 
     const logoutButton = wrapper.find('.logout');
     logoutButton.simulate('click');
