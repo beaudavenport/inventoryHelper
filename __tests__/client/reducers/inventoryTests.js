@@ -189,7 +189,7 @@ describe('inventory', () => {
         assert.strictEqual(result.type, 'ADD_INVENTORY_ITEM');
         const {_id, ...newContainerProps} = result.payload;
         assert.strictEqual(Guid.isGuid(_id), true);
-        assert.deepEqual(newContainerProps, { category: 'container', weight: 0, isNew: true });
+        assert.deepEqual(newContainerProps, { name: 'New Container', category: 'container', weight: 0, isNew: true });
       });
     });
 

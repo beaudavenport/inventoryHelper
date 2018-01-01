@@ -76,7 +76,7 @@ export function updateBlend(blend) {
 export function addContainer() {
   return {
     type: ADD_INVENTORY_ITEM,
-    payload: { _id: Guid.raw(), category: 'container', weight: 0, isNew: true}
+    payload: { _id: Guid.raw(), name: 'New Container', category: 'container', weight: 0, isNew: true}
   };
 }
 

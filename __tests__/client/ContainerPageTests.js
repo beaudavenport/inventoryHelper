@@ -8,25 +8,31 @@ import ContainerPage from '../../src/client/ContainerPage';
 import ContainerRow from '../../src/client/ContainerRow';
 
 describe('ContainerPage', () => {
-  it('displays a row for each container with name and tare weight', () => {
-    const container1 = {_id: 'blah', category: 'container'};
-    const container2 = {_id: 'blah2', category: 'container'};
+  it('displays a row for each container with active row one currenty active', () => {
+    const container1 = {_id: 'blah', name: 'potatosack', category: 'container', weight: 78.1};
+    const container2 = {_id: 'blah2', name: 'things', category: 'container', weight: 3.2};
     const otherThing = {_id: 'ugh', category: 'someThing'};
     const mockStore = configureStore()({inventory: [container2, otherThing, container1]});
 
     const wrapper = shallow(<ContainerPage store={mockStore}/>);
+    const component = wrapper.dive();
+    component.setState({activeRow: container2._id});
 
-    const containerRows = wrapper.dive().find(ContainerRow);
-    assert.deepEqual(container2, containerRows.at(0).prop('container'));
-    assert.deepEqual(container1, containerRows.at(1).prop('container'));
+    const containerRow = component.find(ContainerRow);
+    assert.deepEqual(container2, containerRow.prop('container'));
+    const inactiveRow = component.find('.inactive-row');
+    assert.strictEqual(inactiveRow.find('td').at(0).text(), 'potatosack');
+    assert.strictEqual(inactiveRow.find('td').at(1).text(), '78.10');
   });
 
   it('passes an updateContainer action to containerRow', () => {
     const container = {_id: 'blah', category: 'container'};
     const mockStore = configureStore()({inventory: [container]});
     const wrapper = shallow(<ContainerPage store={mockStore}/>);
+    const component = wrapper.dive();
+    component.setState({activeRow: container._id});
 
-    const containerRow = wrapper.dive().find(ContainerRow);
+    const containerRow = component.find(ContainerRow);
     const updateContainer = containerRow.prop('updateContainer');
     updateContainer({_id: 'blah', name: 'potato'});
 
@@ -34,6 +40,23 @@ describe('ContainerPage', () => {
     assert.strictEqual(action.type, 'UPDATE_INVENTORY_ITEM');
     assert.strictEqual(action.payload._id, 'blah');
     assert.strictEqual(action.payload.name, 'potato');
+  });
+
+  it('passes a flagForDeletion action to containerRow', () => {
+    const container = {_id: 'blah', category: 'container'};
+    const mockStore = configureStore()({inventory: [container]});
+    const wrapper = shallow(<ContainerPage store={mockStore}/>);
+    const component = wrapper.dive();
+    component.setState({activeRow: container._id});
+
+    const containerRow = component.find(ContainerRow);
+    const flagForDeletion = containerRow.prop('flagForDeletion');
+    flagForDeletion(container._id);
+
+    const action = mockStore.getActions()[0];
+    assert.strictEqual(action.type, 'UPDATE_INVENTORY_ITEM');
+    assert.strictEqual(action.payload._id, 'blah');
+    assert.strictEqual(action.payload.isDeleted, true);
   });
 
   it('displays a row with an add container button', () => {

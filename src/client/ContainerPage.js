@@ -2,19 +2,38 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import ContainerRow from './ContainerRow';
-import { addContainer, updateContainer, getContainers } from './reducers/inventory';
+import { addContainer, updateContainer, getContainers, flagForDeletion } from './reducers/inventory';
 
 class ContainerPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeRow: null
+    };
+  }
+
   render() {
-    const { containers, addContainer, updateContainer } = this.props;
+    const { containers, addContainer, updateContainer, flagForDeletion } = this.props;
+    const { activeRow } = this.state;
+
+    const setActiveRow = (id) => this.setState({activeRow: id});
+    const resetActiveRow = () => this.setState({activeRow: null});
     const containerRows = containers.map(container => {
-      return (
-        <ContainerRow key={`container-row-${container._id}`}
-          container={container}
-          updateContainer={updateContainer} />
-      );
+      if(container._id === activeRow) {
+        return (
+          <ContainerRow key={`container-row-${container._id}`}
+            container={container}
+            updateContainer={updateContainer}
+            flagForDeletion={flagForDeletion}
+            closeActiveRow={resetActiveRow} />
+        );
+      }
+      return (<tr className="inactive-row" key={`container-tr-${container._id}`} onClick={() => setActiveRow(container._id)}>
+          <td>{container.name}</td>
+          <td>{parseFloat(container.weight).toFixed(2)}</td>
+          </tr>);
     });
-    const addContainerButtonRow = <tr><td><button className="add-container" onClick={() => addContainer()}>Add Container</button></td></tr>;
+    const addContainerButtonRow = <tr><td colSpan="2"><button className="btn table-button add-container" onClick={() => addContainer()}><i className="fa fa-plus"></i> Add Container</button></td></tr>;
 
     return (
       <div className="card">
@@ -43,7 +62,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ addContainer, updateContainer }, dispatch);
+  return bindActionCreators({ addContainer, updateContainer, flagForDeletion }, dispatch);
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ContainerPage);
