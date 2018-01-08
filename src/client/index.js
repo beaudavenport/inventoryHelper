@@ -15,10 +15,17 @@ import skeleton from 'skeleton.css';
 import fontawesome from 'font-awesome/css/font-awesome.css';
 import css from './styles/index.scss';
 
+let additionalMiddleware;
+
+if(process.env.NODE_ENV !== 'development') {
+  additionalMiddleware = compose(applyMiddleware(thunk));
+} else {
+  additionalMiddleware = compose(applyMiddleware(thunk), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+}
 
 const store = createStore(
   rootReducer,
-  compose(applyMiddleware(thunk), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+  additionalMiddleware
 );
 
 render(
