@@ -28,7 +28,9 @@ class BlendTable extends React.Component {
         />);
       }
       return (<tr className="inactive-row" key={`blend-tr-${blend._id}`} onClick={() => setActiveRow(blend._id)}>
-          <td>{`${blend.name}, ${blend.origin}`}</td>
+          <td className="first-column">
+            <div className="toggle-icon"><i className="fa fa-chevron-right"></i></div>
+            {`${blend.name}, ${blend.origin}`}</td>
           <td>{parseFloat(blend.weight).toFixed(2)}</td>
           <td>{parseFloat(blend.weight).toFixed(2)}</td>
           </tr>);

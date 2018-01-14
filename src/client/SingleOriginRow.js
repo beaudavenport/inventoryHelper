@@ -54,7 +54,8 @@ class SingleOriginRow extends React.Component {
 
     return (
       <tr ref={(element) => this.element = element }>
-        <td colSpan="4" className="row-edit">
+        <td colSpan="4" className="row-edit first-column">
+          <div className="toggle-icon"><i className="fa fa-chevron-down"></i></div>
           <div className="row-edit-message">
             <p className="edit-header-text">You are editing the coffee <span className="edit-header-name">{singleOriginCoffee.name}</span></p>
             <button className="btn row-edit-message-button save" onClick={closeActiveRow}>Done</button>

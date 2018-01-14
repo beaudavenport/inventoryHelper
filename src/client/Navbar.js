@@ -58,8 +58,8 @@ export class Navbar extends React.Component {
             <Link className="header" to="/">
               Inventory Helper
             </Link>
-            {errorPanel}
             {navButtons}
+            {errorPanel}
           </div>
           <div className={loginBarContainerClass}>
             {loginBar}

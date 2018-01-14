@@ -26,6 +26,22 @@ body {
   }
 }
 
+.toggle-icon {
+  position: absolute;
+  top: 10px;
+  left: 7px;
+}
+
+td.first-column {
+  position: relative;
+  padding-left: 20px;
+}
+
+.inactive-row .toggle-icon {
+  top: 40%;
+  left: 7px;
+}
+
 .calculator-row {
   display: flex;
   justify-content: space-around;
@@ -168,6 +184,7 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  flex-wrap: wrap;
 
   &.collection {
     background-color: #5a5a5a;
@@ -196,8 +213,10 @@ nav {
 
   .error-panel {
     color: #ff7070;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-style: italic;
+    text-align: center;
+    width: 100%;
   }
 
   .collection-bar {
@@ -358,16 +377,6 @@ table {
       background-color: #e8e8e8
     }
   }
-
-  // tbody {
-  //   tr:nth-child(even) {
-  //     background-color: #c7c7c7;
-  //   }
-  //
-  //   tr:last-child {
-  //     background-color: white;
-  //   }
-  // }
 }
 
 .card {

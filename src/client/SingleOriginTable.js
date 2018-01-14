@@ -29,7 +29,9 @@ class SingleOriginTable extends React.Component {
         />);
       }
       return (<tr className="inactive-row" key={`so-tr-${singleOriginCoffee._id}`} onClick={() => setActiveRow(singleOriginCoffee._id)}>
-          <td>{`${singleOriginCoffee.name}, ${singleOriginCoffee.origin}`}</td>
+          <td className="first-column">
+            <div className="toggle-icon"><i className="fa fa-chevron-right"></i></div>
+            {` ${singleOriginCoffee.name}, ${singleOriginCoffee.origin}`}</td>
           <td>{parseFloat(singleOriginCoffee.greenWeight).toFixed(2)}</td>
           <td>{parseFloat(singleOriginCoffee.roastedWeight).toFixed(2)}</td>
           <td>{parseFloat(singleOriginCoffee.totalWeight).toFixed(2)}</td>
