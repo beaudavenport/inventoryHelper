@@ -46,7 +46,10 @@ router.post('/:version/login', (req, res) => {
           payload: JSON.stringify(payload),
           token
         });
-      });
+      })
+      .catch(() => {
+        res.status(401).render('login', {errorMessage: 'Error returning collection.'});
+      })
   })
   .catch(() => {
     res.status(401).render('login', {errorMessage: 'Invalid password.'});

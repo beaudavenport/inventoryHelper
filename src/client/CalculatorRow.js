@@ -25,12 +25,13 @@ export default function CalculatorRow(props) {
       </div>
       <div className="row-edit-input-column">
         <p className="subtitle">Container Weight</p>
-        <select defaultValue={calcRowDatum.tare} onChange={event => updateTare(event.target.value)}>
+        <input className="tare-input input" onChange={event => updateTare(event.target.value)} placeholder={calcRowDatum.tare} />
+        <select className="input" defaultValue={calcRowDatum.tare} onChange={event => updateTare(event.target.value)}>
           {options}
         </select>
-        <input className="tare-input input" onChange={event => updateTare(event.target.value)} placeholder={calcRowDatum.tare} />
       </div>
       <div>
+        <p className="subtitle">Net Contents Weight</p>
         <p className="net-weight">{netWeight.toFixed(2)}</p>
       </div>
     </div>

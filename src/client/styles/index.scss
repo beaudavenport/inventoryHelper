@@ -91,7 +91,10 @@ nav {
 
   &.card {
     width: 100%;
-    border: 1px solid #333333;
+    border-top: 1px solid #a0a0a0;
+    border-bottom: 1px solid #a0a0a0;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .button-bar {
@@ -144,8 +147,8 @@ nav {
   margin-left: 5px;
   padding: 7px;
   font-size: 0.6rem;
-  border: 1px solid black;
-  color: black;
+  border: 1px solid #333333;
+  color: #333333;
 
   &:hover, &:active {
     color: #c7c7c7;
@@ -220,7 +223,7 @@ nav {
   }
 
   100% {
-    max-height: 100px;
+    max-height: 110px;
     visibility: visible;
   }
 }
@@ -230,7 +233,7 @@ nav {
 }
 
 .login-bar-container-filled {
-  max-height: 100px;
+  max-height: 110px;
   animation: open .4s ease 1 normal;
 }
 
@@ -249,11 +252,24 @@ nav {
     width: 100%;
     text-align: right;
     margin: 0;
-    font-size: .8rem;
+    font-size: .7rem;
     color: white;
     font-style: italic;
     padding-left: 10px;
     padding-right: 10px;
+  }
+  
+  .login-message {
+    width: 100%;
+    text-align: right;
+    margin: 0;
+    font-style: italic;
+    padding-right: 20px;
+    margin-bottom: 5px;
+  }
+  
+  input {
+    max-width: 25%;
   }
 }
 
