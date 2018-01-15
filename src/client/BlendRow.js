@@ -61,7 +61,7 @@ class BlendRow extends React.Component {
             </div>
             <div className={`row-edit-input-column ${activeCalcClass}`}>
               <p className="subtitle">Bulk Weight</p>
-              <input disabled={isCalcBarOpen} className="blend-weight input" type="text" onChange={(e) => updateWeightWithId(e.target.value)} placeholder={weight} />
+              <input disabled={isCalcBarOpen} className="blend-weight input" type="text" onChange={(e) => updateWeightWithId(e.target.value)} placeholder={weight.toFixed(2)} />
               {calcButton}
             </div>
             <div>{parseFloat(weight).toFixed(2)}</div>

@@ -77,12 +77,12 @@ class SingleOriginRow extends React.Component {
             </div>
             <div className={`row-edit-input-column ${greenClassName}`}>
               <p className="subtitle">Green Weight</p>
-              <input disabled={calcBarType == 'green'} className="green-weight input" type="text" onChange={(e) => updateGreenWeightWithId(e.target.value)} placeholder={greenWeight} />
+              <input disabled={calcBarType == 'green'} className="green-weight input" type="text" onChange={(e) => updateGreenWeightWithId(e.target.value)} placeholder={greenWeight.toFixed(2)} />
               {greenCalcButton}
             </div>
             <div className={`row-edit-input-column ${roastedClassName}`}>
               <p className="subtitle">Roasted Weight</p>
-              <input disabled={calcBarType == 'roasted'}  className="roasted-weight input" type="text" onChange={(e) => updateRoastedWeightWithId(e.target.value)} placeholder={roastedWeight} />
+              <input disabled={calcBarType == 'roasted'}  className="roasted-weight input" type="text" onChange={(e) => updateRoastedWeightWithId(e.target.value)} placeholder={roastedWeight.toFixed(2)} />
               {roastedCalcButton}
             </div>
             <div>

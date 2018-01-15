@@ -28,7 +28,7 @@ function ContainerRow({container, updateContainer, flagForDeletion, closeActiveR
           </div>
           <div className="row-edit-input-column">
             <p className="subtitle">Weight</p>
-            <input className="container-weight input" type="text" onChange={updateWeightWithId} placeholder={weight} />
+            <input className="container-weight input" type="text" onChange={updateWeightWithId} placeholder={weight.toFixed(2)} />
           </div>
         </div>
       </td>

@@ -2,6 +2,7 @@ import React from 'react';
 import mocha from 'mocha';
 import assert from 'assert';
 import sinon from 'sinon';
+import Guid from 'guid';
 import { shallow } from 'enzyme';
 import CalculatorRow from '../../src/client/CalculatorRow';
 
@@ -14,8 +15,8 @@ describe('CalculatorRow', () => {
     const tareInput = wrapper.find('.tare-input');
     const netWeight = wrapper.find('.net-weight');
 
-    assert.strictEqual(grossWeightInput.prop('placeholder'), calcRowDatum.weight);
-    assert.strictEqual(tareInput.prop('placeholder'), calcRowDatum.tare);
+    assert.strictEqual(grossWeightInput.prop('placeholder'), calcRowDatum.weight.toFixed(2));
+    assert.strictEqual(tareInput.prop('placeholder'), calcRowDatum.tare.toFixed(2));
     assert.strictEqual(netWeight.text(), '7.10');
   });
 
@@ -33,7 +34,7 @@ describe('CalculatorRow', () => {
     const container1 = {name: 'foo', weight: 98};
     const container2 = {name: 'bag', weight: 56};
     const containers = [container1, container2];
-    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={containers} />);
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{id: Guid.raw(), weight: 0, tare: 0}} containers={containers} />);
 
     const options = wrapper.find('option');
     assert.deepEqual(options.at(0).prop('value'), 0);
@@ -46,7 +47,7 @@ describe('CalculatorRow', () => {
 
   it('calls to updateTare with selected container weight', () => {
     const updateTare = sinon.spy();
-    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={[]} updateTare={updateTare} />);
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{id: Guid.raw(), weight: 0, tare: 0}} containers={[]} updateTare={updateTare} />);
     const selectContainer = wrapper.find('select');
 
     selectContainer.simulate('change', {target: {value: 987.89}});
@@ -56,7 +57,7 @@ describe('CalculatorRow', () => {
 
   it('calls to updateTare with input tare weight', () => {
     const updateTare = sinon.spy();
-    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={[]} updateTare={updateTare} />);
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{id: Guid.raw(), weight: 0, tare: 0}} containers={[]} updateTare={updateTare} />);
     const selectContainer = wrapper.find('.tare-input');
 
     selectContainer.simulate('change', {target: {value: 987.89}});
@@ -66,7 +67,7 @@ describe('CalculatorRow', () => {
 
   it('calls to updateWeight with input weight', () => {
     const updateWeight = sinon.spy();
-    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={[]} updateWeight={updateWeight} />);
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{id: Guid.raw(), weight: 0, tare: 0}} containers={[]} updateWeight={updateWeight} />);
     const grossWeightInput = wrapper.find('.gross-weight');
 
     grossWeightInput.simulate('change', {target: {value: 55.55}});
@@ -76,7 +77,7 @@ describe('CalculatorRow', () => {
 
   it('calls to delete when delete button clicked', () => {
     const deleteFunc = sinon.spy();
-    const wrapper = shallow(<CalculatorRow calcRowDatum={{}} containers={[]} deleteFunc={deleteFunc} />);
+    const wrapper = shallow(<CalculatorRow calcRowDatum={{id: Guid.raw(), weight: 0, tare: 0}} containers={[]} deleteFunc={deleteFunc} />);
     const deleteButton = wrapper.find('.delete-row');
 
     deleteButton.simulate('click');

@@ -15,20 +15,24 @@ export default function CalculatorRow(props) {
 
   return (
     <div className="calculator-row">
-      <div>
-        <p>Container {rowNumber}</p>
-        <button onClick={deleteFunc} className="btn table-button danger delete-row">Delete</button>
+      <div className="row-edit-input-column">
+        <div>
+          <p className="subtitle">Container {rowNumber} </p>
+          <button onClick={deleteFunc} className="btn table-button danger delete-row">Delete</button>
+        </div>
+        <div>
+          <select className="input" defaultValue={calcRowDatum.tare} onChange={event => updateTare(event.target.value)}>
+            {options}
+          </select>
+        </div>
       </div>
       <div className="row-edit-input-column">
         <p className="subtitle">Gross Weight</p>
-        <input className="gross-weight input" onChange={event => updateWeight(event.target.value)} placeholder={calcRowDatum.weight}></input>
+        <input className="gross-weight input" onChange={event => updateWeight(event.target.value)} placeholder={calcRowDatum.weight.toFixed(2)}></input>
       </div>
       <div className="row-edit-input-column">
         <p className="subtitle">Container Weight</p>
-        <input className="tare-input input" onChange={event => updateTare(event.target.value)} placeholder={calcRowDatum.tare} />
-        <select className="input" defaultValue={calcRowDatum.tare} onChange={event => updateTare(event.target.value)}>
-          {options}
-        </select>
+        <input className="tare-input input" onChange={event => updateTare(event.target.value)} placeholder={calcRowDatum.tare.toFixed(2)} />
       </div>
       <div>
         <p className="subtitle">Net Contents Weight</p>
