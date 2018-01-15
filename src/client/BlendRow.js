@@ -45,8 +45,9 @@ class BlendRow extends React.Component {
             <button className="btn row-edit-message-button save" onClick={closeActiveRow}>Done</button>
             <button className="btn row-edit-message-button danger delete" onClick={deleteBlend}>Delete</button>
           </div>
-          <div className="sticky-edit-header card">
-            <p>Editing Blend: <span className="edit-header-name">{name}</span></p>
+          <div className="sticky-edit-header card item">
+            <p className="sticky-subtitle">Editing Blend: </p>
+            <p className="edit-header-name"> {name}</p>
             <div className="button-bar">
               <button className="btn row-edit-message-button" onClick={scrollToMe}>Go to</button>
               <button className="btn row-edit-message-button" onClick={closeActiveRow}>Done</button>

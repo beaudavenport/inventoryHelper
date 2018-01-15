@@ -59,7 +59,7 @@ class SingleOriginTable extends React.Component {
         <table className="table">
           <thead>
             <tr>
-              <td>Coffee</td>
+              <td className="first-column">Coffee</td>
               <td>Green</td>
               <td>Roasted</td>
               <td>Total</td>

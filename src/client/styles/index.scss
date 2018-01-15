@@ -32,9 +32,15 @@ body {
   left: 7px;
 }
 
+thead td.first-column {
+  width: 30%;  
+}
+
 td.first-column {
   position: relative;
   padding-left: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .inactive-row .toggle-icon {
@@ -95,6 +101,8 @@ nav {
   font-style: italic;
   color: #9a9696;
   font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sticky-edit-header {
@@ -102,6 +110,7 @@ nav {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   bottom: 0;
   left: 0;
 
@@ -109,8 +118,27 @@ nav {
     width: 100%;
     border-top: 1px solid #a0a0a0;
     border-bottom: 1px solid #a0a0a0;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 10px;
+    background-color: #dcdcdc;
+  }
+  
+  &.item {
+    background-color: #e5eef5;
+  }
+  
+  &.calc {
+    background-color: #f9f9f9;
+  }
+  
+  p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
+  
+  .sticky-subtitle {
+    margin-right: 5px;
   }
 
   .button-bar {
@@ -402,8 +430,14 @@ table {
   }
 
   .sticky-edit-header {
+    padding: 2px;
+    
     .button-bar {
       display: block;
+    }
+    
+    .sticky-subtitle {
+      width: 100%;
     }
   }
 

@@ -33,7 +33,7 @@ describe('SingleOriginTable', () => {
     const wrapper = shallow(<SingleOriginTable store={mockStore}/>);
 
     const row = wrapper.dive().find('.inactive-row');
-    assert.strictEqual(row.find('td').at(0).text(), 'foo, blah');
+    assert.strictEqual(row.find('td').at(0).text(), ' foo, blah');
     assert.strictEqual(row.find('td').at(1).text(), '8.90');
     assert.strictEqual(row.find('td').at(2).text(), '10.00');
     assert.strictEqual(row.find('td').at(3).text(), '18.90');

@@ -47,15 +47,16 @@ describe('inventory', () => {
     });
 
     describe('login', () => {
-      it('saves new token and fetches all inventory items', () => {
+      it('clears errors, saves new token and fetches all inventory items', () => {
         const dispatchStub = sinon.stub();
         const expectedLoginBody = JSON.stringify({name: 'myName', password: 'aGoodPass!'});
         return login('myName', 'aGoodPass!')(dispatchStub)
           .then(() => {
             const loginPost = getFetchMockCallInfo(fetchMock.calls().matched[0]);
             const allDataGet = getFetchMockCallInfo(fetchMock.calls().matched[1]);
-            const inventoryAction = dispatchStub.args[0][0];
-            const metadataAction = dispatchStub.args[1][0];
+            const clearErrorAction = dispatchStub.args[0][0];
+            const inventoryAction = dispatchStub.args[1][0];
+            const metadataAction = dispatchStub.args[2][0];
 
             assert.strictEqual(loginPost.url, '/v2/login');
             assert.deepEqual(loginPost.body, expectedLoginBody);
@@ -65,6 +66,7 @@ describe('inventory', () => {
             assert.strictEqual(sessionStorage.setItem.args[0][1], 'myNewToken');
             assert.strictEqual(allDataGet.url, '/inventory');
             assert.strictEqual(allDataGet.tokenHeader, 'tokenString');
+            assert.strictEqual(clearErrorAction.type, 'CLEAR_ERROR');
             assert.deepEqual(inventoryAction.payload.things, ['many things']);
             assert.deepEqual(inventoryAction.type, 'UPDATE_ALL_INVENTORY_ITEMS');
             assert.strictEqual(metadataAction.payload.lastSync, 'sync time');
@@ -75,15 +77,16 @@ describe('inventory', () => {
     });
 
     describe('createNew', () => {
-      it('creates new inventory and saves token', () => {
+      it('clears errors, creates new inventory and saves token', () => {
         const dispatchStub = sinon.stub();
         const expectedCreateBody = JSON.stringify({newName: 'myName', newPassword: 'aGoodPass!'});
         return createNew('myName', 'aGoodPass!')(dispatchStub)
           .then(() => {
             const createNewPost = getFetchMockCallInfo(fetchMock.calls().matched[0]);
             const allDataGet = getFetchMockCallInfo(fetchMock.calls().matched[1]);
-            const inventoryAction = dispatchStub.args[0][0];
-            const metadataAction = dispatchStub.args[1][0];
+            const clearErrorAction = dispatchStub.args[0][0];
+            const inventoryAction = dispatchStub.args[1][0];
+            const metadataAction = dispatchStub.args[2][0];
 
             assert.strictEqual(createNewPost.url, '/v2/create');
             assert.deepEqual(createNewPost.body, expectedCreateBody);
@@ -93,6 +96,7 @@ describe('inventory', () => {
             assert.strictEqual(sessionStorage.setItem.args[0][1], 'myNewToken');
             assert.strictEqual(allDataGet.url, '/inventory');
             assert.strictEqual(allDataGet.tokenHeader, 'tokenString');
+            assert.strictEqual(clearErrorAction.type, 'CLEAR_ERROR');
             assert.deepEqual(inventoryAction.payload.things, ['many things']);
             assert.deepEqual(inventoryAction.type, 'UPDATE_ALL_INVENTORY_ITEMS');
             assert.strictEqual(metadataAction.payload.lastSync, 'sync time');
