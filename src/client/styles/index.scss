@@ -4,6 +4,10 @@ body {
   margin: 0;
 }
 
+#main {
+  padding-bottom: 30px;
+}
+
 .editing-table-row {
   display: flex;
   justify-content: space-around;
@@ -223,11 +227,11 @@ nav {
   .collection-name {
       margin-right: 20px;
       font-size: 1.5rem;
+      font-weight: 700;
   }
 
   .header {
-    font-size: 1.6rem;
-    font-weight: 700;
+    font-size: 1.5rem;
   }
 
   a {

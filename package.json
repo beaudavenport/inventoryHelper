@@ -1,9 +1,12 @@
 {
   "name": "inventoryhelper",
-  "version": "0.0.2",
+  "version": "2.0.0",
   "description": "An inventory helper application for coffee roasting facilities",
   "author": "Beau Davenport <davenportbeau@gmail.com>",
   "private": true,
+  "engines": {
+    "node": "6.11.1"
+  },
   "scripts": {
     "start": "node ./lib/bin/www",
     "test": "set jwtString='foo' & mocha --compilers js:babel-core/register __tests__ --recursive --timeout=15000",
