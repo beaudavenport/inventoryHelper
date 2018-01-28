@@ -9,7 +9,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var db = require('./db');
-var routes = require('./routes/index');
+var v1Routes = require('./routes/index');
 var v2Routes = require('./routes/v2Routes');
 var inventory = require('./routes/inventory');
 
@@ -35,12 +35,14 @@ app.use(function(req,res,next){
   next();
 });
 
-app.use('/v2', v2Routes);
+// define routes
 app.use('/:version/inventory', inventory);
-app.use('/inventory', inventory);
-app.use('/', routes);
+app.use('/v2', v2Routes);
+app.use('/v1', v1Routes);
+
+//default
 app.use('/*', function(req, res) {
-  res.redirect('/login');
+  res.redirect('/v2');
 });
 
 /// catch 404 and forwarding to error handler

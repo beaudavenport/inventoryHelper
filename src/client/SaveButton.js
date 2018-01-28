@@ -9,7 +9,7 @@ class SaveButton extends React.Component {
 
     if(metadata.lastSync != undefined) {
       const callToSave = () => sync();
-      const lastSyncFormatted = new Date(metadata.lastSync).toLocaleString();
+      const lastSyncFormatted = metadata.lastSync == 'never' ? 'Never' : new Date(metadata.lastSync).toLocaleString();
       return (
         <div className="save-button">
           <button className="btn nav-button" onClick={callToSave}><i className="fa fa-floppy-o"></i> SAVE</button>

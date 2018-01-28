@@ -1,5 +1,5 @@
 export function updateInventoryItem(inventoryItem) {
-  return fetch(`/inventory/${inventoryItem._id}`, {
+  return fetch(`/v2/inventory/${inventoryItem._id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -10,7 +10,7 @@ export function updateInventoryItem(inventoryItem) {
 }
 
 export function addInventoryItem(inventoryItem) {
-  return fetch('/inventory', {
+  return fetch('/v2/inventory', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ export function addInventoryItem(inventoryItem) {
 }
 
 export function deleteInventoryItem(id) {
-  return fetch(`/inventory/${id}`, {
+  return fetch(`/v2/inventory/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export function deleteInventoryItem(id) {
 }
 
 export function updateSync(syncItem) {
-  return fetch(`/inventory/sync/${syncItem._id}`, {
+  return fetch(`/v2/inventory/sync/${syncItem._id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export function updateSync(syncItem) {
 }
 
 export function fetchAllData() {
-  return fetch('/inventory', {
+  return fetch('/v2/inventory', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

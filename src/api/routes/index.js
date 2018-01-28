@@ -41,7 +41,7 @@ router.post('/:version/login', (req, res) => {
           containers: resultSet.filter(result => result.category === 'container'),
           lastSync: resultSet.find(result => result.metadata)
         };
-        res.render(`${version}Index`, {
+        res.render('v1Index', {
           title: userCollection,
           payload: JSON.stringify(payload),
           token
@@ -57,9 +57,8 @@ router.post('/:version/login', (req, res) => {
 });
 
 // upon create, set up new collection, then render page
-router.post('/:version/create', (req, res) => {
+router.post('/create', (req, res) => {
   const db = req.db;
-  const version = req.params.version;
   const { newName, newPassword, isHuman } = req.body;
   const newCollectionName = stripSpecialChars(newName);
 
@@ -85,7 +84,7 @@ router.post('/:version/create', (req, res) => {
           ], {safe:true})
           .then((records) => {
             const syncRecord = records.find(record => record.metadata);
-            res.render(`${version}Index`, {
+            res.render(`v1Index`, {
               title: newCollectionName,
               payload: JSON.stringify({coffees: [], blends: [], containers: [], lastSync: syncRecord }),
               token: createToken(newCollectionName)
