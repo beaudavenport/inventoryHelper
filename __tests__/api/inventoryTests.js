@@ -34,7 +34,7 @@ describe('inventory', () => {
     return db.get(COLLECTION_NAME).insert(allRecords)
       .then(() => {
         return request(app)
-          .get('/inventory')
+          .get('/v2/inventory')
           .set('x-access-token', token)
           .set('Accept', 'application/json')
           .expect(200)
@@ -57,7 +57,7 @@ describe('inventory', () => {
     return db.get(COLLECTION_NAME).insert([record1, record2])
       .then(() => {
         return request(app)
-          .get(`/inventory/${record1._id}`)
+          .get(`/v2/inventory/${record1._id}`)
           .set('x-access-token', token)
           .set('Accept', 'application/json')
           .expect(200)
@@ -74,7 +74,7 @@ describe('inventory', () => {
     return db.get(COLLECTION_NAME).insert([record1])
       .then(() => {
         return request(app)
-          .get(`/inventory/${record1._id}`)
+          .get(`/v2/inventory/${record1._id}`)
           .set('x-access-token', token)
           .set('Accept', 'application/json')
           .expect(404)
@@ -92,7 +92,7 @@ describe('inventory', () => {
     };
 
     return request(app)
-      .post('/inventory')
+      .post('/v2/inventory')
       .send(newItem)
       .set('x-access-token', token)
       .set('Accept', 'application/json')
@@ -119,7 +119,7 @@ describe('inventory', () => {
     return db.get(COLLECTION_NAME).insert(itemToUpdate)
       .then(() => {
         return request(app)
-          .put(`/inventory/${itemToUpdate._id}`)
+          .put(`/v2/inventory/${itemToUpdate._id}`)
           .set('x-access-token', token)
           .set('Accept', 'application/json')
           .send({thing: 'NEW information'})
@@ -146,7 +146,7 @@ describe('inventory', () => {
     return db.get(COLLECTION_NAME).insert(itemToUpdate)
       .then(() => {
         return request(app)
-          .put(`/inventory/${itemToUpdate._id}`)
+          .put(`/v2/inventory/${itemToUpdate._id}`)
           .set('x-access-token', token)
           .set('Accept', 'application/json')
           .send({thing: 'NEW information'})
@@ -171,7 +171,7 @@ describe('inventory', () => {
     return db.get(COLLECTION_NAME).insert(record)
       .then(() => {
         return request(app)
-          .delete(`/inventory/${record._id}`)
+          .delete(`/v2/inventory/${record._id}`)
           .set('x-access-token', token)
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
@@ -197,7 +197,7 @@ describe('inventory', () => {
     return db.get(COLLECTION_NAME).insert(itemToDelete)
       .then(() => {
         return request(app)
-          .delete(`/inventory/${itemToDelete._id}`)
+          .delete(`/v2/inventory/${itemToDelete._id}`)
           .set('x-access-token', token)
           .set('Accept', 'application/json')
           .expect(404)
@@ -218,7 +218,7 @@ describe('inventory', () => {
     return db.get(COLLECTION_NAME).insert({metadata: true})
       .then(() => {
         return request(app)
-          .put('/inventory/sync/foo')
+          .put('/v2/inventory/sync/foo')
           .set('x-access-token', token)
           .set('Accept', 'application/json')
           .expect(200)

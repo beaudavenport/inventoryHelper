@@ -21,7 +21,7 @@ describe('login', () => {
 
   it('renders login page', (done) => {
     request(app)
-      .get('/')
+      .get('/v1')
       .expect(200)
       .end((err, res) => {
         if(err) {

@@ -16,7 +16,7 @@ router.get('/', function(req, res) {
 });
 
 // upon login, check credentials, then create JWT token and render main application page
-router.post('/:version/login', (req, res) => {
+router.post('/login', (req, res) => {
   const db = req.db;
   const { name, password } = req.body;
   const userCollection = stripSpecialChars(name);

@@ -16,7 +16,7 @@ describe('v2 endpoints', () => {
           .post('/v1/create')
           .type('form')
           .send({isHuman: 'isHuman', newName: COLLECTION_NAME, newPassword: COLLECTION_PASSWORD})
-          .end((err, response) => {
+          .end((err) => {
             if(err) {
               assert.fail('error displaying homepage:', err);
             }
@@ -26,11 +26,11 @@ describe('v2 endpoints', () => {
   });
 
   describe('GET home', () => {
-    it('renders default app', (done) => {
+    it('renders app when v2 is specified', (done) => {
       request(app)
         .get('/v2')
         .expect(200)
-        .end((err, res) => {
+        .end((err) => {
           if(err) {
             assert.fail('error displaying application:', err);
           }
@@ -42,10 +42,23 @@ describe('v2 endpoints', () => {
       request(app)
         .get('/v2/potato/potato15')
         .expect(200)
+        .end((err) => {
+          if(err) {
+            assert.fail('error displaying application:', err);
+          }
+          done();
+        });
+    });
+
+    it('renders v2 version of app as default', (done) => {
+      request(app)
+        .get('/')
+        .expect(302)
         .end((err, res) => {
           if(err) {
             assert.fail('error displaying application:', err);
           }
+          assert(res.header['location'].endsWith('/v2'));
           done();
         });
     });
