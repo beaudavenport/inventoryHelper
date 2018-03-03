@@ -34,7 +34,7 @@ describe('inventory', () => {
     beforeEach(() => {
       fetchMock.post('express:/v2/login', {token: 'myNewToken'});
       fetchMock.post('express:/v2/create', {token: 'myNewToken'});
-      fetchMock.get('express:/inventory', {things: ['many things'], metadata: {lastSync: 'sync time', collectionName: 'my stuff'}});
+      fetchMock.get('express:/v2/inventory', {things: ['many things'], metadata: {lastSync: 'sync time', collectionName: 'my stuff'}});
       global.sessionStorage = {
         getItem: sinon.stub().withArgs('token').returns('tokenString'),
         setItem: sinon.spy(),
@@ -61,10 +61,10 @@ describe('inventory', () => {
             assert.strictEqual(loginPost.url, '/v2/login');
             assert.deepEqual(loginPost.body, expectedLoginBody);
 
-            assert.strictEqual(allDataGet.url, '/inventory');
+            assert.strictEqual(allDataGet.url, '/v2/inventory');
             assert.strictEqual(sessionStorage.setItem.args[0][0], 'token');
             assert.strictEqual(sessionStorage.setItem.args[0][1], 'myNewToken');
-            assert.strictEqual(allDataGet.url, '/inventory');
+            assert.strictEqual(allDataGet.url, '/v2/inventory');
             assert.strictEqual(allDataGet.tokenHeader, 'tokenString');
             assert.strictEqual(clearErrorAction.type, 'CLEAR_ERROR');
             assert.deepEqual(inventoryAction.payload.things, ['many things']);
@@ -91,10 +91,10 @@ describe('inventory', () => {
             assert.strictEqual(createNewPost.url, '/v2/create');
             assert.deepEqual(createNewPost.body, expectedCreateBody);
 
-            assert.strictEqual(allDataGet.url, '/inventory');
+            assert.strictEqual(allDataGet.url, '/v2/inventory');
             assert.strictEqual(sessionStorage.setItem.args[0][0], 'token');
             assert.strictEqual(sessionStorage.setItem.args[0][1], 'myNewToken');
-            assert.strictEqual(allDataGet.url, '/inventory');
+            assert.strictEqual(allDataGet.url, '/v2/inventory');
             assert.strictEqual(allDataGet.tokenHeader, 'tokenString');
             assert.strictEqual(clearErrorAction.type, 'CLEAR_ERROR');
             assert.deepEqual(inventoryAction.payload.things, ['many things']);
@@ -123,7 +123,7 @@ describe('inventory', () => {
             const allDataGet = getFetchMockCallInfo(fetchMock.calls().matched[0]);
             const inventoryAction = dispatchStub.args[0][0];
             const metadataAction = dispatchStub.args[1][0];
-            assert.strictEqual(allDataGet.url, '/inventory');
+            assert.strictEqual(allDataGet.url, '/v2/inventory');
             assert.strictEqual(allDataGet.tokenHeader, 'tokenString');
             assert.deepEqual(inventoryAction.payload.things, ['many things']);
             assert.deepEqual(inventoryAction.type, 'UPDATE_ALL_INVENTORY_ITEMS');
