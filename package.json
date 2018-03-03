@@ -12,8 +12,10 @@
     "test": "set jwtString='foo' & mocha --compilers js:babel-core/register __tests__ --recursive --timeout=15000",
     "test:api": "set jwtString='foo' & mocha --compilers js:babel-core/register __tests__/api --recursive --timeout=15000",
     "test:client": "mocha --compilers js:babel-core/register __tests__/client --recursive --timeout=15000",
-    "build:api": "babel src/api --watch --out-dir lib --copy-files",
-    "build:client": "webpack --watch --progress --colors"
+    "build:api": "babel src/api --out-dir lib --copy-files",
+    "build:client": "webpack --progress --colors",
+    "build:api:watch": "babel src/api --watch --out-dir lib --copy-files",
+    "build:client:watch": "webpack --watch --progress --colors"
   },
   "dependencies": {
     "async": "^0.9.0",
