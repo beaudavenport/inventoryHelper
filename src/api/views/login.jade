@@ -12,7 +12,7 @@ html
                 h2 Inventory Helper
                 span.glyphicon.glyphicon-leaf
                 p.bg-info= errorMessage
-                form(action='/v2/login', method='post')
+                form(action='/v1/login', method='post')
                   h3.text-muted Please sign in
                   input.form-control(type='text', name='name', placeholder='Inventory Name')
                   br
@@ -20,28 +20,6 @@ html
                   br
                   button.btn.btn-lg.btn-primary.btn-block(type='submit') Submit
                   button.btn.btn-lg.btn-success.btn-block.create(type='button') Create New Inventory
-                form.hidden(action='/v2/create', method='post')
-                  h3 Complete the form below to create a new Inventory
-                  label.text-muted(for='newName') Inventory Name (no spaces or special characters)
-                  input.form-control(type='text', name='newName')
-                  br
-                  label.text-muted(for='newPassword')
-                    |Password (must be at least 8 characters long and contain at least one
-                    |uppercase letter, one number, and one of the following: '$@$!%?&')
-                  input.form-control(type='password', name='newPassword')
-                  br
-                  input(type='hidden', name='isHuman', val='notHuman')
-                  br
-                  button.btn.btn-lg.btn-primary.btn-block(type='submit', value='send a post to this same url') Create
-                hr
-                form(action='/v1/login', method='post')
-                  h3.text-muted (Version 1)
-                  input.form-control(type='text', name='name', placeholder='Inventory Name')
-                  br
-                  input.form-control(type='password', name='password', placeholder='Password')
-                  br
-                  button.btn.btn-lg.btn-outline-primary.btn-block(type='submit') Submit
-                  button.btn.btn-lg.btn-outline-success.btn-block.create(type='button') Create New Inventory
                 form.hidden(action='/v1/create', method='post')
                   h3 Complete the form below to create a new Inventory
                   label.text-muted(for='newName') Inventory Name (no spaces or special characters)
