@@ -3,11 +3,11 @@ html
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1')
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
-    link(rel='stylesheet', href='stylesheets/additional-css.css') 
+    link(rel='stylesheet', href='../stylesheets/additional-css.css')
   body
     // include main html file
     include index.html
-    
+
     // Nav Bar
     nav.navbar.navbar-default(role='navigation')
       .container-fluid
@@ -19,17 +19,17 @@ html
             span.icon-bar
             span.icon-bar
           a.navbar-brand(href='#')= title
-          p.navbar-text.text-muted 
+          p.navbar-text.text-muted
             strong Last sync: #{''}
               span.lastSync
         // Collect the nav links, forms, and other content for toggling
         #bs-example-navbar-collapse-1.collapse.navbar-collapse
           ul.nav.navbar-nav
-            li.revert 
+            li.revert
               a(href='#') Revert to Saved
-            li.print 
+            li.print
               a(href='#print') Print Table
-            li.sync 
+            li.sync
               a(href='#') Sync to DB
             li.containers
               a(href='#containers') Edit Containers
@@ -45,22 +45,21 @@ html
       .container.text-center
         span.glyphicon.glyphicon-refresh
         p Loading...
-    
+
     // Set API access token
     script!= "(function() { sessionStorage.setItem('token', '" + token + "'); })()"
-    
+
     // Set lastSync object
     script!= "(function() { sessionStorage.setItem('lastSync', '" + lastSync + "'); })()"
-    
+
     // Boostrap inital collections into application
     script!= "(function() { sessionStorage.setItem('payload', '" + payload + "'); })()"
-    
+
     // Load Dependencies
     script(src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js')
     script(src='//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js')
-    
-    script(src='javascripts/global.js')
-    
+
+    script(src='../javascripts/global.js')

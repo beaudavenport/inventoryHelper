@@ -4,7 +4,7 @@ html
         meta(charset='utf-8')
         meta(name='viewport', content='width=device-width, initial-scale=1')
         link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
-        link(rel='stylesheet', href='stylesheets/additional-css.css') 
+        link(rel='stylesheet', href='../stylesheets/additional-css.css')
     body
         div.container-fluid
           div.row
@@ -12,7 +12,7 @@ html
                 h2 Inventory Helper
                 span.glyphicon.glyphicon-leaf
                 p.bg-info= errorMessage
-                form(action='/login', method='post')
+                form(action='/v1/login', method='post')
                   h3.text-muted Please sign in
                   input.form-control(type='text', name='name', placeholder='Inventory Name')
                   br
@@ -20,21 +20,20 @@ html
                   br
                   button.btn.btn-lg.btn-primary.btn-block(type='submit') Submit
                   button.btn.btn-lg.btn-success.btn-block.create(type='button') Create New Inventory
-                form.hidden(action='/create', method='post')
+                form.hidden(action='/v1/create', method='post')
                   h3 Complete the form below to create a new Inventory
                   label.text-muted(for='newName') Inventory Name (no spaces or special characters)
                   input.form-control(type='text', name='newName')
                   br
-                  label.text-muted(for='newPassword') 
-                    |Password (must be at least 8 characters long and contain at least one 
+                  label.text-muted(for='newPassword')
+                    |Password (must be at least 8 characters long and contain at least one
                     |uppercase letter, one number, and one of the following: '$@$!%?&')
                   input.form-control(type='password', name='newPassword')
                   br
                   input(type='hidden', name='isHuman', val='notHuman')
                   br
                   button.btn.btn-lg.btn-primary.btn-block(type='submit', value='send a post to this same url') Create
-                hr
-                div.text-muted 
+                div.text-muted
                   p.lead
                     |Inventory Helper is a mobile-friendly application for calculating and saving coffee inventory information
                     |in a coffee roasting facility or coffee shop.
@@ -47,29 +46,29 @@ html
                     tbody
                       tr
                         td Sumatra
-                        td 
+                        td
                           input.form-control(placeholder='Enter weight here!')
                   ul.list-unstyled
-                    li 
+                    li
                       span.glyphicon.glyphicon-wrench
                       p Click the wrench to edit "Name" and "Origin"
                     li
                       span.glyphicon.glyphicon-plus
-                      p 
-                        |Click the plus to open that field's calculator panel, which allows you to 
+                      p
+                        |Click the plus to open that field's calculator panel, which allows you to
                         |input a gross weight and automatically tare it by specifying the container
                         |being used. Edit this list on the "Edit Containers" page!
                   p
-                    |Totals are updated automatically when you input weights or when you 
-                    |press 'Done' from a calculator panel. 
+                    |Totals are updated automatically when you input weights or when you
+                    |press 'Done' from a calculator panel.
                   p.lead Inventory Helper also features:
-                  strong A stateful environment: 
+                  strong A stateful environment:
                   p Edit, make changes, and 'Sync' anytime you choose
                   strong Undo changes:
                   p A 'revert' function allows you to reset your inventory from the last Sync
-                  strong Print with ease: 
+                  strong Print with ease:
                   p A printable page outputs a simple table of your inventory's current state
-                  strong Fully responsive: 
+                  strong Fully responsive:
                   p Access and update your inventory from any computer, tablet or mobile device
         script(src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js')
-        script(src='javascripts/loginPage.js')
+        script(src='../javascripts/loginPage.js')
