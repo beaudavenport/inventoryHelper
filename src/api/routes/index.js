@@ -18,7 +18,6 @@ router.get('/', function(req, res) {
 // upon login, check credentials, then create JWT token and render main application page
 router.post('/:version/login', (req, res) => {
   const db = req.db;
-  const version = req.params.version;
   const { name, password } = req.body;
   const userCollection = stripSpecialChars(name);
 
@@ -49,7 +48,7 @@ router.post('/:version/login', (req, res) => {
       })
       .catch(() => {
         res.status(401).render('login', {errorMessage: 'Error returning collection.'});
-      })
+      });
   })
   .catch(() => {
     res.status(401).render('login', {errorMessage: 'Invalid password.'});
@@ -84,7 +83,7 @@ router.post('/create', (req, res) => {
           ], {safe:true})
           .then((records) => {
             const syncRecord = records.find(record => record.metadata);
-            res.render(`v1Index`, {
+            res.render('v1Index', {
               title: newCollectionName,
               payload: JSON.stringify({coffees: [], blends: [], containers: [], lastSync: syncRecord }),
               token: createToken(newCollectionName)

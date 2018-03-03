@@ -33,9 +33,8 @@ describe('delete', () => {
     db.get(COLLECTION_NAME).insert([{category: 'blend'}, {category: 'coffee'}, {category: 'container'}])
       .then(() => {
         request(app)
-          .post('/delete')
-          .type('form')
-          .send({access_token: createToken('beans')})
+          .post('/v1/delete')
+          .set('x-access-token', createToken('beans'))
           .expect(404)
           .end((err, response) => {
             if(err) {
@@ -47,19 +46,19 @@ describe('delete', () => {
       });
   });
 
-  it('does not delete if collection does not exist', () => {
-    return db.get(COLLECTION_NAME).insert([{category: 'blend'}, {category: 'coffee'}, {category: 'container'}])
+  it('does not delete if collection does not exist', (done) => {
+    db.get(COLLECTION_NAME).drop()
       .then(() => {
         request(app)
-          .post('/login')
-          .type('form')
-          .send({inventoryName: 'thingsUntrue', access_token: token})
+          .post('/v1/delete')
+          .set('x-access-token', token)
           .expect(404)
           .end((err, response) => {
             if(err) {
               assert.fail('error deleting record: ', err);
             }
             assert(response.text.match(/Delete\sDatabase\sfailed\.\sPlease\stry\sagain\./), 'rendered error');
+            done();
           });
       });
   });
@@ -68,9 +67,8 @@ describe('delete', () => {
     db.get(COLLECTION_NAME).insert([{category: 'blend'}, {category: 'coffee'}, {category: 'container'}])
       .then(() => {
         request(app)
-          .post('/delete')
-          .type('form')
-          .send({access_token: token})
+          .post('/v1/delete')
+          .set('x-access-token', token)
           .expect(200)
           .end((err, response) => {
             if(err) {

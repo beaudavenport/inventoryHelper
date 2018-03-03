@@ -4,7 +4,7 @@ module.exports = function(req, res, next) {
     // allow tokens to be included in body, querystring or header
     var app = req.app;
     var token = (req.body && req.body.access_token) || (req.query && req.query.access_token) || req.headers['x-access-token'];
-    console.log("This middleware was attempted. " + token);
+    console.log("Authenticating JWT: " + token);
     if (token) {
         try {
             var decodedToken = jwt.decode(token, app.get('jwtTokenSecret'));
